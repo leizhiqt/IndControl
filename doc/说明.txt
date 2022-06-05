@@ -1,0 +1,43 @@
+登陆{"version":"1.0","method":"login","params": {"ip":"192.168.1.104","port": 9000,"user": "admin","password": "admin123"}}
+登出{"version":"1.0","method":"loginout"}
+获取设备ID信息{"version":"1.0","method":"loadgroupinfo"} 返回值为JSON字符串，{"devlst":["1000000$1$0$0","1000001$1$0$0"]}
+实时播放{"version":"1.0","method":"startrealplay","params": {"index":0,"cameraid": "1000001$1$0$0"}}
+实时播放{"version":"1.0","method":"startrealplay","params": [{"index":0,"cameraid": "1000000$1$0$0"},{"index":3,"cameraid": "1000001$1$0$0"}]}
+停止播放{"version":"1.0","method":"stoprealplay","params": {"index":0}}
+停止播放{"version":"1.0","method":"stoprealplay","params": [{"index":0},{"index":3}]}
+设置窗口大小及位置{"version":"1.0","method":"setwindowpos","params": {"x":50,"y":50,"width":640,"height":480}}
+分屏，支持1*1,2*2,3*3{"version":"1.0","method":"setsplitscreen","params": {"mode":3}}
+{"version":"1.0","method":"setsplitscreen","params": {"mode":1}}
+设置窗口显隐{"version":"1.0","method":"setwindowvisble","params": {"flag":1}}
+截图{"version":"1.0","method":"capture","params": [{"index":0,"filename": "test.jpg"},{"index":0,,"filename": "test2.bmp"}]}
+{"version":"1.0","method":"capture","params": [{"index":0,"filename": "test.jpg"}]}
+返回值为JSON字符串，如{"caplst":["D:/Test/videointercom/build-dahua-Desktop_Qt_5_12_2_MSVC2017_32bit-Debug/debug/capture/test.bmp"]}
+
+
+开始录屏{"version":"1.0","method":"addon_start_screencap","params": {"save_path":"d:\\1.mp4"}}
+停止录屏{"version":"1.0","method":"addon_stop_screencap"}
+
+#云台   上
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_UP","onout": "on"}]}#鼠标按下事件
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_UP","onout": "out"}]}#鼠标松开事件
+#云台   下
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_DOWN","onout": "on"}]}
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_DOWN","onout": "out"}]}
+#云台   左
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_LEFT","onout": "on"}]}
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_LEFT","onout": "out"}]}
+#云台   右
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_RIGHT","onout": "on"}]}
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_RIGHT","onout": "out"}]}
+#云台   左上
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_LEFTUP","onout": "out"}]}
+#云台   左下
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_LEFTDOWN","onout": "out"}]}
+#云台   右上
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_RIGHTUP","onout": "out"}]}
+#云台   右下
+{"version":"1.0","method":"pt_direction_control","params": [{"index":0,"cameraid": "1000000$1$0$0","ptd": "DPSDK_CORE_PTZ_GO_RIGHTDOWN","onout": "out"}]}
+
+#云台   镜头 放大 缩小
+{"version":"1.0","method":"pt_camera_control","params": [{"index":0,"cameraid": "1000000$1$0$0","zoom": "DPSDK_CORE_PTZ_ADD_ZOOM","onout": "on"}]}
+{"version":"1.0","method":"pt_camera_control","params": [{"index":0,"cameraid": "1000000$1$0$0","zoom": "DPSDK_CORE_PTZ_REDUCE_ZOOM","onout": "out"}]}

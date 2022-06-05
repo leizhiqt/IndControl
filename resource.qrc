@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>win.ico</file>
+        <file>res/mask.png</file>
+    </qresource>
+</RCC>

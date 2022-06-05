@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<head>
+     <meta charset="UTF-8">
+    <title>Web sockets test</title>
+    <style>
+        button, textarea, input {
+            display: block;
+            margin: 6px;
+        }
+
+        textarea {
+            min-height: 300px;
+            min-width: 400px;
+        }
+    </style>
+    <script type="text/javascript">
+        var ws = function () {
+            this.webSocketUri = '';
+            this.websock = null;
+            this.receiveItems = [];
+            this.canLog = true;
+            this.online = false;
+        }
+
+        ws.prototype = {
+            initWebSocket: function (uri) {
+                let self = this;
+                //ws地址
+                if (typeof uri === "string" && uri.length > 0) {
+                    this.webSocketUri = uri;
+                } else {
+                    alert("请设置ws地址");
+                    return;
+                }
+                //var wsuri = "ws://192.168.1.7:8090";
+                this.websock = new WebSocket(this.webSocketUri);
+                this.websock.onmessage = function (e) {
+                    self.receiveMessage(e);
+                }
+                this.websock.onclose = ((e) => {
+                    self.stateChange("消息服务 连接关闭");
+                    self.online = false;
+                });
+                this.websock.onopen = ((e) => {
+                    self.stateChange("消息服务 连接成功");
+                    self.online = true;
+                });
+                this.websock.onerror = ((e) => {
+                    self.stateChange("消息服务 连接出错：" + e);
+                    self.online = false;
+                });
+            },
+            closeWebSocket: function () {
+                if (typeof this.webSocketUri === "string" && this.webSocketUri != '') {
+                    this.websock.close();
+                }
+            },
+            //其他模块注册消息接收 name注册名称，action接收消息函数
+            registerReceiveItem: function (name, action) {
+                this.logString('messageCenter.registerReceiveItem ' + name)
+                this.receiveItems.push({
+                    key: name,
+                    value: action
+                });
+            },
+            //其他模块移除消息接收 name注册名称
+            unRegisterReceiveItem: function (name) {
+                this.logString('messageCenter.unregisterReceiveItem ' + name)
+                if (this.receiveItems.length > 0) {
+                    var _index = -1;
+                    for (let index = 0; index < this.receiveItems.length; index++) {
+                        const element = this.receiveItems[index];
+                        if (element.key == name) {
+                            _index = index;
+                        }
+                    }
+                    if (_index > -1) {
+                        this.receiveItems.splice(_index, 1);
+                    }
+                }
+            },
+            //发现消息到服务器 typeId消息号，data发送对象
+            sendMessageToService: function (typeId, data) {
+                var result = "unkown";
+                if (this.websock.readyState === WebSocket.OPEN) {
+                    this.sendMessage(typeId, data);
+                    result = "success";
+                } else if (this.websock.readyState === WebSocket.CONNECTING) {
+                    result = "connection";
+                }
+                return result;
+            },
+            sendMessageStringToService: function (message) {
+                var result = "unkown";
+                if (this.websock.readyState === WebSocket.OPEN) {
+                    try {
+                        this.websock.send(message);
+                        this.logString('messageCenter>>>>>>' + message);
+                        result = "success";
+                    } catch (error) {
+                        this.logString('发送消息失败：' + error);
+                        result = "failed";
+                    }
+
+                } else if (this.websock.readyState === WebSocket.CONNECTING) {
+                    result = "connection";
+                }
+                return result;
+            },
+            //接收来自服务器消息
+            receiveMessage: function (e) {
+                var messageStr = e.data;
+                if (messageStr[0] == '@' && messageStr[messageStr.length - 1] == '#') {
+                    var message = messageStr.substr(1, messageStr.length - 2);
+                    var messObj = null;
+                    try {
+                        messObj = JSON.parse(message);
+                        this.logString('messageCenter<<<<<<' + message);
+                    } catch (error) {
+                        this.logString('无法解析服务器返回的数据"' + message + '",错误提示：' + error);
+                    }
+                    for (let index = 0; index < this.receiveItems.length; index++) {
+                        const element = this.receiveItems[index];
+                        try {
+                            element.value(messObj);
+                        } catch (error) {
+                            this.logString('向索引号' + index + '的订阅推送消息失败：' + error);
+                        }
+                    }
+                } else {
+                    this.logString('messageCenter<<<<<<无法解析的格式：' + messageStr);
+                }
+            },
+            //发送消息到服务器
+            sendMessage: function (typeId, e) {
+                var messageFomart = {
+                    version: '1.0'
+                };
+
+                var _e = null;
+                if (typeof e === "object") {
+                    _e = JSON.stringify(messageFomart);
+                } else if (typeof e === "string") {
+                    _e = e;
+                } else {
+                    this.logString('sendMessage 发送内容解析失败：' + e);
+                }
+                messageFomart.id = this.getHashCode(JSON.stringify(e));
+                messageFomart.type = typeId;
+                messageFomart.content = _e;
+                var content = JSON.stringify(messageFomart);
+                var message = '@' + content + '#';
+                try {
+                    this.websock.send(message);
+                    this.logString('messageCenter>>>>>>' + content);
+                } catch (error) {
+                    this.logString('发送消息失败：' + error);
+                }
+            },
+            //获取hashcode
+            getHashCode: function (value) {
+                var hash = 0;
+                if (value.length == 0) return hash;
+                for (var i = 0; i < value.length; i++) {
+                    var char = value.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return (hash).toString();
+            },
+            logString: function (value) {
+                if (this.canLog) {
+                    console.log(value);
+                }
+            },
+            stateChange: function (value) {
+                this.logString(value);
+            }
+        }
+        var sws = new ws();
+        sws.registerReceiveItem('hello', (r) => {
+            if (r.type == '14101') {
+                var message = JSON.stringify(r);
+                alert(message);
+            }
+        });
+
+
+        var ayncRect = false;
+        var timer = null;
+
+
+        function wsconnection() {
+            var button = document.getElementById("ws_connec");
+
+            if (sws.online) {
+                sws.closeWebSocket();
+                button.textContent = '开启服务';
+                return;
+            }
+            var uri = document.getElementById("ws_uri").value;
+            sws.stateChange = value => document.getElementById("ws_state").innerText = value;
+            sws.initWebSocket(uri);
+            button.textContent = '关闭服务';
+        }
+
+        function SendDataString() {
+            var typeId = document.getElementById("Type_Id").value;
+            var message = document.getElementById("Input_Text").value;
+            sws.sendMessageToService(typeId, message);
+        }
+
+        function SendDataCostomerString() {
+            var message = document.getElementById("Input_Text").value;
+            sws.sendMessageStringToService(message);
+        }
+
+        function autoVideo() {
+            var message = '{"version":"1.0","method":"login","params": {"ip":"192.168.1.104","port": 9000,"user": "admin","password": "admin123"}}';
+            sws.sendMessageStringToService(message);
+            var message = '{"version":"1.0","method":"setwindowpos","params": {"x":50,"y":50,"width":640,"height":480}}';
+            sws.sendMessageStringToService(message);
+            var message = '{"version":"1.0","method":"setsplitscreen","params": {"mode":1}}';
+            sws.sendMessageStringToService(message);
+            var message = '{"version":"1.0","method":"startrealplay","params": {"index":0,"cameraid": "1000001$1$0$0"}}';
+            sws.sendMessageStringToService(message);
+            var message = '{"version":"1.0","method":"setwindowvisble","params": {"flag":1}}';
+            sws.sendMessageStringToService(message);
+        }
+
+        function SendDataObject() {
+            var typeId = document.getElementById("Type_Id").value;
+            var messageObj = document.getElementById("Input_Text").value;
+
+            try {
+                var obj = eval('(function(){return ' + messageObj + ';})()');
+            } catch (error) {
+                alert("发送Javascript对象解析出错：" + error);
+            }
+            sws.sendMessageToService(typeId, obj);
+        }
+
+        function GetWindowRect() {
+            if (!ayncRect) {
+                return;
+            }
+            var rect = {
+                target: null,
+                window: {
+                    x: window.screenX,
+                    y: window.screenY,
+                    w: window.outerWidth,
+                    h: window.outerHeight
+                }
+            }
+            var json = JSON.stringify(rect);
+            sws.sendMessageToService("110", json);
+        }
+
+        function SendWindowRect() {
+            var txt = "";
+            if (ayncRect) {
+                ayncRect = false;
+                txt = "开启窗口同步";
+                if (timer != null) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+            else {
+                ayncRect = true;
+                txt = "关闭窗口同步";
+                if (timer != null) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+                timer = setInterval('GetWindowRect()', 25);
+            }
+            document.getElementById("AsynRect").innerHTML = txt;
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <div>
+        消息服务测试 [<span id="ws_state">请点击‘连接服务器’按钮开启服务</span>]<br />
+        <input id="ws_uri" value="ws://localhost:8888" />
+        <button id="ws_connec" type="button" onclick='wsconnection();'>连接服务器</button>
+        消息号：
+        <input id="Type_Id" />
+        消息正文：
+        <textarea id="Input_Text"></textarea>
+        {"firstName":"Robert","lastName":"Darwin"}
+        <button type="button" onclick='SendDataString();' title="消息正文框中输入json格式字符串">发送‘Json/字符串’消息</button>
+        {firstName:"Robert",lastName:"Darwin"}
+        <button type="button" onclick='SendDataObject();' title="消息正文框中输入JavaScript对象字符串">发送‘Javascript对象’消息</button>
+        @{version:'1.0',id='1234567',type='14001',content={firstName:"Robert"}}#
+        <button type="button" onclick='SendDataCostomerString();' title="消息正文框中输入自定义包装字符串">发送‘自定义字符串’消息</button>
+        <button id="AsynRect" type="button" onclick='SendWindowRect();' title="开启或关闭窗口同步">开启窗口同步</button>
+        <button id="autoVideo" type="button" onclick='autoVideo();' title="一键测试播放">一键测试播放</button>
+    </div>
+</body>
+
+</html>
