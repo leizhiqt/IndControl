@@ -4,6 +4,7 @@
 #include "ControlMain.h"
 #include "UWLog.h"
 #include "Windows.h"
+#include "ModbusTcp.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -83,7 +84,7 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
-//        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
+        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
     });
 
     //托盘
