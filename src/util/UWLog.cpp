@@ -36,9 +36,9 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     t_stime(times);
 
-//    snprintf(logstr,sizeof(logstr),"[%s\t%s\t%d]%s\n",times,files,line,bufstr);
+    snprintf(logstr,sizeof(logstr),"[%s\t%s\t%d]%s\n",times,files,line,bufstr);
 
-    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
+//    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
 
     out_log_fp.write(logstr,strlen(logstr));
     out_log_fp.flush();

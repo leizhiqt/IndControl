@@ -3,6 +3,9 @@
 #include "UWLog.h"
 #include <Windows.h>
 
+
+
+
 TcpClientUtil::TcpClientUtil(){
     visualTcpSocket = new QTcpSocket(this);
     connect(visualTcpSocket, SIGNAL(connection()), this, SLOT(onConnection()));
@@ -43,7 +46,10 @@ void TcpClientUtil::readRes(){
 }
 
 void TcpClientUtil::send(uint8_t *buf){
-    visualTcpSocket->write((char *)buf);
+//   int ok= visualTcpSocket->write((char *)buf);
+       //visualTcpSocket->flush();
+//   int ok=visualTcpSocket->writeData((char *)buf,13);
+//       log_debug("send %d",ok);
 }
 
 void TcpClientUtil::toConnection(QString host,int port){
@@ -76,3 +82,5 @@ void TcpClientUtil::toConnection(QString host,int port){
 ////    }
 
 //}
+
+

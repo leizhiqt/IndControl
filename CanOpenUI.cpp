@@ -4,8 +4,12 @@
 #include "ControlMain.h"
 #include "UWLog.h"
 #include "Windows.h"
+#include "ModbusTcp.h"
 
 #pragma execution_character_set("utf-8")
+
+extern int tcp_send();
+extern int start_tcp(char * host,int port);
 
 CanOpenUI::CanOpenUI(QWidget *parent) :
     QMainWindow(parent),
@@ -15,9 +19,9 @@ CanOpenUI::CanOpenUI(QWidget *parent) :
     set_default_UI();
 
     uiReadThread = new UIReadThread(ui);
-    canClient = new TcpClientUtil();
+//    canClient = new TcpClientUtil();
 
-    ui->ModBusView->append("Modbus Server 已经开启! 1520");
+    ui->ModBusView->append("Modbus Server 已经开启! 502");
 }
 
 CanOpenUI::~CanOpenUI()
@@ -79,11 +83,35 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->CanConn, &QPushButton::clicked, [=](){
-            canClient->toConnection(ui->CanIP->text(),ui->CanPort->text().toInt());
+//            canClient->toConnection(ui->CanIP->text(),ui->CanPort->text().toInt());
+        char ip[]="192.168.2.152";
+        start_tcp(ip,ui->CanPort->text().toInt());
+    });
+
+    connect(ui->sendCan, &QPushButton::clicked, [=](){
+        uint8_t can_data[13];
+           memset(can_data,'\0',sizeof(can_data));
+           can_data[0]=0x43;
+           can_data[1]=0x00;
+           can_data[2]=0x00;
+           can_data[3]=0x01;
+           can_data[4]=0x8a;
+
+           can_data[5]=0x00;//b0
+           can_data[6]=0x00;//b1
+           can_data[7]=0x0;//b2
+           can_data[8]=0x01;//b3
+           can_data[9]=0x00;//b4
+           can_data[10]=0x00;//b5
+           can_data[11]=0x00;//b6
+           can_data[12]=0x00;//b7
+
+//            canClient->send(can_data);
+           tcp_send();
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
-//        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
+        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
     });
 
     //托盘

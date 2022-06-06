@@ -28,6 +28,7 @@ int modbus_tcp_receive_thread_run()
     {
         int rc;
         rc = modbus_receive(ctx, query);
+         log_debug("modbus_receive len=%d",rc);
         if(rc>1)
         {
 
@@ -78,8 +79,11 @@ int modbus_tcp_send_thread_run()
             Sleep(300);
         }
 
+//        modbus_write_register(ctx, 1, 500);
+
         uint8_t *modbus_rbuf = rbuf.front();
         uint8_t b0 = *modbus_rbuf;
+        log_debug("modbus_receive b0=%40x",b0);
 
         if(b0==0x18a|| b0==0x18b||b0==0x18c){
             modbus_write_bits(ctx,1,13,can_data);
@@ -94,6 +98,8 @@ int modbus_tcp_start(char* ipAddr,int port)
 
 //	const char *ipAdd = "127.0.0.1";
     ctx = modbus_new_tcp(ipAddr, port);
+
+    modbus_set_slave(ctx, 0);
 	modbus_set_debug(ctx, TRUE);
 
 	
@@ -137,15 +143,83 @@ int modbus_tcp_start(char* ipAddr,int port)
 
 
 
+int test(void);
 
 int modbus_tcp_thread_start(char* ipAddr,int port)
 {
     // 启动 CAN 通道的接收线程
-    thd_handle0 = std::thread(modbus_tcp_start,ipAddr,port);
+//    thd_handle0 = std::thread(modbus_tcp_start,ipAddr,port);
+    thd_handle0 = std::thread(test);
+    return 0;
 }
 
 void modbus_tcp_thread_wait()
 {
     if (thd_handle0.joinable())
         thd_handle0.join();
+}
+
+
+
+
+int test(void)
+{
+    int server_socket = -1;
+    modbus_t* ctx;
+    modbus_mapping_t* mb_mapping;
+    const char *ipAdd = "192.168.2.181";
+    ctx = modbus_new_tcp(ipAdd, 502);
+    modbus_set_slave(ctx, 0);
+    modbus_set_debug(ctx, TRUE);
+
+    mb_mapping = modbus_mapping_new(500, 500, 500, 500);
+    if(mb_mapping == NULL)
+    {
+        fprintf(stderr, "Failed mapping:%s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return -1;
+    }
+    server_socket = modbus_tcp_listen(ctx, 1);
+    if(server_socket==-1)
+    {
+        fprintf(stderr, "Unable to listen TCP\n");
+        modbus_free(ctx);
+        return -1;
+    }
+    modbus_tcp_accept(ctx, &server_socket);
+
+    for(;;)
+    {
+        uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+        int rc;
+
+        modbus_write_register(ctx, 1, MODBUS_TCP_MAX_ADU_LENGTH);
+
+        rc = modbus_receive(ctx, query);
+        if(rc>1)
+        {
+           modbus_reply(ctx, query, rc, mb_mapping);
+           //log_debug("modbus_receive b0=%40x ",b0);
+
+           char buf[512];
+           char hex[8];
+           for(int i=0;i<rc;i++){
+               sprintf(hex,"%40x",query[i]);
+               strcat(buf,hex);
+           }
+           log_debug("modbus_receive %s",buf);
+
+        }
+        else
+        {
+            printf("Connection Closed\n");
+            modbus_close(ctx);
+            modbus_tcp_accept(ctx, &server_socket);
+        }
+    }
+    printf("Quit the loop:%s\n", modbus_strerror(errno));
+    modbus_mapping_free(mb_mapping);
+    modbus_close(ctx);
+    modbus_free(ctx);
+    return 0;
 }

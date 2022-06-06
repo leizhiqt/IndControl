@@ -20,7 +20,7 @@ private slots:
 
 //    void sendMessages();
 
-private:
+public:
     QTcpSocket *visualTcpSocket;
 
 //    QTcpServer *tcpSer;

@@ -8,6 +8,8 @@ win32 {
 #    LIBS += -L$$PWD/../../lib/emqtt/x64 -lpaho-mqtt3a -lpaho-mqtt3c \
 #            -Le:/pgsql/lib -Le:/pgsql/bin -llibpq
 
+
+    LIBS += -lws2_32
     #message($$INCLUDEPATH)
     #message($$LIBS)
 
@@ -33,4 +35,7 @@ win32 {
         $$PWD/FormatTimes.cpp \
         $$PWD/UWLog.cpp $$PWD/TcpClientUtil.cpp
 }
+
+SOURCES += \
+    $$PWD/WTcpSocket.cpp
 

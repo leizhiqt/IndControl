@@ -23,7 +23,7 @@ public:
 //    void call_open_zlgcan(QString ip,QString port);
 
     Ui::CanOpenUI *ui;
-    TcpClientUtil *canClient;
+//    TcpClientUtil *canClient;
 
 protected:
     void mousePressEvent(QMouseEvent *e);
