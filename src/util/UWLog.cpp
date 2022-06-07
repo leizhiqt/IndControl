@@ -36,9 +36,9 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     t_stime(times);
 
-//    snprintf(logstr,sizeof(logstr),"[%s\t%s\t%d]%s\n",times,files,line,bufstr);
+    snprintf(logstr,sizeof(logstr),"[%s\t%s\t%d]%s\n",times,files,line,bufstr);
 
-    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
+//    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
 
     out_log_fp.write(logstr,strlen(logstr));
     out_log_fp.flush();
@@ -50,4 +50,19 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 void log_close()
 {
     out_log_fp.close();
+}
+
+
+void printf_hex(uchar const *p,int size)
+{
+    uchar bufs[1024];
+    memset(bufs,'\0',sizeof(bufs));
+    char buf[20];
+    for (int i = 0; i < size;i++) {
+        memset(buf,'\0',sizeof(buf));
+        sprintf(buf,"0x%02x ",*(p+i));
+        strcat((char *)bufs,buf);
+    }
+    log_debug((char *)bufs);
+    //printf(bufs);
 }

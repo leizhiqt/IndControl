@@ -5,9 +5,13 @@ win32 {
     INCLUDEPATH += $$PWD \
                     $$PWD/../../include/emqtt \
                     e:/pgsql/include
+    LIBS += -lws2_32
+
 #    LIBS += -L$$PWD/../../lib/emqtt/x64 -lpaho-mqtt3a -lpaho-mqtt3c \
 #            -Le:/pgsql/lib -Le:/pgsql/bin -llibpq
 
+
+    LIBS += -lws2_32
     #message($$INCLUDEPATH)
     #message($$LIBS)
 
@@ -20,7 +24,7 @@ win32 {
         $$PWD/NetToolHelper.h \
 #        $$PWD/PGSQLDriveHelper.h
         $$PWD/FormatTimes.h \
-        $$PWD/UWLog.h $$PWD/TcpClientUtil.h
+        $$PWD/UWLog.h
 
     SOURCES += \
         $$PWD/JSONUtil.cpp \
@@ -31,6 +35,6 @@ win32 {
         $$PWD/NetToolHelper.cpp \
 #        $$PWD/PGSQLDriveHelper.cpp
         $$PWD/FormatTimes.cpp \
-        $$PWD/UWLog.cpp $$PWD/TcpClientUtil.cpp
+        $$PWD/UWLog.cpp
 }
 

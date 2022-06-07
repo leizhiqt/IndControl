@@ -4,8 +4,6 @@
 
 #include <QWidget>
 #include <QGridLayout>
-#include <Windows.h>
-
 #include "QTCamera.h"
 
 class QTScreen:public QObject

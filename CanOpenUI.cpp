@@ -1,10 +1,11 @@
-﻿#include <QMouseEvent>
+﻿#define WIN32_LEAN_AND_MEAN
 
+#include <QMouseEvent>
 #include "CanOpenUI.h"
 #include "ControlMain.h"
 #include "UWLog.h"
-#include "Windows.h"
 #include "ModbusTcp.h"
+#include "WTcpSocket.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -16,9 +17,9 @@ CanOpenUI::CanOpenUI(QWidget *parent) :
     set_default_UI();
 
     uiReadThread = new UIReadThread(ui);
-    canClient = new TcpClientUtil();
+//    canClient = new TcpClientUtil();
 
-    ui->ModBusView->append("Modbus Server 已经开启! 1520");
+    ui->ModBusView->append("Modbus Server 已经开启! 502");
 }
 
 CanOpenUI::~CanOpenUI()
@@ -80,22 +81,39 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->CanConn, &QPushButton::clicked, [=](){
-            canClient->toConnection(ui->CanIP->text(),ui->CanPort->text().toInt());
+        start_tcp_client_th(ui->CanIP->text().toLatin1().data(),ui->CanPort->text().toInt());
+    });
+
+    connect(ui->sendCan, &QPushButton::clicked, [=](){
+        unsigned char frame[13];
+            memset(frame,'\0',sizeof(frame));
+            frame[0]=0x06;
+            frame[1]=0x00;
+            frame[2]=0x00;
+            frame[3]=0x01;
+            frame[4]=0x8a;
+
+            frame[5]=0x00;//b0
+            frame[6]=0x00;//b1
+            frame[7]=0x0;//b2
+            frame[8]=0x01;//b3
+            frame[9]=0x00;//b4
+            frame[10]=0x00;//b5
+            frame[11]=0x00;//b6
+            frame[12]=0x00;//b7
+
+           tcp_client_send(frame,sizeof(frame));
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
+        char *host =  ui->ModIP->text().toLatin1().data();
+        log_debug("host:%s",host);
         modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
     });
 
     //托盘
     qtTray = new QTTray(this);
 }
-
-//void CanOpenUI::call_open_zlgcan(QString ip,QString port){
-//    char *p_ip = ip.toLatin1().data();
-//    char *p_port = port.toLatin1().data();
-//    open_zlgcan(p_ip,p_port);
-//}
 
 void CanOpenUI::mousePressEvent(QMouseEvent *e)
 {

@@ -4,11 +4,25 @@
 #endif
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
+#include <errno.h>
+#include <signal.h>
 
-#include "modbus.h"
+#if defined(_WIN32)
+#include<WinSock2.h>
+#include<WS2tcpip.h>
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+#include "ModbusTcp.h"
 #include <thread>
 #include "ControlMain.h"
 #include "UWLog.h"
+
+#pragma comment(lib,"ws2_32.lib")
 
 modbus_t* ctx;
 modbus_mapping_t* mb_mapping;
@@ -28,6 +42,7 @@ int modbus_tcp_receive_thread_run()
     {
         int rc;
         rc = modbus_receive(ctx, query);
+         log_debug("modbus_receive len=%d",rc);
         if(rc>1)
         {
 
@@ -78,8 +93,11 @@ int modbus_tcp_send_thread_run()
             Sleep(300);
         }
 
+//        modbus_write_register(ctx, 1, 500);
+
         uint8_t *modbus_rbuf = rbuf.front();
         uint8_t b0 = *modbus_rbuf;
+        log_debug("modbus_receive b0=%40x",b0);
 
         if(b0==0x18a|| b0==0x18b||b0==0x18c){
             modbus_write_bits(ctx,1,13,can_data);
@@ -88,60 +106,162 @@ int modbus_tcp_send_thread_run()
     }
 }
 
-int modbus_tcp_start(char* ipAddr,int port)
-{
-
-
-//	const char *ipAdd = "127.0.0.1";
-    ctx = modbus_new_tcp(ipAddr, port);
-	modbus_set_debug(ctx, TRUE);
-
-	
-	mb_mapping = modbus_mapping_new(500, 500, 500, 500);
-	if(mb_mapping == NULL)
-	{
-	    fprintf(stderr, "Failed mapping:%s\n", modbus_strerror(errno));
-		modbus_free(ctx);
-		return -1;
-	}
-
-
-	server_socket = modbus_tcp_listen(ctx, 1);
-	if(server_socket==-1)
-	{
-	    fprintf(stderr, "Unable to listen TCP\n");
-		modbus_free(ctx);
-		return -1;
-	}
-
-
-	modbus_tcp_accept(ctx, &server_socket);
-
-    //启动成功
-    thd_handle_receive = std::thread(modbus_tcp_receive_thread_run);
-    thd_handle_send = std::thread(modbus_tcp_send_thread_run);
-
-    if (thd_handle_receive.joinable())
-        thd_handle_receive.join();
-
-    if (thd_handle_send.joinable())
-        thd_handle_send.join();
-
+static void close_sigint(int dummy) {
+    modbus_free(ctx);
     modbus_mapping_free(mb_mapping);
-	modbus_close(ctx);
-	modbus_free(ctx);
-
-	return 0;
+    exit(dummy);
 }
 
+int modbus_tcp_start(char* ipAddr,int port)
+{
+    int master_socket;
+    int rc;
+    fd_set refset;
+    fd_set rdset;
+    int fdmax;
+    int header_length = 7;
 
+    //我们作为服务器，启动后操作台自已来连
+    ctx = modbus_new_tcp(ipAddr, port);
 
+    //初始化寄存器
+    mb_mapping = modbus_mapping_new(UT_BITS_ADDRESS + UT_BITS_NB,//读线圈
+                                    UT_INPUT_BITS_ADDRESS + UT_INPUT_BITS_NB,//读离散量输入
+                                    UT_REGISTERS_ADDRESS + UT_REGISTERS_NB,//读保持寄存器
+                                    UT_INPUT_REGISTERS_ADDRESS + UT_INPUT_REGISTERS_NB);//读输入寄存器
+    if(mb_mapping == NULL)
+    {
+        fprintf(stderr, "初始化寄存器失败:%s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return -1;
+    }
 
+    //初始化离散量输入寄存器
+    modbus_set_bits_from_bytes(mb_mapping->tab_input_bits,
+                                           UT_INPUT_BITS_ADDRESS,
+                                           UT_INPUT_BITS_NB,
+                                           UT_INPUT_BITS_TAB);
+
+    //初始化输入寄存器
+    for (int i = 0; i < UT_INPUT_REGISTERS_NB; i++)
+    {
+        mb_mapping->tab_input_registers[UT_INPUT_REGISTERS_ADDRESS + i] = UT_INPUT_REGISTERS_TAB[i];
+    }
+
+    //初始化读保持寄存器
+    for (int i = 0; i < UT_REGISTERS_NB; i++)
+    {
+        mb_mapping->tab_registers[UT_REGISTERS_ADDRESS + i] = UT_REGISTERS_TAB[i];
+    }
+
+    //开始监听
+    server_socket = modbus_tcp_listen(ctx, NB_CONNECTION);
+    if (server_socket == -1)
+    {
+        fprintf(stderr, "无法监听TCP\n");
+        modbus_free(ctx);
+        return -1;
+    }
+
+    signal(SIGINT, close_sigint);
+
+    //清除套接字的引用集
+    FD_ZERO(&refset);
+    //添加服务器套接字
+    FD_SET(server_socket, &refset);
+    fdmax = server_socket;
+
+    //以下实现断网重连机制
+    for(;;)
+    {
+        rdset = refset;
+        if (select(fdmax + 1, &rdset, NULL, NULL, NULL) == -1)
+        {
+            perror("服务器 select() 失败。\n");
+            close_sigint(1);
+        }
+
+        for (master_socket = 0; master_socket <= fdmax; master_socket++) {
+            if (FD_ISSET(master_socket, &rdset)) {
+                if (master_socket == server_socket) {
+                    //一个客户端要求一个新的连接
+                    socklen_t addrlen;
+                    struct sockaddr_in clientaddr;
+                    int newfd;
+
+                    //处理新的连接
+                    addrlen = sizeof(clientaddr);
+                    memset(&clientaddr, 0, sizeof(clientaddr));
+                    newfd = accept(server_socket, (struct sockaddr *)&clientaddr, &addrlen);
+                    if (newfd == -1)
+                    {
+                        perror("服务器 accept() 出错。\n");
+                    }
+                    else
+                    {
+                        FD_SET(newfd, &refset);
+                        if (newfd > fdmax)
+                        {
+                            //记录最大值
+                            fdmax = newfd;
+                        }
+                        printf("新连接 %s:%d on socket %d\n", inet_ntoa(clientaddr.sin_addr), clientaddr.sin_port, newfd);
+                    }
+                }
+                else
+                {
+                    //已连接的主服务器发送了一个新的查询
+                    uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+                    int data = 0;
+                    int address = 0;
+
+                    modbus_set_socket(ctx, master_socket);
+                    rc = modbus_receive(ctx, query);
+
+                    printf_hex((unsigned char *)query,rc);
+
+                    address = (query[header_length + 1] << 8) + query[header_length + 2];
+                    if (query[header_length] == 0x06)
+                    {
+                        //这里可以写保持寄存器
+                    }
+                    if (rc != -1)
+                    {
+                        modbus_reply(ctx, query, rc, mb_mapping);
+                    }
+                    else
+                    {
+                        //客户端关闭了连接
+                        printf("Connection closed on socket %d\n", master_socket);
+                        //移除
+                        FD_CLR(master_socket, &refset);
+                        if (master_socket == fdmax)
+                        {
+                            fdmax--;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    printf("停止循环:%s\n", modbus_strerror(errno));
+
+    modbus_mapping_free(mb_mapping);
+    modbus_close(ctx);
+    modbus_free(ctx);
+    return 0;
+}
 
 int modbus_tcp_thread_start(char* ipAddr,int port)
 {
-    // 启动 CAN 通道的接收线程
+    //modbustcp server
+    if(thd_handle0.joinable()){
+        return 0;
+    }
+
     thd_handle0 = std::thread(modbus_tcp_start,ipAddr,port);
+    return 0;
 }
 
 void modbus_tcp_thread_wait()

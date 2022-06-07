@@ -6,7 +6,7 @@
 #include "Conf.h"
 #include "QTTray.h"
 #include "UIReadThread.h"
-#include "TcpClientUtil.h"
+#include "QTcpComponentl.h"
 
 namespace Ui {
 class CanOpenUI;
@@ -20,10 +20,7 @@ public:
     explicit CanOpenUI(QWidget *parent = nullptr);
     ~CanOpenUI();
 
-//    void call_open_zlgcan(QString ip,QString port);
-
     Ui::CanOpenUI *ui;
-    TcpClientUtil *canClient;
 
 protected:
     void mousePressEvent(QMouseEvent *e);

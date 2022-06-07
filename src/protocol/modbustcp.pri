@@ -1,6 +1,6 @@
 
 INCLUDEPATH += $$PWD $$PWD/modbustcp
-LIBS += -L$$PWD/modbustcp -lmodbus
+LIBS += -L$$PWD/modbustcp -lmodbus -lws2_32
 
 INCLUDEPATH += \
         $$PWD \
