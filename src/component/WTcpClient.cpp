@@ -6,10 +6,11 @@
 #include<thread>
 
 #include "UWLog.h"
-#include "WTcpSocket.h"
+#include "WTcpClient.h"
 
 using namespace std;
-#pragma comment(lib, "WS2_32.lib")
+
+int c_forever;
 
 SOCKET sSocket;
 std::thread thd_handle_client;//主线程
@@ -33,7 +34,7 @@ int tcp_client_doth(char* host,int port)
     if (INVALID_SOCKET == sSocket) {
         printf("socker failed\n");
         WSACleanup();
-        return -1;
+        return -2;
     }
 
     //设置服务器地址
@@ -57,14 +58,14 @@ int tcp_client_doth(char* host,int port)
         log_debug("connect failed\n");
 //            closesocket(sSocket);
         WSACleanup();//释放套接字资源
-        return -1;
+        return -3;
     }
 
     log_debug("3======================");
     //接收数据
     char buf[BUF_SIZE];
 //    ZeroMemory(buf, BUF_SIZE);
-    while (1) {
+    while (c_forever) {
         n = recv(sSocket, buf, BUF_SIZE, 0);
         log_debug("recv:%d %s",n,buf);
 
@@ -72,10 +73,8 @@ int tcp_client_doth(char* host,int port)
             printf("send failed");
         }
 
-        Sleep(1000*3);
+        Sleep(200);
     }
-
-
     return 0;
 }
 
@@ -85,7 +84,8 @@ int tcp_client_send(unsigned char const *buf,size_t size)
 //    char buf[BUF_SIZE];
 //    ZeroMemory(buf, BUF_SIZE);
 //    strcpy(buf, "hello server");
-    printf_hex(buf,size);
+    unsigned char hexs[1024];
+    printf_hex(hexs,buf,size);
     int retVal = send(sSocket,(char *)buf, size, 0);
     printf("send ok=%d!\n",retVal);
     return 0;
@@ -97,9 +97,23 @@ int start_tcp_client_th(char * host,int port)
     if (thd_handle_client.joinable())
         return 0;
 
+    c_forever=1;
     thd_handle_client = std::thread(tcp_client_doth,host,port);
 
-//    if (thd_handle_receive.joinable())
-//        thd_handle_receive.join();
+    Sleep(500);
+
+    if (!thd_handle_client.joinable()){
+        return -1;
+    }
+
+    return 0;
+}
+
+int stop_tcp_client_th()
+{
+    c_forever=0;
+
+    if (thd_handle_client.joinable())
+        thd_handle_client.join();
     return 0;
 }

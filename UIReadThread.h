@@ -17,7 +17,7 @@ public:
 protected:
     void run();
 
-private:
+public:
     Ui::CanOpenUI *ui;
 };
 

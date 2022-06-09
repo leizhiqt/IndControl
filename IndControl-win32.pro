@@ -37,7 +37,7 @@ include(./src/component/component.pri)
 include(./src/wsserver/wsserver.pri)
 #include(./src/protocol/protocol.pri)
 
-include(./src/protocol/modbustcp.pri)
+#include(./src/protocol/modbustcp.pri)
 #include(./src/protocol/zlgcan_x64/zlgcan_x64.pri)
 #include(./src/protocol/zlgcan_x86/zlgcan_x86.pri)
 

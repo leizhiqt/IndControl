@@ -33,7 +33,7 @@ private:
     //托盘
     QTTray *qtTray;
 
-    UIReadThread *uiReadThread;
+//    UIReadThread *uiReadThread;
 
 
 //     ModbusTcpClient *mtClient;

@@ -9,15 +9,15 @@
 
 #include "ControlMain.h"
 
-
 ControlMain *controlMain;
 
 int main(int argc, char *argv[])
 {
     //App start
 //    qInstallMessageHandler(myMessageOutput);
-    //qDebug("[%s %d]:%s",__FILE__ , __LINE__,"main");
+//    qDebug("[%s %d]:%s",__FILE__ , __LINE__,"main");
 
+    printf("%s %d\n",__FILE__ , __LINE__);
     //>>测试
 //    PGSQLDriveHelper pgsql;
 //    pgsql.pg_test();
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     QApplication qtApp(argc, argv);
 
-    //启动主程序
+//    //启动主程序
     controlMain = new ControlMain();
 
     return qtApp.exec();

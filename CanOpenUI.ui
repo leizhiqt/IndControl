@@ -27,8 +27,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>510</y>
+      <x>270</x>
+      <y>280</y>
       <width>131</width>
       <height>24</height>
      </rect>
@@ -66,27 +66,27 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>470</x>
       <y>270</y>
-      <width>81</width>
-      <height>16</height>
+      <width>91</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>CanTest IP:</string>
+     <string>CanOpen  IP:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>300</y>
-      <width>81</width>
+      <x>670</x>
+      <y>270</y>
+      <width>41</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>CanTest Port:</string>
+     <string>Port:</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">
@@ -104,7 +104,7 @@
      <rect>
       <x>580</x>
       <y>270</y>
-      <width>141</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -115,9 +115,9 @@
    <widget class="QLineEdit" name="CanPort">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>300</y>
-      <width>61</width>
+      <x>700</x>
+      <y>270</y>
+      <width>41</width>
       <height>21</height>
      </rect>
     </property>
@@ -128,9 +128,9 @@
    <widget class="QPushButton" name="CanConn">
     <property name="geometry">
      <rect>
-      <x>650</x>
+      <x>580</x>
       <y>300</y>
-      <width>75</width>
+      <width>161</width>
       <height>24</height>
      </rect>
     </property>
@@ -161,50 +161,24 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;井下集控中心&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="ModIP">
-    <property name="geometry">
-     <rect>
-      <x>600</x>
-      <y>340</y>
-      <width>113</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>127.0.0.1</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
       <x>470</x>
       <y>340</y>
-      <width>91</width>
+      <width>151</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Master IP</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>370</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Master Port</string>
+     <string>Master IP:127.0.0.1 Port:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="ModPort">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>370</y>
+      <x>630</x>
+      <y>340</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -216,9 +190,9 @@
    <widget class="QPushButton" name="ModConn">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>580</x>
       <y>370</y>
-      <width>75</width>
+      <width>161</width>
       <height>24</height>
      </rect>
     </property>
@@ -229,8 +203,8 @@
    <widget class="QPushButton" name="sendCan">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>290</y>
+      <x>490</x>
+      <y>300</y>
       <width>75</width>
       <height>24</height>
      </rect>

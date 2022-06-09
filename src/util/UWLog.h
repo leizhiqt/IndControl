@@ -1,7 +1,7 @@
 ﻿#ifndef UWLOG_H
 #define UWLOG_H
 
-#define uchar unsigned char
+//#define uchar unsigned char
 
 #ifdef __cplusplus /* 如果采用了C++，如下代码使用C编译器 */
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
@@ -11,7 +11,7 @@
     void log_printfs(const char* files,unsigned int line,const char* fmt, ...);
     void log_close();
 
-    void printf_hex(uchar const *p,int size);
+    void printf_hex(unsigned char *hexs,unsigned char const *p,int size);
 
     /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */

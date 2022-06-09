@@ -4,8 +4,9 @@
 #include "CanOpenUI.h"
 #include "ControlMain.h"
 #include "UWLog.h"
-#include "ModbusTcp.h"
-#include "WTcpSocket.h"
+//#include "ModbusTcp.h"
+#include "WTcpClient.h"
+#include "WTcpServer.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -16,10 +17,9 @@ CanOpenUI::CanOpenUI(QWidget *parent) :
     ui->setupUi(this);
     set_default_UI();
 
-    uiReadThread = new UIReadThread(ui);
+//    uiReadThread = new UIReadThread(ui);
 //    canClient = new TcpClientUtil();
 
-    ui->ModBusView->append("Modbus Server 已经开启! 502");
 }
 
 CanOpenUI::~CanOpenUI()
@@ -58,7 +58,7 @@ void CanOpenUI::set_default_UI()
 #ifdef ENABLE_OPENCAN
             controlMain->canopenQThread->wait();
 #endif
-            uiReadThread->wait();
+//            uiReadThread->wait();
             ui->pushButton->setText("协议停止");
             ui->pushButton->setStyleSheet("#pushButton {background-color:#A3A3A3;}");
             return;
@@ -70,9 +70,9 @@ void CanOpenUI::set_default_UI()
 #ifdef ENABLE_OPENCAN
             controlMain->canopenQThread->start();
 #endif
-            Sleep(1);
-            uiReadThread->start();
-            Sleep(1);
+//            Sleep(1);
+//            uiReadThread->start();
+//            Sleep(1);
 
             ui->pushButton->setText("协议开启");
             ui->pushButton->setStyleSheet("#pushButton {background-color:#3366cc;}");
@@ -81,7 +81,18 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->CanConn, &QPushButton::clicked, [=](){
-        start_tcp_client_th(ui->CanIP->text().toLatin1().data(),ui->CanPort->text().toInt());
+        int ret = start_tcp_client_th(ui->CanIP->text().toLatin1().data(),ui->CanPort->text().toInt());
+        QString msg;
+        msg.append(ui->CanIP->text());
+        msg.append(":");
+        msg.append(ui->CanPort->text());
+
+        if(ret==0)
+            ui->textBrowser->append("连接成功");
+        else
+           ui->textBrowser->append("连接失败");
+
+        ui->textBrowser->append(msg);
     });
 
     connect(ui->sendCan, &QPushButton::clicked, [=](){
@@ -106,9 +117,14 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
-        char *host =  ui->ModIP->text().toLatin1().data();
-        log_debug("host:%s",host);
-        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
+//        char *host =  ui->ModIP->text().toLatin1().data();
+//        log_debug("host:%s",host);
+//        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
+        int ret = tcp_server_start(ui->ModPort->text().toInt());
+        if(ret==0)
+            ui->ModBusView->append("Modbus Server 开启成功! 502");
+        else
+           ui->ModBusView->append("Modbus Server 开启失败! 502");
     });
 
     //托盘

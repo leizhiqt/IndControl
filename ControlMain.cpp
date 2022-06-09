@@ -1,5 +1,6 @@
 ﻿#include "ControlMain.h"
 #include "UWLog.h"
+#include "WTcpClient.h"
 
 #pragma execution_character_set("utf-8")
 
@@ -34,6 +35,9 @@ ControlMain::~ControlMain(){
 //    delete dbServer;
 //    delete command;
 //    delete daHuaControll;
+
+    stop_tcp_client_th();
+
     log_close();
     qDebug()<<"destroy and Exit";
 }

@@ -18,11 +18,15 @@
 #endif
 
 #include "ModbusTcp.h"
-#include <thread>
-#include "ControlMain.h"
 #include "UWLog.h"
+#include "WTcpClient.h"
+#include "ControlMain.h"
+#include <thread>
 
 #pragma comment(lib,"ws2_32.lib")
+
+
+Ui::CanOpenUI *ui=controlMain->mWin->ui;
 
 modbus_t* ctx;
 modbus_mapping_t* mb_mapping;
@@ -35,6 +39,8 @@ std::thread thd_handle_send;//发送线程
 
 std::list<uint8_t *> rbuf;
 uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+
+void recv_xly(unsigned char *frame,size_t len);
 
 int modbus_tcp_receive_thread_run()
 {
@@ -218,8 +224,13 @@ int modbus_tcp_start(char* ipAddr,int port)
                     modbus_set_socket(ctx, master_socket);
                     rc = modbus_receive(ctx, query);
 
-                    printf_hex((unsigned char *)query,rc);
+//                    unsigned char hexs[1024];
+//                    printf_hex(hexs,query,rc);
 
+//                    QString hex_s((char *)hexs);
+//                    ui->textBrowser->append(hex_s); //添加到文本框显示
+
+//                    recv_xly((unsigned char *)query,rc);
                     address = (query[header_length + 1] << 8) + query[header_length + 2];
                     if (query[header_length] == 0x06)
                     {
@@ -268,4 +279,135 @@ void modbus_tcp_thread_wait()
 {
     if (thd_handle0.joinable())
         thd_handle0.join();
+}
+
+
+void recv_xly(unsigned char *frame,size_t len)
+{
+//    unsigned char frame[13];
+//    memset(frame,'\0',sizeof(frame));
+//    frame[0]=0x06;
+//    frame[1]=0x00;
+//    frame[2]=0x00;
+//    frame[3]=0x01;
+//    frame[4]=0x8a;
+
+//    frame[5]=0x00;//b0
+//    frame[6]=0x00;//b1
+//    frame[7]=0x0;//b2
+//    frame[8]=0x01;//b3
+//    frame[9]=0x00;//b4
+//    frame[10]=0x00;//b5
+//    frame[11]=0x00;//b6
+//    frame[12]=0x00;//b7
+
+       if((*frame<9 && *frame>0))
+       {
+            return;
+       }
+
+        if(*(frame+1)==0x01 && *(frame+2)==0x8a){
+//                if(*(frame+7)==0x01)
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x01 && *(frame+2)==0x8b){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x01 && *(frame+2)==0x8c){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x05 && *(frame+2)==0x01){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x05 && *(frame+2)==0x02){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x05 && (*(frame+2)==0x21 || *(frame+2)==0x22 || *(frame+2)==0x23
+                                 || *(frame+2)==0x24 || *(frame+2)==0x25 || *(frame+2)==0x26
+                                 || *(frame+2)==0x27)){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x02 && *(frame+2)==0x10){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x03 && *(frame+2)==0x10){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x04 && *(frame+2)==0x10){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x05 && *(frame+2)==0x10){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x02 && *(frame+2)==0x11){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x03 && *(frame+2)==0x11){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x02 && *(frame+2)==0x87){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x03 && *(frame+2)==0x87){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x04 && *(frame+2)==0x87){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x04 && *(frame+2)==0x0e){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
+
+        if(*(frame+1)==0x02 && *(frame+2)==0x90){
+//            printf_hex(frame,len);
+            tcp_client_send(frame,len);
+            return;
+        }
 }

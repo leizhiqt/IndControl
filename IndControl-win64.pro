@@ -32,6 +32,8 @@ CONFIG -= debug_and_release
 #include(./src/example/example.pri)
 
 include(./src/util/utils.pri)
+include(./src/component/component.pri)
+
 include(./src/wsserver/wsserver.pri)
 #include(./src/protocol/protocol.pri)
 
