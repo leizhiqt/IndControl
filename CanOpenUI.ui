@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>590</height>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,35 +19,22 @@
      <rect>
       <x>50</x>
       <y>70</y>
-      <width>291</width>
+      <width>341</width>
       <height>191</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>280</y>
-      <width>131</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>协议开启</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>130</x>
       <y>10</y>
-      <width>181</width>
+      <width>121</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;地面分控中心&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;协议接收&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -55,12 +42,12 @@
      <rect>
       <x>530</x>
       <y>20</y>
-      <width>171</width>
+      <width>131</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;EPC工控电脑&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;发送指令&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -92,9 +79,9 @@
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>430</x>
       <y>70</y>
-      <width>301</width>
+      <width>341</width>
       <height>192</height>
      </rect>
     </property>
@@ -128,9 +115,9 @@
    <widget class="QPushButton" name="CanConn">
     <property name="geometry">
      <rect>
-      <x>580</x>
+      <x>460</x>
       <y>300</y>
-      <width>161</width>
+      <width>281</width>
       <height>24</height>
      </rect>
     </property>
@@ -138,47 +125,24 @@
      <string>连接</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_3">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>340</y>
-      <width>291</width>
-      <height>191</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>280</y>
-      <width>181</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;井下集控中心&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>340</y>
-      <width>151</width>
+      <x>100</x>
+      <y>270</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Master IP:127.0.0.1 Port:</string>
+     <string>Modbus Master Port:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="ModPort">
     <property name="geometry">
      <rect>
-      <x>630</x>
-      <y>340</y>
+      <x>240</x>
+      <y>270</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -190,21 +154,21 @@
    <widget class="QPushButton" name="ModConn">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>370</y>
-      <width>161</width>
+      <x>100</x>
+      <y>300</y>
+      <width>201</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>开启</string>
+     <string>开启协议接收</string>
     </property>
    </widget>
    <widget class="QPushButton" name="sendCan">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>300</y>
+      <x>460</x>
+      <y>330</y>
       <width>75</width>
       <height>24</height>
      </rect>

@@ -1,14 +1,13 @@
+pgsqlDir = E:\pgsql-32
+
 win32 {
 #    INCLUDEPATH += $$PWD $$PWD/../../ $$PWD/../../include/emqtt D:/pgsql/include
 #    LIBS += -L$$PWD/../../lib/emqtt/x64 -lpaho-mqtt3a -lpaho-mqtt3c
 
     INCLUDEPATH += $$PWD \
-                    $$PWD/../../include/emqtt \
-                    e:/pgsql/include
-    LIBS += -lws2_32
+                   $$pgsqlDir/include
 
-#    LIBS += -L$$PWD/../../lib/emqtt/x64 -lpaho-mqtt3a -lpaho-mqtt3c \
-#            -Le:/pgsql/lib -Le:/pgsql/bin -llibpq
+    LIBS += -LE:\IndControl\build\win32\bin -llibpq
 
     #message($$INCLUDEPATH)
     #message($$LIBS)
@@ -20,7 +19,7 @@ win32 {
         $$PWD/ShellProcess.h \
         $$PWD/IOTUtil.h \
         $$PWD/NetToolHelper.h \
-#        $$PWD/PGSQLDriveHelper.h
+        $$PWD/PGSQLDriveHelper.h \
         $$PWD/FormatTimes.h \
         $$PWD/UWLog.h
 
@@ -31,7 +30,7 @@ win32 {
         $$PWD/ShellProcess.cpp \
         $$PWD/IOTUtil.cpp \
         $$PWD/NetToolHelper.cpp \
-#        $$PWD/PGSQLDriveHelper.cpp
+        $$PWD/PGSQLDriveHelper.cpp \
         $$PWD/FormatTimes.cpp \
         $$PWD/UWLog.cpp
 }

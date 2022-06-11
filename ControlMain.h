@@ -22,6 +22,7 @@
 //#include "QTTray.h"
 
 #include "IOTUtil.h"
+#include "Conf.h"
 #include "CanOpenUI.h"
 
 #ifdef ENABLE_OPENCAN
@@ -40,17 +41,12 @@ public:
     ControlMain();
     ~ControlMain();
 
+    Conf *conf;
+
     CanOpenUI *mWin;
 #ifdef ENABLE_OPENCAN
     CANopenQThread *canopenQThread;
 #endif
-
-//    DaHuaControll *daHuaControll;
-
-//    Command *command;
-//private:
-//    BDServer *websocketServer;
-//    BDServer *deviceServer;
 };
 
 extern ControlMain *controlMain;

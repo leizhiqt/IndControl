@@ -4,7 +4,6 @@
 #include "CanOpenUI.h"
 #include "ControlMain.h"
 #include "UWLog.h"
-//#include "ModbusTcp.h"
 #include "WTcpClient.h"
 #include "WTcpServer.h"
 
@@ -33,52 +32,6 @@ void CanOpenUI::set_default_UI()
     //setWindowFlags(Qt::WindowStaysOnTopHint|Qt::CustomizeWindowHint|Qt::FramelessWindowHint|Qt::SubWindow);
 //    setWindowFlags(Qt::WindowStaysOnTopHint|Qt::CustomizeWindowHint|Qt::FramelessWindowHint|Qt::SubWindow);
 //    ui->centralWidget->setWindowFlags(Qt::FramelessWindowHint);
-
-    //主层
-//    ui->centralWidget->setStyleSheet("#centralWidget{background:#ffffff;border:1px solid red}");// yellow  red green
-    //播放层
-//    ui->widget_video->setStyleSheet("#widget_video{background:#ffffff;border:1px solid red;}");
-    //云台层
-//    ui->widget_right->setStyleSheet("#widget_right{background:#ffffff;border:1px solid green;border-left:0px;}");
-
-    //9格宫/多格宫 组件
-//    qtScreen = new QTScreen(ui->widget_video);
-
-    //云台组件
-//    pan_tilt = new QTPanTilt(ui->widget_right);
-
-    //监听
-    ui->pushButton->setText("协议停止");
-    ui->pushButton->setStyleSheet("#pushButton {background-color:#A3A3A3;border:1px solid #aabbcc;}");
-
-    connect(ui->pushButton, &QPushButton::clicked, [=](){
-
-        if(can_stop==0){
-            can_stop=1;
-#ifdef ENABLE_OPENCAN
-            controlMain->canopenQThread->wait();
-#endif
-//            uiReadThread->wait();
-            ui->pushButton->setText("协议停止");
-            ui->pushButton->setStyleSheet("#pushButton {background-color:#A3A3A3;}");
-            return;
-        }
-
-        if(can_stop==1){
-            can_stop=0;
-
-#ifdef ENABLE_OPENCAN
-            controlMain->canopenQThread->start();
-#endif
-//            Sleep(1);
-//            uiReadThread->start();
-//            Sleep(1);
-
-            ui->pushButton->setText("协议开启");
-            ui->pushButton->setStyleSheet("#pushButton {background-color:#3366cc;}");
-            return;
-        }
-    });
 
     connect(ui->CanConn, &QPushButton::clicked, [=](){
         int ret = start_tcp_client_th(ui->CanIP->text().toLatin1().data(),ui->CanPort->text().toInt());
@@ -127,8 +80,27 @@ void CanOpenUI::set_default_UI()
            ui->ModBusView->append("Modbus Server 开启失败! 502");
     });
 
+    connect(this,SIGNAL(AppendText(QString,int)),this,SLOT(SlotAppendText(QString,int)));
+
     //托盘
     qtTray = new QTTray(this);
+}
+
+void CanOpenUI::Append(const QString &text,int ch)
+{
+    emit AppendText(text,ch);
+}
+
+void CanOpenUI::SlotAppendText(const QString &text,int ch)
+{
+    if(ch==1){
+        ui->ModBusView->append(text);
+        return;
+    }
+    if(ch==2){
+        ui->textBrowser->append(text);
+        return;
+    }
 }
 
 void CanOpenUI::mousePressEvent(QMouseEvent *e)

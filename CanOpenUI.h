@@ -20,13 +20,23 @@ public:
     explicit CanOpenUI(QWidget *parent = nullptr);
     ~CanOpenUI();
 
-    Ui::CanOpenUI *ui;
 
 protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
+signals:
+    void AppendText(const QString &text,int ch);
+private slots:
+    void SlotAppendText(const QString &text,int ch);
+
+    //声明接口函数
+public:
+    void Append(const QString &text,int ch);
+
 private:
+    Ui::CanOpenUI *ui;
+
     //鼠标移动窗口移动
     QPoint mPoint;
 

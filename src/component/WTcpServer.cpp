@@ -6,11 +6,11 @@
 #include "UWLog.h"
 #include "WTcpServer.h"
 #include "WTcpClient.h"
-#include "ui_CanOpenUI.h"
 #include "ControlMain.h"
+#include "PGSQLDriveHelper.h"
 
 // Need to link with Ws2_32.lib
-
+#pragma execution_character_set("utf-8")
 
 int serv_dowork(int port);
 
@@ -18,7 +18,16 @@ int s_forever;
 
 SOCKET ListenSocket;
 std::thread thread_handle_tcpserver;//主线程
-Ui::CanOpenUI *ui;
+
+typedef struct _client_info
+{
+  SOCKET acceptSocket;
+  SOCKADDR_IN  addr;
+  char ip[128];
+  unsigned int port;
+  int len;
+} client_info;
+
 
 void recv_xly(unsigned char *frame,size_t len);
 
@@ -27,17 +36,16 @@ int tcp_server_start(int port){
     if (thread_handle_tcpserver.joinable())
         return 0;
 
-    ui = controlMain->mWin->ui;
-
     s_forever=1;
     thread_handle_tcpserver = std::thread(serv_dowork,port);
 
-    Sleep(500);
+    Sleep(300);
 
-    if (!thread_handle_tcpserver.joinable()){
-        return -1;
+    if (thread_handle_tcpserver.joinable()){
+        return 0;
     }
-    return 0;
+
+    return -2;
 }
 
 void tcp_server_stop(){
@@ -45,19 +53,27 @@ void tcp_server_stop(){
     if (thread_handle_tcpserver.joinable())
         thread_handle_tcpserver.join();
 
-    ui->ModBusView->append("stop");
+    CanOpenUI *ui=controlMain->mWin;
+    ui->Append("stop",1);
 }
 
 DWORD WINAPI ThreadProc(
     __in  LPVOID lpParameter
     )
 {
-    SOCKET AcceptSocket=(SOCKET) lpParameter;
+    client_info info = *(client_info *)lpParameter;
+//    SOCKET AcceptSocket=(SOCKET) lpParameter;
+
+    // 取得ip和端口号
+   sprintf(info.ip, inet_ntoa(info.addr.sin_addr));
+   info.port = ntohs(info.addr.sin_port);
+//   info.sock = new_fd;
+    log_debug("recv:ip=%s port=%d ",info.ip,info.port);
     //接收缓冲区的大小是50个字符
     char recvBuf[51];
     unsigned char hexs[256];
     while(s_forever){
-        int count =recv(AcceptSocket ,recvBuf,50,0);
+        int count =recv(info.acceptSocket ,recvBuf,50,0);
         if(count==0)break;//被对方关闭
 //        if(count==SOCKET_ERROR)break;//错误count<0
 //        int sendCount,currentPosition=0;
@@ -72,14 +88,19 @@ DWORD WINAPI ThreadProc(
 
         printf_hex(hexs,(unsigned char*)recvBuf,count);
 
-        ui->ModBusView->append((char *)hexs);
-        log_debug("接收来自客户端%d的信息：%s %d/n",AcceptSocket,hexs,strlen((char *)hexs));
+        //接收到的数据
+//        PGSQLDriveHelper::getInstance()->pg_add_exec((char *)hexs);
+        PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_recv",info.ip,info.port,(char *)hexs);
+
+        CanOpenUI *ui=controlMain->mWin;
+        ui->Append((char *)hexs,1);
+
+        log_debug("recv:%d %s %d ",info.acceptSocket,hexs,strlen((char *)hexs));
     }
     //结束连接
-    closesocket(AcceptSocket);
+    closesocket(info.acceptSocket);
     return 0;
 }
-
 
 int serv_dowork(int port)
 {
@@ -88,8 +109,8 @@ int serv_dowork(int port)
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != NO_ERROR) {
-        wprintf(L"WSAStartup failed with error: %ld\n", iResult);
-        return 1;
+        log_debug("WSAStartup failed with error: %ld", iResult);
+        return -1;
     }
     //----------------------
     // Create a SOCKET for listening for
@@ -97,9 +118,9 @@ int serv_dowork(int port)
 //    SOCKET ListenSocket;
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ListenSocket == INVALID_SOCKET) {
-        wprintf(L"socket failed with error: %ld\n", WSAGetLastError());
+        log_debug("socket failed with error: %ld", WSAGetLastError());
         WSACleanup();
-        return 1;
+        return -2;
     }
     //----------------------
     // The sockaddr_in structure specifies the address family,
@@ -112,10 +133,10 @@ int serv_dowork(int port)
 
     //绑定套接字到一个IP地址和一个端口上
     if (bind(ListenSocket,(SOCKADDR *) & addrServer, sizeof (addrServer)) == SOCKET_ERROR) {
-        wprintf(L"bind failed with error: %ld\n", WSAGetLastError());
+        log_debug("bind failed with error: %ld", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
-        return 1;
+        return -3;
     }
 
     //将套接字设置为监听模式等待连接请求
@@ -123,39 +144,47 @@ int serv_dowork(int port)
     // Listen for incoming connection requests.
     // on the created socket
     if (listen(ListenSocket, 5) == SOCKET_ERROR) {
-        wprintf(L"listen failed with error: %ld\n", WSAGetLastError());
+        log_debug("listen failed with error: %ld", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
-        return 1;
+        return -4;
     }
 
-    SOCKADDR_IN addrClient;
-    int len=sizeof(SOCKADDR);
+    client_info info;
+    info.acceptSocket=0;
+    info.addr={0};
+    info.len=sizeof(SOCKADDR);
+
+//    SOCKADDR_IN addrClient;
+//    int len=sizeof(SOCKADDR);
     //以一个无限循环的方式，不停地接收客户端socket连接
     while(s_forever)
     {
         //请求到来后，接受连接请求，返回一个新的对应于此次连接的套接字
-        SOCKET AcceptSocket=accept(ListenSocket,(SOCKADDR*)&addrClient,&len);
-        if(AcceptSocket  == INVALID_SOCKET)break; //出错
-
+        info.acceptSocket=accept(ListenSocket,(SOCKADDR*)&(info.addr),&info.len);
+        if(info.acceptSocket  == INVALID_SOCKET)
+        {
+            s_forever = 0;
+            log_debug("acceptSocket %d",info.acceptSocket);
+            break; //出错
+        }
         //启动线程
         DWORD dwThread;
-        HANDLE hThread = CreateThread(NULL,0,ThreadProc,(LPVOID)AcceptSocket,0,&dwThread);
+        HANDLE hThread = CreateThread(NULL,0,ThreadProc,(LPVOID)&info,0,&dwThread);
         if(hThread==NULL)
         {
-            closesocket(AcceptSocket);
-            wprintf(L"Thread Creat Failed!\n");
+            s_forever = 0;
+            closesocket(info.acceptSocket);
+            log_debug("Thread Creat Failed!");
             break;
         }
-
         CloseHandle(hThread);
     }
 
     closesocket(ListenSocket);
     WSACleanup();
 
-
-    return 0;
+    return -5;
 }
 
 

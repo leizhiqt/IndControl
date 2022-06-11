@@ -17,7 +17,7 @@ void QTTray::ui_init()
     QIcon icon(":win.ico");
     systemTray = new QSystemTrayIcon(this);
     systemTray->setIcon(icon);
-    systemTray->setToolTip(QString::fromLocal8Bit("BD-Dahua"));
+    systemTray->setToolTip("协议伺服器");
     systemTray->show();
 
     minimumAct = new QAction("Minimum Window", this);
@@ -80,11 +80,15 @@ int QTTray::OnSystemTrayClicked(QSystemTrayIcon::ActivationReason reason)
     if (reason == QSystemTrayIcon::Trigger
         || reason == QSystemTrayIcon::DoubleClick)
     {
+    #ifdef ENABLE_GUI
         // 显示主窗口
         if(parent->isHidden())
             parent->showNormal();
         else
             parent->hide();
+
+    #endif
+
     }
     return 0;
 }

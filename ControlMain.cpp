@@ -1,43 +1,38 @@
 ﻿#include "ControlMain.h"
 #include "UWLog.h"
 #include "WTcpClient.h"
+#include "WTcpServer.h"
 
 #pragma execution_character_set("utf-8")
 
 ControlMain::ControlMain(){
-    log_open("IndControl.txt");
+
+    conf = Conf::getInstance();
 
     mWin = new CanOpenUI();
     //mWin->setWindowTitle(QString::fromLocal8Bit("北斗伺服器"));
     mWin->setWindowTitle("CanOpen|ModBus|Tcp");
-//    mWin->hide();
-    mWin->show();
+//
+
 #ifdef ENABLE_OPENCAN
     canopenQThread = new CANopenQThread();
 #endif
 
-//    daHuaControll = DaHuaControll::getInstance();
-//    command = Command::getInstance();
-//    dbServer = BDServer::getInstance(8888);
+#ifdef ENABLE_GUI
+    mWin->show();
+#endif
 
-//    //register("PGSQLDriveHelper","pgHelper");
+#ifndef ENABLE_GUI
+    mWin->hide();
+    tcp_server_start(502);
+    start_tcp_client_th(conf->hostIp.toLatin1().data(),conf->port);
+#endif
 
-//    qDebug()<< "daHuaControll: "<<daHuaControll<<" static:"<<ControlMain::daHuaControll;
-//    qDebug()<< "dbServer: "<<dbServer<<" static:"<<ControlMain::dbServer;
-//    qDebug()<<"start";
-
-//    websocketServer = BDServer::getInstance(8000);
-//    deviceServer = BDServer::getInstance(8001);
 }
 
 ControlMain::~ControlMain(){
-//    delete mWin;
-//    delete dbServer;
-//    delete command;
-//    delete daHuaControll;
 
     stop_tcp_client_th();
 
-    log_close();
     qDebug()<<"destroy and Exit";
 }

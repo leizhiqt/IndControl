@@ -1,6 +1,6 @@
 win32 {
     INCLUDEPATH += $$PWD
-    LIBS += -lws2_32
+    LIBS +=
 
     #message($$INCLUDEPATH)
     #message($$LIBS)

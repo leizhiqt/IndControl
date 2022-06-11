@@ -19,18 +19,8 @@ private:
 
     ICommand *command;
 
-    BDServer(quint16 port);//1.构造函数私有
-    BDServer(const BDServer &);//拷贝构造函数不实现，防止拷贝产生多个实例
-    BDServer & operator =  (const BDServer &);//复制构造函数不实现，防止赋值产生多个实例
-
 public:
-//    BDServer(quint16 port);//1.构造函数私有
-    static BDServer * getInstance(quint16 port)//2.提供全局访问点
-    {
-        BDServer *newServer = new BDServer(port);//3.c++11保证了多线程安全，程序退出时，释放资源
-        return newServer;
-    }
-
+    BDServer(quint16 port);
     ~BDServer();
 
     void initialize();

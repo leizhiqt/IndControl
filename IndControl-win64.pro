@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-APP_BUILD = $$PWD/build
+buildDir = $$PWD/build/win64
 
 QT       += gui network websockets
 
@@ -69,10 +69,10 @@ FORMS += \
 RESOURCES += \
     resource.qrc
 
-DESTDIR = $$APP_BUILD/bin/win64
-MOC_DIR = $$APP_BUILD/temp
-RCC_DIR = $$APP_BUILD/temp
-OBJECTS_DIR = $$APP_BUILD/temp
+DESTDIR = $$buildDir/bin
+MOC_DIR = $$buildDir/temp
+RCC_DIR = $$buildDir/temp
+OBJECTS_DIR = $$buildDir/temp
 UI_DIR = $$PWD
 
 #DLLDESTDIR = $$[QT_INSTALL_BINS]

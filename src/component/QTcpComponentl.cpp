@@ -39,7 +39,7 @@ void QTcpComponentl::readRes(){
     log_debug("readRes");
     QByteArray data = visualTcpSocket->readAll();
     QString str(data);
-    controlMain->mWin->ui->textBrowser->append(str);
+//    controlMain->mWin->Append(str);
 }
 
 void QTcpComponentl::send(uint8_t *buf){

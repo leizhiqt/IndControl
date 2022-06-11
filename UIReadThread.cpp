@@ -46,9 +46,9 @@ void UIReadThread:: run()
     ui->textBrowser->append("======================================="); //添加到文本框显示
     while(1)
     {
-        if(can_stop){
-            break;
-        }
+//        if(can_stop){
+//            break;
+//        }
 
         if(aStream.atEnd()){
             Sleep(100);

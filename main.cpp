@@ -1,12 +1,4 @@
 ﻿#include <QApplication>
-#include <QMutex>
-#include <QFile>
-#include <QDateTime>
-#include <QTextStream>
-#include <QDebug>
-#include <QString>
-#include <QTextCodec>
-
 #include "ControlMain.h"
 
 ControlMain *controlMain;
@@ -17,7 +9,7 @@ int main(int argc, char *argv[])
 //    qInstallMessageHandler(myMessageOutput);
 //    qDebug("[%s %d]:%s",__FILE__ , __LINE__,"main");
 
-    printf("%s %d\n",__FILE__ , __LINE__);
+//    printf("%s %d\n",__FILE__ , __LINE__);
     //>>测试
 //    PGSQLDriveHelper pgsql;
 //    pgsql.pg_test();
@@ -27,7 +19,7 @@ int main(int argc, char *argv[])
     //<<测试
 
     QApplication qtApp(argc, argv);
-
+    setbuf(stdout, NULL);
 //    //启动主程序
     controlMain = new ControlMain();
 

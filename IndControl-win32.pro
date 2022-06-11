@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-APP_BUILD = $$PWD/build
+buildDir = $$PWD/build/win32
 
-QT       += gui network websockets
+QT       += core gui network websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -69,10 +69,10 @@ FORMS += \
 RESOURCES += \
     resource.qrc
 
-DESTDIR = $$APP_BUILD/bin/win32
-MOC_DIR = $$APP_BUILD/temp
-RCC_DIR = $$APP_BUILD/temp
-OBJECTS_DIR = $$APP_BUILD/temp
+DESTDIR = $$buildDir/bin
+MOC_DIR = $$buildDir/temp
+RCC_DIR = $$buildDir/temp
+OBJECTS_DIR = $$buildDir/temp
 UI_DIR = $$PWD
 
 #DLLDESTDIR = $$[QT_INSTALL_BINS]

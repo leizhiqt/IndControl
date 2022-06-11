@@ -2,8 +2,9 @@
 #include "stdarg.h"
 #include "stdio.h"
 #include <fstream>
-
 #include "FormatTimes.h"
+
+#pragma execution_character_set("utf-8")
 
 using namespace std;
 
@@ -15,12 +16,13 @@ void log_open(const char* savefp)
 {
     snprintf(logfile, sizeof(logfile),"%s",savefp);
     out_log_fp.open(logfile,ios::trunc);
+    printf("logfile save:%s\n",logfile);
 }
 
 void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 {
 
-    char bufstr[2048]    = "\0";
+    char bufstr[2048]   = "\0";
     char logstr[4096] = "\0";
     char times[20]="\0";
 
@@ -32,17 +34,19 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     va_end (va_alist);
 
-    //printf("logfile save:%s\n",logfile);
+//    printf("logfile save:%s\n",logfile);
 
     t_stime(times);
 
     snprintf(logstr,sizeof(logstr),"[%s\t%s\t%d]%s\n",times,files,line,bufstr);
 
 //    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
+    printf("%s",logstr);
 
     out_log_fp.write(logstr,strlen(logstr));
     out_log_fp.flush();
     //printf("_level:%d\n",_level);
+
 
 //    if(_level) printf("%s",logbuf);
 }
