@@ -1,4 +1,4 @@
-pgsqlDir = E:\pgsql-32
+pgsqlDir = E:\pgsql
 
 win32 {
 #    INCLUDEPATH += $$PWD $$PWD/../../ $$PWD/../../include/emqtt D:/pgsql/include

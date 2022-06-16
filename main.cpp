@@ -1,4 +1,7 @@
 ﻿#include <QApplication>
+#include <QSystemSemaphore>
+#include <QSharedMemory>
+#include <QMessageBox>
 #include "ControlMain.h"
 
 ControlMain *controlMain;
