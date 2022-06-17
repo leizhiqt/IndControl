@@ -1,13 +1,11 @@
-pgsqlDir = E:\pgsql
-
 win32 {
-#    INCLUDEPATH += $$PWD $$PWD/../../ $$PWD/../../include/emqtt D:/pgsql/include
-#    LIBS += -L$$PWD/../../lib/emqtt/x64 -lpaho-mqtt3a -lpaho-mqtt3c
 
-    INCLUDEPATH += $$PWD \
-                   $$pgsqlDir/include
+INCLUDEPATH += $$PWD \
+                   $$PWD/../../3rd/$$TARGET_ARCH/emqtt/include \
+                   $$PWD/../../3rd/$$TARGET_ARCH/pgsql/include
 
-    LIBS += -LE:\IndControl\build\win32\bin -llibpq
+    LIBS += -L$$PWD/../../3rd/$$TARGET_ARCH/emqtt/lib -lpaho-mqtt3a -lpaho-mqtt3c \
+            -L$$PWD/../../3rd/$$TARGET_ARCH/pgsql/lib -llibpq
 
     #message($$INCLUDEPATH)
     #message($$LIBS)

@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     QSharedMemory memory("IotService");//全局对象名
     if(!memory.create(1)) //如果全局对象存在则提示退出
     {
-       QMessageBox::information(0, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("IotService 已经运行!"));
+       QMessageBox::information(0, "提示", "IotService 已经运行!");
        semaphore.release();
        exit(0);
     }

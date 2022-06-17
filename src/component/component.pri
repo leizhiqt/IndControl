@@ -8,11 +8,13 @@ win32 {
     HEADERS += \
     $$PWD/QTcpComponentl.h \
     $$PWD/WTcpClient.h \
-    $$PWD/WTcpServer.h
+    $$PWD/WTcpServer.h \
+    $$PWD/BDServer.h
 
     SOURCES += \
     $$PWD/QTcpComponentl.cpp \
     $$PWD/WTcpClient.cpp \
-    $$PWD/WTcpServer.cpp
+    $$PWD/WTcpServer.cpp \
+    $$PWD/BDServer.cpp
 }
 
