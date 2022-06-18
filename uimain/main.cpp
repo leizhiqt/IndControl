@@ -8,19 +8,6 @@ ControlMain *controlMain;
 
 int main(int argc, char *argv[])
 {
-    //App start
-//    qInstallMessageHandler(myMessageOutput);
-//    qDebug("[%s %d]:%s",__FILE__ , __LINE__,"main");
-
-//    printf("%s %d\n",__FILE__ , __LINE__);
-    //>>测试
-//    PGSQLDriveHelper pgsql;
-//    pgsql.pg_test();
-    //MOD TEST
-//    readEnv();
-//    readHeadDisk();
-    //<<测试
-
     QApplication qtApp(argc, argv);
     setbuf(stdout, NULL);
     

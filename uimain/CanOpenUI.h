@@ -2,11 +2,10 @@
 #define CANOPENUI_H
 
 #include <QMainWindow>
-
 #include "Conf.h"
 #include "QTTray.h"
-#include "UIReadThread.h"
 #include "QTcpComponentl.h"
+#include "ui_CanOpenUI.h"
 
 namespace Ui {
 class CanOpenUI;

@@ -12,7 +12,7 @@ INCLUDEPATH += $$PWD \
 
     HEADERS += \
         $$PWD/JSONUtil.h \
-#        $$PWD/MQTTUtil.h \
+        $$PWD/MQTTUtil.h \
         $$PWD/MyDownloader.h \
         $$PWD/ShellProcess.h \
         $$PWD/IOTUtil.h \
@@ -23,7 +23,7 @@ INCLUDEPATH += $$PWD \
 
     SOURCES += \
         $$PWD/JSONUtil.cpp \
-#        $$PWD/MQTTUtil.cpp \
+        $$PWD/MQTTUtil.cpp \
         $$PWD/MyDownloader.cpp \
         $$PWD/ShellProcess.cpp \
         $$PWD/IOTUtil.cpp \
