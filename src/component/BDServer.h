@@ -24,10 +24,10 @@ private:
 
 public:
     ~BDServer();
-    static BDServer * getInstance(quint16 port)
+    static BDServer & getInstance(quint16 port)
     {
         static BDServer singleBDServer(port);
-        return &singleBDServer;
+        return singleBDServer;
     }
 
     void init();
