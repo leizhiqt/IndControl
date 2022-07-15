@@ -1,4 +1,6 @@
-﻿#ifndef CONTROLMAIN_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef CONTROLMAIN_H
 #define CONTROLMAIN_H
 
 //#define QTTRAY_ENABLE
@@ -8,6 +10,8 @@
 #include "IOTUtil.h"
 #include "Conf.h"
 #include "CanOpenUI.h"
+#include "WebSocket.h"
+#include "WTcpClient.h"
 
 #ifdef ENABLE_OPENCAN
 #include "CANopenQThread.h"
@@ -16,6 +20,9 @@
 #pragma execution_character_set("utf-8")
 class ControlMain
 {
+private:
+    void try_do();
+    void th_do();
 public:
     ControlMain();
     ~ControlMain();
@@ -26,6 +33,9 @@ public:
 #ifdef ENABLE_OPENCAN
     CANopenQThread *canopenQThread;
 #endif
+    WebSocket *webSocket;
+
+    SOCKET canOpenSocket;
 };
 
 extern ControlMain *controlMain;

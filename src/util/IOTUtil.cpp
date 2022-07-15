@@ -1,4 +1,6 @@
-﻿#include "IOTUtil.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "IOTUtil.h"
 #include "MyDownloader.h"
 
 #include <QDateTime>

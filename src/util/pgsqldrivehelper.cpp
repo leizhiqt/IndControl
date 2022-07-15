@@ -1,4 +1,6 @@
-﻿#include "PGSQLDriveHelper.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "PGSQLDriveHelper.h"
 #include "Conf.h"
 #include "UWLog.h"
 #include <iostream>

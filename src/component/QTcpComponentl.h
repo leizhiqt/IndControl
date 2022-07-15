@@ -1,4 +1,6 @@
-﻿#ifndef QTCPCOMPONENTL_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef QTCPCOMPONENTL_H
 #define QTCPCOMPONENTL_H
 #include <QTcpSocket>
 #include <QTcpServer>
@@ -18,15 +20,8 @@ private slots:
     void socketDisconnected();
     void readRes();
 
-//    void sendMessages();
-
 public:
     QTcpSocket *visualTcpSocket;
-
-//    QTcpServer *tcpSer;
-
-//    QString host;
-//    int port;
 };
 
-#endif // CANZLG_H
+#endif //QTCPCOMPONENTL_H

@@ -1,4 +1,6 @@
-﻿#ifndef FORMATTIMES_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef FORMATTIMES_H
 #define FORMATTIMES_H
 
 #include "stdio.h"

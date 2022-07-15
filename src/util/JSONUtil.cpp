@@ -1,4 +1,6 @@
-﻿#include "JSONUtil.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "JSONUtil.h"
 
 QString JSONUtil::jsonToStr(QJsonObject jsonObj){
     //JSON to String

@@ -1,4 +1,6 @@
-﻿#ifndef MYDOWNLOADER_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef MYDOWNLOADER_H
 #define MYDOWNLOADER_H
 #include <QObject>
 #include <QFile>

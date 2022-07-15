@@ -1,4 +1,6 @@
-﻿#include "MyDownloader.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "MyDownloader.h"
 #include <QFileInfo>
 
 MyDownloader::MyDownloader()

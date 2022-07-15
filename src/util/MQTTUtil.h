@@ -1,4 +1,6 @@
-﻿#ifndef MQTTUTIL_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef MQTTUTIL_H
 #define MQTTUTIL_H
 #include "MQTTClient.h"
 

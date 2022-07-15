@@ -1,4 +1,6 @@
-﻿#ifndef CANOPENUI_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef CANOPENUI_H
 #define CANOPENUI_H
 
 #include <QMainWindow>

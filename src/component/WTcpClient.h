@@ -1,10 +1,16 @@
-﻿#ifndef WTCPCLIENT_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef WTCPCLIENT_H
 #define WTCPCLIENT_H
 
-int tcp_client_send(unsigned char const *buf,size_t size);
+#define WIN32_LEAN_AND_MEAN
+#include<WinSock2.h>
+#include<WS2tcpip.h>
 
-int start_tcp_client_th(char * host,int port);
+int tcp_client_send(const SOCKET *sSocket,const char *buf,size_t size);
+
+int start_tcp_client_th(char * host,int port,SOCKET *sSocket);
 
 int stop_tcp_client_th();
 
-#endif // CANZLG_H
+#endif //WTCPCLIENT_H

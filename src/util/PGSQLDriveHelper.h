@@ -1,4 +1,6 @@
-﻿#ifndef PGSQLDRIVEHELPER_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef PGSQLDRIVEHELPER_H
 #define PGSQLDRIVEHELPER_H
 #include <libpq-fe.h>
 

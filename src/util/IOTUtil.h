@@ -1,4 +1,6 @@
-﻿#ifndef IOTUTILS_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef IOTUTILS_H
 #define IOTUTILS_H
 #include <QString>
 

@@ -1,9 +1,8 @@
-﻿#define BUF_SIZE 128
-#include <iostream>
+﻿#pragma execution_character_set("utf-8")
 
-#include<WinSock2.h>
-#include<WS2tcpip.h>
-#include<thread>
+#define BUF_SIZE 128
+#include <iostream>
+#include <thread>
 
 #include "UWLog.h"
 #include "WTcpClient.h"
@@ -13,17 +12,10 @@
 
 using namespace std;
 
-//int c_forever=0;
-
-SOCKET sSocket=-1;
-char to_host[128];
-int to_port;
-//std::thread thd_handle_client;//主线程
-
 //192.168.2.187
-int tcp_client_doth(char* host,int port)
+int tcp_client_doth(char* host,int port,SOCKET *sSocket)
 {
-    log_debug("tcp_client_doth ======================");
+    log_debug("tcp_client_do_conn");
     WSADATA wsd;
     SOCKADDR_IN servAddr;
 
@@ -34,10 +26,12 @@ int tcp_client_doth(char* host,int port)
         printf("WSAStartup failed\n");
         return -1;
     }
+
     //创建套接字
-    sSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (INVALID_SOCKET == sSocket) {
+    *sSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (INVALID_SOCKET == *sSocket) {
         printf("socker failed\n");
+        log_debug("socker failed %s %d",host,port);
         WSACleanup();
         return -2;
     }
@@ -50,9 +44,9 @@ int tcp_client_doth(char* host,int port)
     //连接服务器
     //log_debug("2====================== %s %d\n",host,port);
     for(int i=0;i<5;i++){
-        n = connect(sSocket, (LPSOCKADDR)&servAddr, nServAddrLen);
+        n = connect(*sSocket, (LPSOCKADDR)&servAddr, nServAddrLen);
         if (SOCKET_ERROR == n) {
-            log_debug("connect failed %d\n",SOCKET_ERROR);
+            log_debug("connect failed %d %s %d",SOCKET_ERROR,host,port);
            Sleep(500);
             continue;
         }
@@ -60,8 +54,7 @@ int tcp_client_doth(char* host,int port)
     }
 
     if (SOCKET_ERROR == n) {
-        log_debug("connect failed\n");
-//            closesocket(sSocket);
+        log_debug("connect failed %d %s %d",SOCKET_ERROR,host,port);
         WSACleanup();//释放套接字资源
         return -3;
     }
@@ -85,26 +78,24 @@ int tcp_client_doth(char* host,int port)
 //        log_debug("c_forever client");
 //        Sleep(200);
 //    }
-
-    strcpy(to_host,host);
-    to_port = port;
+    log_debug("conn ok %s %d",host,port);
     return 0;
 }
 
-int tcp_client_send(unsigned char const *buf,size_t size)
+int tcp_client_send(const SOCKET *sSocket,const char *buf,size_t size)
 {
-    log_debug("tcp_client_send sSocket:%d",sSocket);
+    log_debug("tcp_client_send sSocket:%d",*sSocket);
 
-    if(!(sSocket>0)){
+    if(!(*sSocket>0)){
         return 0;
     }
 
     int ret;
     //发送数据
-    unsigned char hexs[1024];
+    char hexs[1024];
     printf_hex(hexs,buf,size);
 //log_debug("tcp_client_send sSocket:%d c_forever:%d",sSocket,c_forever);
-    ret = send(sSocket,(char *)buf, size, 0);
+    ret = send(*sSocket,(char *)buf, size, 0);
     log_debug("tcp_client_send %d",ret);
 
     CanOpenUI *mWin = controlMain->mWin;
@@ -114,27 +105,15 @@ int tcp_client_send(unsigned char const *buf,size_t size)
         mWin->Append("下发失败",2);
     }
 
-    PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_send",to_host,to_port,(char *)hexs);
+    //写入数据库
+//    PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_send",to_host,to_port,(char *)hexs);
 //    log_debug("tcp_client_send");
     return 0;
 }
 
-
-int start_tcp_client_th(char * host,int port)
+int start_tcp_client_th(char * host,int port,SOCKET *sSocket)
 {
-//    if (thd_handle_client.joinable())
-//        return 0;
-
-//    c_forever=1;
-//    thd_handle_client = std::thread(tcp_client_doth,host,port);
-
-//    Sleep(500);
-
-//    if (!thd_handle_client.joinable()){
-//        return -1;
-//    }
-    tcp_client_doth(host,port);
-    return 0;
+    return tcp_client_doth(host,port,sSocket);
 }
 
 int stop_tcp_client_th()

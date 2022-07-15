@@ -1,4 +1,6 @@
-﻿#ifndef NETTOOLHELPER_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef NETTOOLHELPER_H
 #define NETTOOLHELPER_H
 #include "qstring.h"
 

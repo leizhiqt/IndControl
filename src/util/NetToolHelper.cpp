@@ -1,4 +1,6 @@
-﻿#include "NetToolHelper.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "NetToolHelper.h"
 #include <QtDebug>
 #include <QtNetwork/QtNetwork>
 

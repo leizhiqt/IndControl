@@ -1,4 +1,6 @@
-﻿#ifndef JSONUTIL_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef JSONUTIL_H
 #define JSONUTIL_H
 
 #include <QString>

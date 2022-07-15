@@ -1,4 +1,6 @@
-﻿#ifndef UWLOG_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef UWLOG_H
 #define UWLOG_H
 
 //#define uchar unsigned char
@@ -11,8 +13,7 @@
     void log_printfs(const char* files,unsigned int line,const char* fmt, ...);
     void log_close();
 
-    void printf_hex(unsigned char *hexs,unsigned char const *p,int size);
-
+    void printf_hex(char *hexs,char const *p,int size);
     /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */
      }

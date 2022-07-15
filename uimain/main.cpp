@@ -1,4 +1,6 @@
-﻿#include <QApplication>
+﻿#pragma execution_character_set("utf-8")
+
+#include <QApplication>
 #include <QSystemSemaphore>
 #include <QSharedMemory>
 #include <QMessageBox>
@@ -23,7 +25,7 @@ int main(int argc, char *argv[])
     }
     semaphore.release();
     
-//    //启动主程序
+    //启动主程序
     controlMain = new ControlMain();
 
     return qtApp.exec();

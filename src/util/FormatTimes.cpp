@@ -1,4 +1,6 @@
-﻿#include "FormatTimes.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "FormatTimes.h"
 
 //时间
 

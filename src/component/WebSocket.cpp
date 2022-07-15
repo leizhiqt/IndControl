@@ -1,4 +1,6 @@
-﻿#include "BDServer.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "WebSocket.h"
 #include <QDebug>
 #include <QHostAddress>
 #include <QJsonDocument>
@@ -7,19 +9,25 @@
 #include <QProcess>
 #include <QSharedMemory>
 #include <QBuffer>
+#include "WTcpClient.h"
+#include "UWLog.h"
+#include "PGSQLDriveHelper.h"
+#include "ControlMain.h"
 
-#pragma execution_character_set("utf-8")
+extern SOCKET jhjSocket;
 
-BDServer::BDServer(quint16 port)
+WebSocket::WebSocket(quint16 port)
 {
     this->port=port;
     init();
 
     this->start();
-    qDebug()<<"listen";
+
+    qDebug()<<"开始监听"<<port;
 }
 
-void BDServer::init()
+/* 初始化WebSocket服务 */
+void WebSocket::init()
 {
     qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     m_websocketserver = new QWebSocketServer("server", QWebSocketServer::NonSecureMode);
@@ -27,44 +35,39 @@ void BDServer::init()
     m_websocketserver->listen(QHostAddress::Any,port);
 }
 
-BDServer::~BDServer()
+WebSocket::~WebSocket()
 {
     qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     stop();
 }
 
-void BDServer::run()
+void WebSocket::run()
 {
     while(1){
-        //qDebug() << __FUNCTION__;
         sleep(180);
     }
 }
 
-void BDServer::stop()
+/* 停止服务 */
+void WebSocket::stop()
 {
-    qDebug() << __FUNCTION__;
-
+    //移除所有客户端连接
     for (int i = 0; i < m_clients.size(); ++i)
     {
         QWebSocket *csocket = (QWebSocket *)m_clients.at(i);
         if(csocket->state()==QAbstractSocket::SocketState::ConnectedState)
             csocket->close();
-
         m_clients.removeAt(i);
-        //qDebug() << "removeAt"<< csocket->close();
-        //m_clients.removeAt(i);       // 删除
-        //m_clients.append(csocket);   // 添加
     }
 
     m_websocketserver->close();
     m_websocketserver=NULL;
 }
 
-void BDServer::onNewConnection()
+/* 新连接接入 */
+void WebSocket::onNewConnection()
 {
-    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
-
+    //qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     client_socket = m_websocketserver->nextPendingConnection();
 
     connect(client_socket, SIGNAL(textMessageReceived(QString)), this, SLOT(recvTextMessage(QString)));
@@ -73,43 +76,43 @@ void BDServer::onNewConnection()
 
     connect(client_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
 
-    m_clients << client_socket;
+    m_clients.push_back(client_socket);
 }
 
-void BDServer::recvBinaryMessage(QByteArray message)
+/* 收到消息 */
+void WebSocket::recvBinaryMessage(QByteArray message)
 {
     qDebug()<<__FILE__<<__LINE__<<"recvTextMessage is:" <<message.toStdString().data();
+
 }
 
 
-//收到消息
-void BDServer::recvTextMessage(QString message)
+/* 收到消息 */
+void WebSocket::recvTextMessage(QString message)
 {
     qDebug()<<__FILE__<<__LINE__<<"recvTextMessage is:" <<message.toLatin1().constData();
-    printf("========================\n");
-//    DaHuaIOT *dahuaIOT = DaHuaIOT::getInstance();
-//    dahuaIOT->
-//    QByteArray bytes =message.toLatin1();
-//    const char* chp = bytes.data();
-    //cmd->processCommand(message);
+    //Web端发来的消息
+    const char *recvBuf = message.toLatin1().constData();
+    tcp_client_send(&(controlMain->canOpenSocket),recvBuf,message.length());
 }
 
-//连接断开的操作
-void BDServer::socketDisconnected()
+//连接断开
+void WebSocket::socketDisconnected()
 {
     qDebug()<<__FILE__<<__LINE__<<"socketDisconnected.";
 }
 
-//Send message to process
 //给客户端发送消息
-void BDServer::sendMessage(QString message)
+void WebSocket::sendMessage(QString message)
 {
     qDebug()<<__FILE__<<__LINE__<<"sendMessage.";
-    client_socket->sendTextMessage(message);
 }
 
-void BDServer::pushMessageToClients(QString content)
+//推送消息给客户端
+void WebSocket::pushMessageToClients(QString content)
 {
+//    qDebug()<<"push data:"<<content;
+    log_debug("sendTextMessage %s",content.toLatin1().constData());
     for (auto socket:m_clients) {
         socket->sendTextMessage(content);
     }

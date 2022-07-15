@@ -1,4 +1,6 @@
-﻿#ifndef SHELLPROCESS_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef SHELLPROCESS_H
 #define SHELLPROCESS_H
 
 #include <QThread>

@@ -1,4 +1,6 @@
-﻿#include "QTTray.h"
+﻿#pragma execution_character_set("utf-8")
+
+#include "QTTray.h"
 #include <QMenu>
 #include <QCoreApplication>
 #include <QCloseEvent>
@@ -17,7 +19,7 @@ void QTTray::ui_init()
     QIcon icon(":win.ico");
     systemTray = new QSystemTrayIcon(this);
     systemTray->setIcon(icon);
-    systemTray->setToolTip("协议伺服器");
+    systemTray->setToolTip("协议服务器");
     systemTray->show();
 
     minimumAct = new QAction("Minimum Window", this);

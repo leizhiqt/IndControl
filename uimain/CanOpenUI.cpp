@@ -1,4 +1,6 @@
-﻿#define WIN32_LEAN_AND_MEAN
+﻿#pragma execution_character_set("utf-8")
+
+#define WIN32_LEAN_AND_MEAN
 
 #include <QMouseEvent>
 #include "CanOpenUI.h"
@@ -6,8 +8,7 @@
 #include "UWLog.h"
 #include "WTcpClient.h"
 #include "WTcpServer.h"
-
-#pragma execution_character_set("utf-8")
+#include "Conf.h"
 
 CanOpenUI::CanOpenUI(QWidget *parent) :
     QMainWindow(parent),
@@ -15,9 +16,6 @@ CanOpenUI::CanOpenUI(QWidget *parent) :
 {
     ui->setupUi(this);
     set_default_UI();
-
-//    uiReadThread = new UIReadThread(ui);
-//    canClient = new TcpClientUtil();
 
 }
 
@@ -29,23 +27,21 @@ CanOpenUI::~CanOpenUI()
 
 void CanOpenUI::set_default_UI()
 {
-    //setWindowFlags(Qt::WindowStaysOnTopHint|Qt::CustomizeWindowHint|Qt::FramelessWindowHint|Qt::SubWindow);
-//    setWindowFlags(Qt::WindowStaysOnTopHint|Qt::CustomizeWindowHint|Qt::FramelessWindowHint|Qt::SubWindow);
-//    ui->centralWidget->setWindowFlags(Qt::FramelessWindowHint);
-
     connect(ui->CanConn, &QPushButton::clicked, [=](){
-        int ret = start_tcp_client_th(ui->CanIP->text().toLatin1().data(),ui->CanPort->text().toInt());
-        QString msg;
-        msg.append(ui->CanIP->text());
-        msg.append(":");
-        msg.append(ui->CanPort->text());
+//        int ret = start_tcp_client_th(canOpenIp,canOpenPort);
+//        QString msg;
+//        msg.append(canOpenIp);
+//        msg.append(":");
+//        msg.append(canOpenPort);
 
-        if(ret==0)
-            ui->textBrowser->append("连接成功");
-        else
-           ui->textBrowser->append("连接失败");
-
-        ui->textBrowser->append(msg);
+//        if(ret==0)
+//            //ui->textBrowser->append("连接成功");
+//            log_debug("can连接成功");
+//        else
+//           //ui->textBrowser->append("连接失败");
+//            log_debug("can连接失败");
+//        //ui->textBrowser->append(msg);
+//        log_debug(msg);
     });
 
     connect(ui->sendCan, &QPushButton::clicked, [=](){
@@ -66,18 +62,17 @@ void CanOpenUI::set_default_UI()
             frame[11]=0x00;//b6
             frame[12]=0x00;//b7
 
-           tcp_client_send(frame,sizeof(frame));
+//           tcp_client_send(frame,sizeof(frame));
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
-//        char *host =  ui->ModIP->text().toLatin1().data();
-//        log_debug("host:%s",host);
-//        modbus_tcp_thread_start(ui->ModIP->text().toLatin1().data(),ui->ModPort->text().toInt());
-        int ret = tcp_server_start(ui->ModPort->text().toInt());
-        if(ret==0)
-            ui->ModBusView->append("Modbus Server 开启成功! 502");
-        else
-           ui->ModBusView->append("Modbus Server 开启失败! 502");
+//        int ret = tcp_server_start(modBusPort);
+//        if(ret==0)
+//            //ui->ModBusView->append("Modbus Server 开启成功! 502");
+//            log_debug("Modbus开启成功");
+//        else
+//           //ui->ModBusView->append("Modbus Server 开启失败! 502");
+//           log_debug("Modbus开启失败");
     });
 
     connect(this,SIGNAL(AppendText(QString,int)),this,SLOT(SlotAppendText(QString,int)));
@@ -94,11 +89,13 @@ void CanOpenUI::Append(const QString &text,int ch)
 void CanOpenUI::SlotAppendText(const QString &text,int ch)
 {
     if(ch==1){
-        ui->ModBusView->append(text);
+        //ui->ModBusView->append(text);
+//        log_debug(text);
         return;
     }
     if(ch==2){
-        ui->textBrowser->append(text);
+        //ui->textBrowser->append(text);
+//        log_debug(text);
         return;
     }
 }
@@ -117,8 +114,6 @@ void CanOpenUI::mousePressEvent(QMouseEvent *e)
 
 void CanOpenUI::mouseMoveEvent(QMouseEvent *e)
 {
-    //Note that the returned value is always Qt::NoButton
-    //for mouse move events.
     if (e->buttons() & Qt::LeftButton) {
         move(e->globalPos() - mPoint);
         e->accept();

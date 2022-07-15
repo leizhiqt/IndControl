@@ -1,4 +1,6 @@
-﻿#ifndef QTTRAY_H
+﻿#pragma execution_character_set("utf-8")
+
+#ifndef QTTRAY_H
 #define QTTRAY_H
 
 //托盘

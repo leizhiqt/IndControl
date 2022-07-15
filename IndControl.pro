@@ -33,18 +33,8 @@ DEFINES += QT_MESSAGELOGCONTEXT
 CONFIG += c++11
 CONFIG -= debug_and_release
 
-#include(./src/example/example.pri)
-
 include(./src/util/utils.pri)
 include(./src/component/component.pri)
-
-#include(./src/protocol/protocol.pri)
-#include(./src/protocol/modbustcp.pri)
-#include(./src/protocol/zlgcan_x64/zlgcan_x64.pri)
-#include(./src/protocol/zlgcan_x86/zlgcan_x86.pri)
-
-#include(./src/plugs/plugs.pri)
-
 include(./src/qtview/qtview.pri)
 
 INCLUDEPATH += $$PWD/uimain
@@ -53,14 +43,12 @@ INCLUDEPATH += $$PWD/uimain
 HEADERS += \
         $$PWD/uimain/CanOpenUI.h \
         $$PWD/uimain/Conf.h \
-#        $$PWD/uimain/UIReadThread.h \
         $$PWD/uimain/ControlMain.h
 
 SOURCES += \
         $$PWD/uimain/CanOpenUI.cpp \
         $$PWD/uimain/Conf.cpp \
         $$PWD/uimain/main.cpp \
-#        $$PWD/uimain/UIReadThread.cpp \
         $$PWD/uimain/ControlMain.cpp
 
 FORMS += \
@@ -81,10 +69,9 @@ UI_DIR = $$PWD/uimain
 # Default rules for deployment.
 unix:   IndControl.files=
 win32:  IndControl.files= \
-#                    $$PWD/3rd/$$TARGET_ARCH/mysql/lib/*.dll \
                     $$PWD/3rd/$$TARGET_ARCH/pgsql/lib/*
 #                    $$PWD/3rd/$$TARGET_ARCH/emqtt/lib/*.dll
-#                    $$PWD/tools
+
 
 IndControl.path=$${DESTDIR}
 INSTALLS += IndControl
