@@ -23,16 +23,17 @@ WebSocket::WebSocket(quint16 port)
 
     this->start();
 
-    qDebug()<<"开始监听"<<port;
+    log_debug("开始监听:%d",port);
 }
 
 /* 初始化WebSocket服务 */
 void WebSocket::init()
 {
-    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     m_websocketserver = new QWebSocketServer("server", QWebSocketServer::NonSecureMode);
     connect(m_websocketserver, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     m_websocketserver->listen(QHostAddress::Any,port);
+
+    connect(this, SIGNAL(broadcast_msg(QString)), this, SLOT(slot_broadcast_msg(QString)));
 }
 
 WebSocket::~WebSocket()
@@ -80,20 +81,23 @@ void WebSocket::onNewConnection()
 }
 
 /* 收到消息 */
-void WebSocket::recvBinaryMessage(QByteArray message)
+void WebSocket::recvBinaryMessage(const QByteArray &message)
 {
-    qDebug()<<__FILE__<<__LINE__<<"recvTextMessage is:" <<message.toStdString().data();
-
+    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
+    const char *recvBuf = message.begin();
+    tcp_client_send((controlMain->canOpenSocket),recvBuf,strlen(recvBuf));
+    tcp_server_broadcast(controlMain->xly_srv,(char *)recvBuf,strlen(recvBuf));
 }
 
 
+
 /* 收到消息 */
-void WebSocket::recvTextMessage(QString message)
+void WebSocket::recvTextMessage(const QString &message)
 {
-    qDebug()<<__FILE__<<__LINE__<<"recvTextMessage is:" <<message.toLatin1().constData();
     //Web端发来的消息
-    const char *recvBuf = message.toLatin1().constData();
-    tcp_client_send(&(controlMain->canOpenSocket),recvBuf,message.length());
+    const char *recvBuf = message.toLocal8Bit().constData();
+    tcp_client_send((controlMain->canOpenSocket),recvBuf,strlen(recvBuf));
+    tcp_server_broadcast(controlMain->xly_srv,(char *)recvBuf,strlen(recvBuf));
 }
 
 //连接断开
@@ -108,12 +112,16 @@ void WebSocket::sendMessage(QString message)
     qDebug()<<__FILE__<<__LINE__<<"sendMessage.";
 }
 
+
 //推送消息给客户端
-void WebSocket::pushMessageToClients(QString content)
+void WebSocket::slot_broadcast_msg(QString content)
 {
-//    qDebug()<<"push data:"<<content;
-    log_debug("sendTextMessage %s",content.toLatin1().constData());
+//    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     for (auto socket:m_clients) {
         socket->sendTextMessage(content);
+//        qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
+//        socket->sendBinaryMessage(content);
+//        socket->sendBinaryMessage("\n");
+//        socket->flush();
     }
 }

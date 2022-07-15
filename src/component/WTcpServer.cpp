@@ -6,14 +6,9 @@
 #include "WTcpClient.h"
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
-
+#include "ConvertUtil.h"
 
 int serv_dowork(server_info_t *s_info);
-
-//SOCKET xlySocket;
-//SOCKET jhjSocket;
-
-void recv_xly(unsigned char *frame,size_t len);
 
 int tcp_server_start(server_info_t *s_info)
 {
@@ -31,36 +26,53 @@ void tcp_server_stop(server_info_t* s_info){
     ui->Append("stop",1);
 }
 
-DWORD WINAPI ThreadProc(
-    __in  LPVOID lpParameter
-    )
+int tcp_server_broadcast(server_info_t *s_info,char *buf,int len){
+    log_debug(__FUNCTION__);
+    for(size_t i = 0; i < controlMain->xly_cliens.size(); ++i)
+    {
+        tcp_client_send((controlMain->xly_cliens[i]),buf,len);
+    }
+    return 0;
+}
+
+DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 {
-    client_info info = *(client_info *)lpParameter;
+    client_info *info = (client_info *)lpParameter;
 
     // 取得ip和端口号
-   sprintf(info.ip, inet_ntoa(info.addr.sin_addr));
-   info.port = ntohs(info.addr.sin_port);
+    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
+    info->port = ntohs(info->addr.sin_port);
+    log_debug("recv:ip=%s port=%d ",info->ip,info->port);
 
-   log_debug("recv:ip=%s port=%d ",info.ip,info.port);
-    //接收缓冲区的大小是50个字符(这里是不是设小了?)
-    char recvBuf[51];
-
+    char recvBuf[1024] = {0};
+    int count = 0;
     while(1){
         memset(recvBuf,'\0',sizeof(recvBuf));
-        int count =recv(info.acceptSocket ,recvBuf,50,0);
-        if(count==0)break;//被对方关闭
+        count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
+        if (count == -1)
+        {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                break; //表示没有数据了
+            }
+            return 0; //遇见其他错误
+        }
 
-        if(info.s_info->recvFun !=NULL)
-            info.s_info->recvFun(recvBuf,count);
+        if(count==0) break;//被对方关闭
+
+        //处理接收数据 回调函数
+        if(info->s_info->recvFun!=NULL)
+            info->s_info->recvFun(recvBuf,count);
+
+        Sleep(300);
     }
     //结束连接
-    closesocket(info.acceptSocket);
+    closesocket(info->acceptSocket);
     return 0;
 }
 
 int serv_dowork(server_info_t *s_info)
 {
-//    server_info_t *s_info = &s_info_t;
     //----------------------
     // Initialize Winsock.
     log_debug("Initialize Winsock %d",s_info->port);
@@ -91,7 +103,6 @@ int serv_dowork(server_info_t *s_info)
     addrServer.sin_addr.s_addr = htonl(INADDR_ANY); //实际上是0
     addrServer.sin_port = htons(s_info->port);
 
-
     //绑定套接字到一个IP地址和一个端口上
     if (::bind(s_info->ListenSocket,(sockaddr *) &addrServer,sizeof(addrServer)) == SOCKET_ERROR)
     {
@@ -114,16 +125,16 @@ int serv_dowork(server_info_t *s_info)
     }
     log_debug("将套接字设置为监听模式等待连接请求:成功");
 
-    client_info info;
+    client_info info= {0};
     info.acceptSocket=0;
     info.addr={0};
     info.len=sizeof(SOCKADDR);
     info.s_info = s_info;
-//    SOCKADDR_IN addrClient;
-//    int len=sizeof(SOCKADDR);
+
     //以一个无限循环的方式，不停地接收客户端socket连接
     while(s_info->s_forever)
     {
+
         //请求到来后，接受连接请求，返回一个新的对应于此次连接的套接字
         info.acceptSocket=accept(s_info->ListenSocket,(SOCKADDR*)&(info.addr),&info.len);
         if(info.acceptSocket  == INVALID_SOCKET)
@@ -132,6 +143,9 @@ int serv_dowork(server_info_t *s_info)
             log_debug("acceptSocket %d",info.acceptSocket);
             break; //出错
         }
+
+        controlMain->xly_cliens.push_back(info.acceptSocket);
+
         //启动线程
         DWORD dwThread;
         HANDLE hThread = CreateThread(NULL,0,ThreadProc,(LPVOID)&info,0,&dwThread);
@@ -143,12 +157,35 @@ int serv_dowork(server_info_t *s_info)
             break;
         }
         CloseHandle(hThread);
+        Sleep(100);
     }
 
     closesocket(s_info->ListenSocket);
     WSACleanup();
 
     return -5;
+}
+
+void recvXly(char *buf,int len)
+{
+    if(buf==NULL || len<1)
+            return;
+
+    emit controlMain->webSocket->broadcast_msg((char *)buf);
+    //发送交换机
+    tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);
+
+    //CanOpenUI *ui=controlMain->mWin;
+    //ui->Append((char *)hexs,1);
+}
+
+void recvModbusTcp(char *buf,int len)
+{
+    if(buf==NULL || len<1)
+        return;
+
+    //发送交换机
+    tcp_client_send((controlMain->canOpenSocket),buf,len);
 }
 
 void recv_xly(unsigned char *frame,size_t len)
@@ -279,31 +316,4 @@ void recv_xly(unsigned char *frame,size_t len)
             //tcp_client_send(frame,len);
             return;
         }
-}
-
-void recvXly(char *buf,int len)
-{
-    //发送交换机
-    tcp_client_send(&(controlMain->canOpenSocket),buf,len);
-    //用委托的形式
-    QMetaObject::invokeMethod(controlMain->webSocket, "pushMessageToClients", Q_ARG(QString, buf));
-
-    //接收到的数据
-//        PGSQLDriveHelper::getInstance()->pg_add_exec((char *)hexs);
-//        PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_recv",info.ip,info.port,(char *)hexs);
-
-    //printf_hex(hexs,(char*)recvBuf,count);
-    //log_debug("recv csocket=%d len=%d %s",info.acceptSocket,strlen((char *)hexs),hexs);
-
-    //CanOpenUI *ui=controlMain->mWin;
-    //ui->Append((char *)hexs,1);
-}
-
-void recvModbusTcp(char *buf,int len){
-
-    //发送交换机
-    tcp_client_send(&(controlMain->canOpenSocket),buf,len);
-    //用委托的形式
-    QString qrecvStr(buf);
-    QMetaObject::invokeMethod(controlMain->webSocket, "pushMessageToClients", Q_ARG(QString, qrecvStr));
 }

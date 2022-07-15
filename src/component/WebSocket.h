@@ -42,17 +42,17 @@ public:
     void stop();
     void sendMessage(QString message);
 
-    //增加Q_INVOKABLE声明
-    Q_INVOKABLE void pushMessageToClients(QString message);
-
     void (*fun_processText)(QString);
 
 Q_SIGNALS:
+    void broadcast_msg(QString message);
 
 public Q_SLOTS:
     void onNewConnection();
-    void recvTextMessage(QString message);
+    void recvTextMessage(const QString &message);
     void socketDisconnected();
-    void recvBinaryMessage(QByteArray message);
+    void recvBinaryMessage(const QByteArray &message);
+
+    void slot_broadcast_msg(QString message);
 };
 #endif //WEBSOCKET_H

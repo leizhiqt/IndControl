@@ -6,6 +6,7 @@
 #include <fstream>
 #include <Windows.h>
 #include "FormatTimes.h"
+#include "ConvertUtil.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     char bufstr[2048]   = "\0";
     char logstr[4096] = "\0";
+    char log_gbk_str[4096] = "\0";
     char times[20]="\0";
 
     va_list va_alist;
@@ -39,10 +41,14 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     t_stime(times);
 
-    snprintf(logstr,sizeof(logstr),"[%ld %s\t%s\t%d]%s\n",GetCurrentThreadId(),times,files,line,bufstr);
+    utf8ToGbk(bufstr,log_gbk_str);
+
+    snprintf(logstr,sizeof(logstr),"[%ld %s\t%s\t%d]%s\n",GetCurrentThreadId(),times,files,line,log_gbk_str);
 
 //    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
     printf("%s",logstr);
+
+
 
     out_log_fp.write(logstr,strlen(logstr));
     out_log_fp.flush();
@@ -57,7 +63,7 @@ void log_close()
     out_log_fp.close();
 }
 
-void printf_hex(char *hexs,char const *p,int size)
+void sprintf_hex(char *hexs,char const *p,int size)
 {
     unsigned char bufs[1024];
     memset(bufs,'\0',sizeof(bufs));
@@ -70,4 +76,12 @@ void printf_hex(char *hexs,char const *p,int size)
     strcpy((char *)hexs,(char *)bufs);
 //    log_debug((char *)bufs);
     //printf(bufs);
+}
+
+void printf_hex(unsigned char *hexs,int len)
+{
+    for(int i=0;i<len;i++){
+        printf(" 0x%02x",*(hexs+i));
+    }
+    printf("\n");
 }

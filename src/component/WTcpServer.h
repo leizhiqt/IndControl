@@ -8,14 +8,16 @@
 #include<WS2tcpip.h>
 #include<thread>
 
+typedef struct _client_info client_info;
+typedef struct _server_info server_info_t;
+
 typedef struct _server_info
 {
-//  std::thread thread_handle_tcpserver;//主线程
   SOCKET ListenSocket;
   void (*recvFun)(char *buf,int len);
-
   int port;
   int s_forever;
+
 } server_info_t;
 
 typedef struct _client_info
@@ -30,6 +32,7 @@ typedef struct _client_info
 } client_info;
 
 int tcp_server_start(server_info_t *s_info);
+int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 
 void recvXly(char *buf,int len);
 void recvModbusTcp(char *buf,int len);

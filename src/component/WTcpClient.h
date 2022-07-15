@@ -7,10 +7,10 @@
 #include<WinSock2.h>
 #include<WS2tcpip.h>
 
-int tcp_client_send(const SOCKET *sSocket,const char *buf,size_t size);
+int tcp_client_send(const SOCKET sSocket,const char *buf,int size);
 
 int start_tcp_client_th(char * host,int port,SOCKET *sSocket);
 
-int stop_tcp_client_th();
+int stop_tcp_client_th(SOCKET *sSocket);
 
 #endif //WTCPCLIENT_H

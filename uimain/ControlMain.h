@@ -12,6 +12,7 @@
 #include "CanOpenUI.h"
 #include "WebSocket.h"
 #include "WTcpClient.h"
+#include "WTcpServer.h"
 
 #ifdef ENABLE_OPENCAN
 #include "CANopenQThread.h"
@@ -36,6 +37,10 @@ public:
     WebSocket *webSocket;
 
     SOCKET canOpenSocket;
+
+    server_info_t *modbus_srv;
+    server_info_t *xly_srv;
+    std::vector<SOCKET> xly_cliens;
 };
 
 extern ControlMain *controlMain;

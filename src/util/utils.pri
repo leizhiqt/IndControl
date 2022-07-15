@@ -33,3 +33,9 @@ INCLUDEPATH += $$PWD \
         $$PWD/UWLog.cpp
 }
 
+HEADERS += \
+    $$PWD/ConvertUtil.h
+
+SOURCES += \
+    $$PWD/ConvertUtil.cpp
+

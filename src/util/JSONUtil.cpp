@@ -2,6 +2,7 @@
 
 #include "JSONUtil.h"
 
+
 QString JSONUtil::jsonToStr(QJsonObject jsonObj){
     //JSON to String
     QJsonDocument document;
@@ -13,3 +14,7 @@ QString JSONUtil::jsonToStr(QJsonObject jsonObj){
     //qDebug() << __FILE__<< __LINE__<< "base64JSON>>>" << json_str<< "<<<base64JSON" << endl;
     return json_str;
 }
+
+
+
+

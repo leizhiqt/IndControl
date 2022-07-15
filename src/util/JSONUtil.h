@@ -16,4 +16,6 @@ public:
     static QString jsonToStr(QJsonObject jsonObj);
 };
 
+
+
 #endif // JSONUTIL_H
