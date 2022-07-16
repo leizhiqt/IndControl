@@ -102,12 +102,11 @@ void to_hexi(char *hexs,unsigned char* va,bool od)
         value.ascii[0] = va[0];
     }
 
-    log_debug("%02x %02x %02x %02x %16x",va[0],va[1],va[2],va[3],value.numeric);
-    log_debug("%02x %02x %02x %02x %16x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0],value.numeric);
-    log_debug("%4.4f",value.numeric);
+//    log_debug("%02x %02x %02x %02x %16x",va[0],va[1],va[2],va[3],value.numeric);
+//    log_debug("%02x %02x %02x %02x %16x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0],value.numeric);
+//    log_debug("%4.4f",value.numeric);
 
-    sprintf(hexs,"%4.4f",value.numeric);
-
+    sprintf(hexs,"%5.2f",value.numeric);
 
 //    unsigned char bufs[21];
 //    memset(bufs,'\0',sizeof(bufs));

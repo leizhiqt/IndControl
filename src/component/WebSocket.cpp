@@ -35,7 +35,7 @@ void WebSocket::init()
     connect(m_websocketserver, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     m_websocketserver->listen(QHostAddress::Any,port);
 
-    connect(this, SIGNAL(broadcast_msg(QString)), this, SLOT(slot_broadcast_msg(QString)));
+    connect(this, SIGNAL(broadcast_msg(QByteArray)), this, SLOT(slot_broadcast_msg(QByteArray)));
 }
 
 WebSocket::~WebSocket()
@@ -482,26 +482,41 @@ void WebSocket::nomal_broadcast_msg(QString message)
 }
 
 //推送消息给客户端
-void WebSocket::slot_broadcast_msg(QString content)
+void WebSocket::slot_broadcast_msg(QByteArray content)
 {
     //这里我也要用，推送消息给客户端
     qDebug()<<__FILE__<<__LINE__<<__FUNCTION__<<content;
 
-    char *str_ascii = content.toLatin1().data();
-    int ascii_len =content.toLatin1().length();
-    int bin_len = ascii_len/2;
-
-//    log_debug("ascii_len=%d bin_len=%d",ascii_len,bin_len);
-
-    unsigned char frame[1024];
-    hexs_to_binary(str_ascii,ascii_len,frame);
-
-    printf_hex(frame,bin_len);
-
+    int len = content.size();
     char json_buf[1024];
-    conver_request_xly_to_frame((const char*)frame,ascii_len,json_buf);
+    memset(json_buf,'\0',sizeof(json_buf));
+log_debug("QByteArray =%d",len);
 
-    log_debug("tcp_client_send");
+    if(len>=104){
+        QString message = QString(content);
+        message.remove(QRegExp("\\s"));
+
+        char *str_ascii = message.toLatin1().data();
+        int ascii_len =message.toLatin1().length();
+        int bin_len = ascii_len/2;
+
+        log_debug("ascii_len=%d bin_len=%d",ascii_len,bin_len);
+
+        unsigned char frame[1024];
+        hexs_to_binary(str_ascii,ascii_len,frame);
+
+        printf_hex(frame,bin_len);
+
+        conver_request_xly_to_frame((const char*)frame,bin_len,json_buf);
+    }else{ //len==52
+        char *frame = (char *)content.data();
+        printf_hex((unsigned char*)frame,content.length());
+        log_debug("buf len=%d %d",content.length(),content.size());
+        log_debug("ascii_len");
+        conver_request_xly_to_frame((const char*)frame,content.length(),json_buf);
+    }
+
+    log_debug("tcp_client_send %s",json_buf);
     for (auto socket:m_clients) {
         socket->sendTextMessage(json_buf);
 //        qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
