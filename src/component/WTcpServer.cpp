@@ -172,6 +172,7 @@ void recvXly(char *buf,int len)
             return;
 
     emit controlMain->webSocket->broadcast_msg((char *)buf);
+
     //发送交换机
     tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);
 

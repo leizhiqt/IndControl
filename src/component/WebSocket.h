@@ -44,6 +44,8 @@ public:
 
     void (*fun_processText)(QString);
 
+    void nomal_broadcast_msg(QString message);
+
 Q_SIGNALS:
     void broadcast_msg(QString message);
 

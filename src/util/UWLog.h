@@ -13,8 +13,6 @@
     void log_printfs(const char* files,unsigned int line,const char* fmt, ...);
     void log_close();
 
-    void printf_hex(unsigned char *hexs,int len);
-    void sprintf_hex(char *hexs,char const *p,int size);
     /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */
      }

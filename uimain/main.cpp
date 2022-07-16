@@ -5,6 +5,7 @@
 #include <QSharedMemory>
 #include <QMessageBox>
 #include "ControlMain.h"
+#include "ConvertUtil.h"
 
 ControlMain *controlMain;
 
@@ -25,6 +26,17 @@ int main(int argc, char *argv[])
     }
     semaphore.release();
     
+//    UStuff value;
+//    value.numeric=0.0;
+
+//    value.ascii[3] = 0x66;
+//    value.ascii[2] = 0x41;
+//    value.ascii[1] = 0x7c;
+//    value.ascii[0] = 0xcc;
+
+//    qDebug()<<value.numeric;
+//        printf("=====%f\n",value.numeric);
+
     //启动主程序
     controlMain = new ControlMain();
 

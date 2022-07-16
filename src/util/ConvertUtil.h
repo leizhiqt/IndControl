@@ -5,6 +5,19 @@
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
 #endif
 
+union UStuff
+ {
+     float  numeric;
+     unsigned char  ascii[4];
+ };
+
+void to_hexi(char *hexs,unsigned char* va,bool od);
+void to_hexc(char *hexs,unsigned char va);
+
+void sprintf_hex(char *hexs,char const *p,int size);
+
+void printf_hex(unsigned char *hexs,int len);
+
 int hexs_to_binary(char *in,int len, unsigned char *out);
 
 int binary_to_hexs(unsigned char *in, int len, char *out);

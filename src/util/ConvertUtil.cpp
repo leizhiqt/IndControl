@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Windows.h>
+#include "UWLog.h"
+#include <QDebug>
 
 int hexs_to_binary(char *in,int len, unsigned char *out) {
 //    int len = (int)strlen(in);
@@ -62,6 +64,76 @@ void utf8ToGbk(char *utf8String, char *gbkString)
 
     //unicode编码转换成gbk编码
     free(unicodeStr);
+}
+
+void sprintf_hex(char *hexs,char const *p,int size)
+{
+    unsigned char bufs[1024];
+    memset(bufs,'\0',sizeof(bufs));
+    char buf[20];
+    for (int i = 0; i < size;i++) {
+        memset(buf,'\0',sizeof(buf));
+        sprintf(buf,"%02x ",(unsigned char)*(p+i));
+        strcat((char *)bufs,buf);
+    }
+    strcpy((char *)hexs,(char *)bufs);
+//    log_debug((char *)bufs);
+    //printf(bufs);
+}
+
+void to_hexi(char *hexs,unsigned char* va,bool od)
+{
+    memset(hexs,'\0',512);
+//    sprintf(hexs,"%.4f",va);
+//    printf("%s %x\n",hexs,va);
+   UStuff value;
+    value.numeric=0.0;
+
+    if(od)
+    {
+        value.ascii[3] = va[0];
+        value.ascii[2] = va[1];
+        value.ascii[1] = va[2];
+        value.ascii[0] = va[3];
+    }else{
+        value.ascii[3] = va[3];
+        value.ascii[2] = va[2];
+        value.ascii[1] = va[1];
+        value.ascii[0] = va[0];
+    }
+
+    log_debug("%02x %02x %02x %02x %16x",va[0],va[1],va[2],va[3],value.numeric);
+    log_debug("%02x %02x %02x %02x %16x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0],value.numeric);
+    log_debug("%4.4f",value.numeric);
+
+    sprintf(hexs,"%4.4f",value.numeric);
+
+
+//    unsigned char bufs[21];
+//    memset(bufs,'\0',sizeof(bufs));
+
+//    char buf[5];
+//    for (int i = 0; i < 4;i++) {
+//        memset(buf,'\0',sizeof(buf));
+//        sprintf(buf,"%02x",(unsigned char)*(va+i));
+//        strcat((char *)bufs,buf);
+//    }
+//    log_debug("%s",bufs);
+//    strcat((char *)hexs,(char *)bufs);
+}
+
+void to_hexc(char *hexs,unsigned char va)
+{
+    memset(hexs,'\0',21);
+    sprintf(hexs,"%02x",va);
+}
+
+void printf_hex(unsigned char *hexs,int len)
+{
+    for(int i=0;i<len;i++){
+        printf(" 0x%02x",*(hexs+i));
+    }
+    printf("\n");
 }
 
 /*

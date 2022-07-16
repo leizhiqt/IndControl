@@ -62,26 +62,3 @@ void log_close()
 {
     out_log_fp.close();
 }
-
-void sprintf_hex(char *hexs,char const *p,int size)
-{
-    unsigned char bufs[1024];
-    memset(bufs,'\0',sizeof(bufs));
-    char buf[20];
-    for (int i = 0; i < size;i++) {
-        memset(buf,'\0',sizeof(buf));
-        sprintf(buf,"%02x ",(unsigned char)*(p+i));
-        strcat((char *)bufs,buf);
-    }
-    strcpy((char *)hexs,(char *)bufs);
-//    log_debug((char *)bufs);
-    //printf(bufs);
-}
-
-void printf_hex(unsigned char *hexs,int len)
-{
-    for(int i=0;i<len;i++){
-        printf(" 0x%02x",*(hexs+i));
-    }
-    printf("\n");
-}

@@ -18,7 +18,3 @@ win32 {
     $$PWD/WebSocket.cpp
 }
 
-HEADERS +=
-
-SOURCES +=
-

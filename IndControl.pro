@@ -36,6 +36,7 @@ CONFIG -= debug_and_release
 include(./src/util/utils.pri)
 include(./src/component/component.pri)
 include(./src/qtview/qtview.pri)
+include(./src/protocol/protocol.pri)
 
 INCLUDEPATH += $$PWD/uimain
 #LIBS += -lUser32
