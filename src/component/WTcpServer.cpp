@@ -174,7 +174,7 @@ void recvXly(char *buf,int len)
     printf_hex((unsigned char*)buf,len);
     log_debug("buf len=%d",len);
 
-    emit controlMain->webSocket->broadcast_msg(QByteArray(buf,len));
+    emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
 
     //发送交换机
 //    tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);

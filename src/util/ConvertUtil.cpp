@@ -4,6 +4,7 @@
 #include <string.h>
 #include <Windows.h>
 #include "UWLog.h"
+#include "UTypes.h"
 #include <QDebug>
 
 int hexs_to_binary(char *in,int len, unsigned char *out) {
@@ -66,7 +67,7 @@ void utf8ToGbk(char *utf8String, char *gbkString)
     free(unicodeStr);
 }
 
-void sprintf_hex(char *hexs,char const *p,int size)
+void sprintf_hex(char *hexs,unsigned char const *p,int size)
 {
     unsigned char bufs[1024];
     memset(bufs,'\0',sizeof(bufs));
@@ -86,8 +87,8 @@ void to_hexi(char *hexs,unsigned char* va,bool od)
     memset(hexs,'\0',512);
 //    sprintf(hexs,"%.4f",va);
 //    printf("%s %x\n",hexs,va);
-   UStuff value;
-    value.numeric=0.0;
+   _UStuff_t value;
+    value.va_float=0.0;
 
     if(od)
     {
@@ -106,7 +107,7 @@ void to_hexi(char *hexs,unsigned char* va,bool od)
 //    log_debug("%02x %02x %02x %02x %16x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0],value.numeric);
 //    log_debug("%4.4f",value.numeric);
 
-    sprintf(hexs,"%5.2f",value.numeric);
+    sprintf(hexs,"%5.2f",value.va_float);
 
 //    unsigned char bufs[21];
 //    memset(bufs,'\0',sizeof(bufs));
@@ -119,6 +120,26 @@ void to_hexi(char *hexs,unsigned char* va,bool od)
 //    }
 //    log_debug("%s",bufs);
 //    strcat((char *)hexs,(char *)bufs);
+}
+
+QString float_to_hex(float va)
+{
+   char hexs[128];
+   memset(hexs,'\0',sizeof(hexs));
+   _UStuff_t value;
+   value.va_float=va;
+   sprintf(hexs,"%02x%02x%02x%02x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0]);
+   return QString(hexs);
+}
+
+QString int_to_hex(int va)
+{
+    char hexs[128];
+    memset(hexs,'\0',sizeof(hexs));
+    _UStuff_t value;
+    value.va_int=va;
+    sprintf(hexs,"%02x%02x%02x%02x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0]);
+    return QString(hexs);
 }
 
 void to_hexc(char *hexs,unsigned char va)

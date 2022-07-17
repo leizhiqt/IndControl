@@ -1,20 +1,19 @@
 ﻿#ifndef CONVERTUTIL_H
 #define CONVERTUTIL_H
 
+#include <QString>
+
+QString float_to_hex(float va);
+QString int_to_hex(int va);
+
 #ifdef __cplusplus /* 如果采用了C++，如下代码使用C编译器 */
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
 #endif
 
-union UStuff
- {
-     float  numeric;
-     unsigned char  ascii[4];
- };
-
 void to_hexi(char *hexs,unsigned char* va,bool od);
 void to_hexc(char *hexs,unsigned char va);
 
-void sprintf_hex(char *hexs,char const *p,int size);
+void sprintf_hex(char *hexs,unsigned char const *p,int size);
 
 void printf_hex(unsigned char *hexs,int len);
 

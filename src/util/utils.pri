@@ -34,7 +34,8 @@ INCLUDEPATH += $$PWD \
 }
 
 HEADERS += \
-    $$PWD/ConvertUtil.h
+    $$PWD/ConvertUtil.h \
+    $$PWD/UTypes.h
 
 SOURCES += \
     $$PWD/ConvertUtil.cpp

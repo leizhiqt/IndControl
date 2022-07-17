@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <Qdebug>
 #include "ConvertUtil.h"
 #include "UWLog.h"
 
@@ -14,6 +15,7 @@
      char hexs[512];
      if(len>=sizeof(response_xly_t)){
         p=(response_xly_t *)frame_buf;
+        /*
         //QtJson topic
         QJsonObject response_xly_qjson;
         response_xly_qjson.insert("version", "1.0");
@@ -62,7 +64,7 @@
         char *str_p =bytes.begin();
         log_debug("tcp_client_send %s",str_p);
 //        strcpy(str_json,str_p);
-        log_debug("tcp_client_send");
+        log_debug("tcp_client_send");*/
     }
  }
 
@@ -107,3 +109,99 @@
 //        log_debug("tcp_client_send");
      }
  }
+
+/*
+ void conver_request_xly_to_frame(const char *frame_buf,const int len, char *str_json)
+ {
+     request_xly_t *p;
+          log_debug("conver_request_xly_to_frame %d %d",len,sizeof(request_xly_t));
+          char hexs[512];
+          if(len>=sizeof(request_xly_t)){
+             p=(request_xly_t *)frame_buf;
+             //QtJson topic
+             QJsonObject response_xly_qjson;
+             response_xly_qjson.insert("version", "1.0");
+             response_xly_qjson.insert("method", "gesturedata");
+
+             QJsonObject parms;
+             to_hexc(hexs,p->r1);parms.insert("r1",hexs);
+             to_hexc(hexs,p->r2);parms.insert("r2",hexs);
+
+             to_hexi(hexs,p->r3,true);parms.insert("r3",hexs);
+             to_hexi(hexs,p->r4,true);parms.insert("r4",hexs);
+             to_hexi(hexs,p->r5,true);parms.insert("r5",hexs);
+
+             to_hexi(hexs,p->r6,false);parms.insert("r6",hexs);
+             to_hexi(hexs,p->r7,false);parms.insert("r7",hexs);
+             to_hexi(hexs,p->r8,false);parms.insert("r8",hexs);
+
+             to_hexi(hexs,p->r9,false);parms.insert("r9",hexs);
+             to_hexi(hexs,p->r10,false);parms.insert("r10",hexs);
+             to_hexi(hexs,p->r11,false);parms.insert("r11",hexs);
+             to_hexi(hexs,p->r12,false);parms.insert("r12",hexs);
+             to_hexi(hexs,p->r13,false);parms.insert("r13",hexs);
+             to_hexi(hexs,p->r14,false);parms.insert("r14",hexs);
+             to_hexc(hexs,p->r15);parms.insert("r15",hexs);
+             to_hexc(hexs,p->r16);parms.insert("r16",hexs);
+
+             QJsonDocument doc(parms);
+             QString parms_str = QString(doc.toJson(QJsonDocument::Indented));
+             response_xly_qjson.insert("parms", parms);
+             QJsonDocument document;
+             document.setObject(response_xly_qjson);
+             QByteArray bytes = document.toJson(QJsonDocument::Indented);
+             char *str_p =bytes.begin();
+             log_debug("tcp_client_send %s",str_p);
+             strcpy(str_json,str_p);
+             log_debug("tcp_client_send");
+          }
+     /*
+     request_xly_t *p;
+     log_debug("conver_request_xly_to_frame %d %d",len,sizeof(request_xly_t));
+     char hexs[512];
+     if(len>=sizeof(request_xly_t)){
+
+         p=(request_xly_t *)frame_buf;
+
+        //QtJson topic
+        QJsonObject response_xly_qjson;
+        response_xly_qjson.insert("version", "1.0");
+        response_xly_qjson.insert("method", "gesturedata");
+
+        QJsonObject parms;
+        to_hexi(hexs,p->r3,true);parms.insert("bodyxvalue",hexs);
+        to_hexi(hexs,p->r4,true);parms.insert("bodyyvalue",hexs);
+        to_hexi(hexs,p->r5,true);parms.insert("bodyzvalue",hexs);
+        to_hexi(hexs,p->r6,true);parms.insert("bodyfyangle",hexs);
+        to_hexi(hexs,p->r7,true);parms.insert("bodyhgangle",hexs);
+        to_hexi(hexs,p->r8,true);parms.insert("bodyhxangle",hexs);
+        to_hexi(hexs,p->r9,true);parms.insert("headxvalue",hexs);
+        to_hexi(hexs,p->r10,true);parms.insert("headyvalue",hexs);
+        to_hexi(hexs,p->r11,true);parms.insert("headzvalue",hexs);
+        to_hexi(hexs,p->r12,true);parms.insert("headfyangle",hexs);
+        to_hexi(hexs,p->r13,true);parms.insert("headhgangle",hexs);
+        to_hexi(hexs,p->r14,true);parms.insert("headhxangle",hexs);
+        to_hexc(hexs,p->r15);parms.insert("qzystate",hexs);
+
+        QJsonDocument doc(parms);
+        QString parms_str=doc.toJson(QJsonDocument::Compact);
+        qDebug()<<parms_str;
+//        log_debug("toJson %s",parms_str.data());
+
+//        QString parms_str = doc.toJson(QJsonDocument::Indented);
+
+//        response_xly_qjson.insert("parms", parms);
+
+//        QJsonDocument document;
+//        document.setObject(response_xly_qjson);
+//        QByteArray bytes = document.toJson(QJsonDocument::Indented);
+//        char *str_p =bytes.begin();
+//        log_debug("tcp_client_send %s",str_p);
+
+        char t[]="abcddfdsfdsafsaf";
+        memcpy(str_json,t,sizeof(t));
+//        memcpy(str_json,str_p,bytes.size());
+//        log_debug("tcp_client_send");
+     }
+ }
+*/

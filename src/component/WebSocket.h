@@ -43,11 +43,11 @@ public:
     void sendMessage(QString message);
 
     void (*fun_processText)(QString);
-
-    void nomal_broadcast_msg(QString message);
+//    void nomal_broadcast_msg(QString message);
 
 Q_SIGNALS:
-    void broadcast_msg(QByteArray message);
+    void broadcast_binary(QByteArray message);
+    void broadcast_msg(QString message);
 
 public Q_SLOTS:
     void onNewConnection();
@@ -55,6 +55,7 @@ public Q_SLOTS:
     void socketDisconnected();
     void recvBinaryMessage(const QByteArray &message);
 
-    void slot_broadcast_msg(QByteArray message);
+    void slot_broadcast_binary(QByteArray message);
+    void slot_broadcast_msg(QString message);
 };
 #endif //WEBSOCKET_H
