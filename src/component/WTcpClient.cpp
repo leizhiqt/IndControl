@@ -12,7 +12,6 @@
 
 using namespace std;
 
-//192.168.2.187
 int tcp_client_doth(char* host,int port,SOCKET *sSocket)
 {
     log_debug("tcp_client_do_conn");
@@ -41,8 +40,8 @@ int tcp_client_doth(char* host,int port,SOCKET *sSocket)
     servAddr.sin_addr.s_addr = inet_addr(host);
     servAddr.sin_port = htons(port);
     int nServAddrLen = sizeof(servAddr);
+
     //连接服务器
-    //log_debug("2====================== %s %d\n",host,port);
     for(int i=0;i<3;i++){
         n = connect(*sSocket, (LPSOCKADDR)&servAddr, nServAddrLen);
         if (SOCKET_ERROR == n) {
@@ -58,14 +57,12 @@ int tcp_client_doth(char* host,int port,SOCKET *sSocket)
         WSACleanup();//释放套接字资源
         return -3;
     }
-    log_debug("conn ok %s %d",host,port);
+
     return 0;
 }
 
 int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
-//    log_debug("tcp_client_send sSocket:%d",*sSocket);
-//log_debug("tcp_client_send size:%s %d",buf,size);
     if(buf==NULL || size<1)
         return 0;
 
@@ -76,16 +73,6 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
     int n = send(sSocket,(char *)buf, size, 0);
     log_debug("tcp_client_send %d",n);
 
-//    CanOpenUI *mWin = controlMain->mWin;
-//    if(ret>0){
-//        mWin->Append((char *)hexs,2);
-//    }else{
-//        mWin->Append("下发失败",2);
-//    }
-
-    //写入数据库
-//    PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_send",to_host,to_port,(char *)hexs);
-//    log_debug("tcp_client_send");
     return 0;
 }
 
@@ -96,7 +83,6 @@ int start_tcp_client_th(char * host,int port,SOCKET *sSocket)
 
 int stop_tcp_client_th(SOCKET *sSocket)
 {
-
     CanOpenUI *mWin = controlMain->mWin;
     mWin->Append("stop",2);
 

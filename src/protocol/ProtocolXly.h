@@ -6,8 +6,6 @@
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
 #endif
 
-//#define PROTOCOLXLY_H
-
 typedef struct _response_xly_t response_xly_t;
 typedef struct _request_xly_t request_xly_t;
 

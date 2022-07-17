@@ -71,7 +71,6 @@ void WebSocket::stop()
 /* 新连接接入 */
 void WebSocket::onNewConnection()
 {
-    //qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     client_socket = m_websocketserver->nextPendingConnection();
 
     connect(client_socket, SIGNAL(textMessageReceived(QString)), this, SLOT(recvTextMessage(QString)));
@@ -100,7 +99,6 @@ void WebSocket::recvTextMessage(const QString &content)
     message.remove(QRegExp("\\s"));
 
     QByteArray msgBytes = message.toLatin1().constData();
-//    qDebug()<<msgBytes;
     log_debug("%s",msgBytes.begin());
     QJsonDocument jsonDocument = QJsonDocument::fromJson(msgBytes);
     if(jsonDocument.isNull() || (!jsonDocument.isObject() && jsonDocument.isArray())){
@@ -142,9 +140,6 @@ void WebSocket::recvTextMessage(const QString &content)
         //初始经度
         *((float *)&(response_xly.r3)) = valueContent.value("startxvalue").toString().toFloat();
 
-        log_debug("%02x %02x %02x %02x %d",response_xly.r3[3],response_xly.r3[2],
-                response_xly.r3[1],response_xly.r3[0],sizeof(_UStuff_t));
-
         //初始纬度
         *((float *)&(response_xly.r4))  = valueContent.value("startyvalue").toString().toFloat();
 
@@ -156,62 +151,77 @@ void WebSocket::recvTextMessage(const QString &content)
 
         //前置视觉标定
         *((int *)&(response_xly.r7)) = valueContent.value("frontview").toString().toInt();
+
         //后置视觉标定
         *((int *)&(response_xly.r8)) = valueContent.value("rearview").toString().toInt();
+
         //激光A点X坐标
         *((float *)&(response_xly.r9)) = valueContent.value("laseraxvalue").toString().toFloat();
+
         //激光A点Y坐标
         *((float *)&(response_xly.r10)) = valueContent.value("laserayvalue").toString().toFloat();
+
         //激光A点Z坐标
         *((float *)&(response_xly.r11)) = valueContent.value("laserazvalue").toString().toFloat();
+
         //激光B点X坐标
         *((float *)&(response_xly.r12)) = valueContent.value("laserbxvalue").toString().toFloat();
+
         //激光B点Y坐标
         *((float *)&(response_xly.r13)) = valueContent.value("laserbyvalue").toString().toFloat();
+
         //激光B点Z坐标
         *((float *)&(response_xly.r14)) = valueContent.value("laserbzvalue").toString().toFloat();
+
         //激光C点X坐标
         *((float *)&(response_xly.r15)) = valueContent.value("lasercxvalue").toString().toFloat();
+
         //激光C点Y坐标
         *((float *)&(response_xly.r16)) = valueContent.value("lasercyvalue").toString().toFloat();
+
         //激光C点Z坐标
         *((float *)&(response_xly.r17)) = valueContent.value("laserczvalue").toString().toFloat();
+
         //激光A1点X坐标
         *((float *)&(response_xly.r18)) = valueContent.value("lasera1xvalue").toString().toFloat();
+
         //激光A1点Y坐标
         *((float *)&(response_xly.r19)) = valueContent.value("lasera1yvalue").toString().toFloat();
+
         //激光A1点Z坐标
         *((float *)&(response_xly.r20)) = valueContent.value("lasera1zvalue").toString().toFloat();
+
         //激光B1点X坐标
         *((float *)&(response_xly.r21)) = valueContent.value("laserb1xvalue").toString().toFloat();
+
         //激光B1点Y坐标
         *((float *)&(response_xly.r22)) = valueContent.value("laserb1yvalue").toString().toFloat();
+
         //激光B1点Z坐标
         *((float *)&(response_xly.r23)) = valueContent.value("laserb1zvalue").toString().toFloat();
+
         //激光C1点X坐标
         *((float *)&(response_xly.r24)) = valueContent.value("laserc1xvalue").toString().toFloat();
+
         //激光C1点Y坐标
         *((float *)&(response_xly.r25)) = valueContent.value("laserc1yvalue").toString().toFloat();
+
         //激光C1点Z坐标
         *((float *)&(response_xly.r26)) = valueContent.value("laserc1zvalue").toString().toFloat();
+
         //截割深度
         *((float *)&(response_xly.r27)) = valueContent.value("cutdepth").toString().toFloat();
+
         //掘进速度
         *((float *)&(response_xly.r28)) = valueContent.value("diginspeed").toString().toFloat();
         response_xly.r29 = 0xBF;
-
-//        char hexs[sizeof(response_xly_t)+1]={0xf};
-//        sprintf_hex(hexs,(const unsigned char *)&response_xly,sizeof(response_xly_t));
-//        log_debug("%d %s",sizeof(response_xly_t),hexs);
-
         printf_hex((unsigned char *)&response_xly,sizeof(response_xly_t));
-        log_debug("发送：%d",sizeof(response_xly_t));
+
         //将报文下发给位姿系统客户端
         for(size_t i = 0; i < controlMain->xly_cliens.size(); ++i)
         {
             tcp_client_send((controlMain->xly_cliens[i]),(char *)&response_xly,sizeof(response_xly_t));
         }
-
         //给WEBSOCKET客户端推送消息
         emit broadcast_msg("{\"version\":\"1.0\",\"method\":\"paramset\",\"result\":\"参数设置发送完毕\"}");
     }
@@ -232,12 +242,9 @@ void WebSocket::sendMessage(QString message)
 //给客户端发送消息
 void WebSocket::slot_broadcast_msg(QString message)
 {
-    log_debug("nomal_broadcast_msg %s",message.toLatin1().data());
     for (auto socket:m_clients) {
-        log_debug("m_clients");
         socket->sendTextMessage(message);
     }
-    log_debug("end");
 }
 
 //推送消息给客户端binary
@@ -247,8 +254,6 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
     char json_buf[1024];
     memset(json_buf,'\0',sizeof(json_buf));
 
-    log_debug("QByteArray =%d",len);
-
     if(len>=104){
         QString message = QString(content);
         message.remove(QRegExp("\\s"));
@@ -257,15 +262,13 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
         int ascii_len =message.toLatin1().length();
         int bin_len = ascii_len/2;
 
-        log_debug("ascii_len=%d bin_len=%d",ascii_len,bin_len);
-
         unsigned char frame[1024];
         hexs_to_binary(str_ascii,ascii_len,frame);
 
         printf_hex(frame,bin_len);
 
         conver_request_xly_to_frame((const char*)frame,bin_len,json_buf);
-    }else{ //len==52
+    }else{
         char *frame = (char *)content.data();
         printf_hex((unsigned char*)frame,content.length());
         log_debug("buf len=%d %d",content.length(),content.size());
@@ -273,13 +276,8 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
         conver_request_xly_to_frame((const char*)frame,content.length(),json_buf);
     }
 
-    log_debug("tcp_client_send %s",json_buf);
     //推送消息给客户端
     for (auto socket:m_clients) {
         socket->sendTextMessage(json_buf);
-//        qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
-//        socket->sendBinaryMessage(content);
-//        socket->sendBinaryMessage("\n");
-//        socket->flush();
     }
 }

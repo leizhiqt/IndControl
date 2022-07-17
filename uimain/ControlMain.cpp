@@ -50,7 +50,6 @@ ControlMain::ControlMain(){
 
 ControlMain::~ControlMain(){
 
-//    stop_tcp_client_th();
     qDebug()<<"destroy and Exit";
 }
 
