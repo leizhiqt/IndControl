@@ -177,7 +177,7 @@ void recvXly(char *buf,int len)
     emit controlMain->webSocket->broadcast_msg(QByteArray(buf,len));
 
     //发送交换机
-    tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);
+//    tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);
 
     //CanOpenUI *ui=controlMain->mWin;
     //ui->Append((char *)hexs,1);

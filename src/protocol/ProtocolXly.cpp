@@ -79,25 +79,20 @@
         response_xly_qjson.insert("method", "gesturedata");
 
         QJsonObject parms;
-        to_hexc(hexs,p->r1);parms.insert("r1",hexs);
-        to_hexc(hexs,p->r2);parms.insert("r2",hexs);
 
-        to_hexi(hexs,p->r3,true);parms.insert("r3",hexs);
-        to_hexi(hexs,p->r4,true);parms.insert("r4",hexs);
-        to_hexi(hexs,p->r5,true);parms.insert("r5",hexs);
-        to_hexi(hexs,p->r6,true);parms.insert("r6",hexs);
-        to_hexi(hexs,p->r7,true);parms.insert("r7",hexs);
-        to_hexi(hexs,p->r8,true);parms.insert("r8",hexs);
-
-        to_hexi(hexs,p->r9,true);parms.insert("r9",hexs);
-        to_hexi(hexs,p->r10,true);parms.insert("r10",hexs);
-        to_hexi(hexs,p->r11,true);parms.insert("r11",hexs);
-        to_hexi(hexs,p->r12,true);parms.insert("r12",hexs);
-        to_hexi(hexs,p->r13,true);parms.insert("r13",hexs);
-        to_hexi(hexs,p->r14,true);parms.insert("r14",hexs);
-
-        to_hexc(hexs,p->r15);parms.insert("r15",hexs);
-        to_hexc(hexs,p->r16);parms.insert("r16",hexs);
+        to_hexi(hexs,p->r3,true);parms.insert("bodyxvalue",hexs);
+        to_hexi(hexs,p->r4,true);parms.insert("bodyyvalue",hexs);
+        to_hexi(hexs,p->r5,true);parms.insert("bodyzvalue",hexs);
+        to_hexi(hexs,p->r6,true);parms.insert("bodyfyangle",hexs);
+        to_hexi(hexs,p->r7,true);parms.insert("bodyhgangle",hexs);
+        to_hexi(hexs,p->r8,true);parms.insert("bodyhxangle",hexs);
+        to_hexi(hexs,p->r9,true);parms.insert("headxvalue",hexs);
+        to_hexi(hexs,p->r10,true);parms.insert("headyvalue",hexs);
+        to_hexi(hexs,p->r11,true);parms.insert("headzvalue",hexs);
+        to_hexi(hexs,p->r12,true);parms.insert("headfyangle",hexs);
+        to_hexi(hexs,p->r13,true);parms.insert("headhgangle",hexs);
+        to_hexi(hexs,p->r14,true);parms.insert("headhxangle",hexs);
+        to_hexc(hexs,p->r15);parms.insert("qzystate",hexs);
 
         QJsonDocument doc(parms);
         QString parms_str = QString(doc.toJson(QJsonDocument::Indented));

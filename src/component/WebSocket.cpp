@@ -484,9 +484,6 @@ void WebSocket::nomal_broadcast_msg(QString message)
 //推送消息给客户端
 void WebSocket::slot_broadcast_msg(QByteArray content)
 {
-    //这里我也要用，推送消息给客户端
-    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__<<content;
-
     int len = content.size();
     char json_buf[1024];
     memset(json_buf,'\0',sizeof(json_buf));
@@ -517,6 +514,7 @@ log_debug("QByteArray =%d",len);
     }
 
     log_debug("tcp_client_send %s",json_buf);
+    //推送消息给客户端
     for (auto socket:m_clients) {
         socket->sendTextMessage(json_buf);
 //        qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
