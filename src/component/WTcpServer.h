@@ -34,7 +34,9 @@ typedef struct _client_info
 int tcp_server_start(server_info_t *s_info);
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 
+//位姿系统接收
 void recvXly(char *buf,int len);
+//modbus接收
 void recvModbusTcp(char *buf,int len);
 
 #endif // WTCPSERVER_H

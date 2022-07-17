@@ -166,6 +166,7 @@ int serv_dowork(server_info_t *s_info)
     return -5;
 }
 
+//位姿系统接收
 void recvXly(char *buf,int len)
 {
     if(buf==NULL || len<1)
@@ -174,15 +175,14 @@ void recvXly(char *buf,int len)
     printf_hex((unsigned char*)buf,len);
     log_debug("buf len=%d",len);
 
+    //信号槽机制 广播websocket
     emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
-
-    //发送交换机
-//    tcp_client_send((controlMain->canOpenSocket),(char *)buf,len);
 
     //CanOpenUI *ui=controlMain->mWin;
     //ui->Append((char *)hexs,1);
 }
 
+//modbus接收
 void recvModbusTcp(char *buf,int len)
 {
     if(buf==NULL || len<1)
@@ -191,31 +191,9 @@ void recvModbusTcp(char *buf,int len)
     //发送交换机
     tcp_client_send((controlMain->canOpenSocket),buf,len);
 }
-
+/*
 void recv_xly(unsigned char *frame,size_t len)
 {
-//    unsigned char frame[13];
-//    memset(frame,'\0',sizeof(frame));
-//    frame[0]=0x06;
-//    frame[1]=0x00;
-//    frame[2]=0x00;
-//    frame[3]=0x01;
-//    frame[4]=0x8a;
-
-//    frame[5]=0x00;//b0
-//    frame[6]=0x00;//b1
-//    frame[7]=0x0;//b2
-//    frame[8]=0x01;//b3
-//    frame[9]=0x00;//b4
-//    frame[10]=0x00;//b5
-//    frame[11]=0x00;//b6
-//    frame[12]=0x00;//b7
-
-       if((*(frame)<9 && *(frame)>0))
-       {
-            return;
-       }
-
         if(*(frame+1)==0x01 && *(frame+2)==0x8a){
 //                if(*(frame+7)==0x01)
 //            printf_hex(frame,len);
@@ -321,3 +299,4 @@ void recv_xly(unsigned char *frame,size_t len)
             return;
         }
 }
+*/

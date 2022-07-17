@@ -11,6 +11,9 @@
 typedef struct _response_xly_t response_xly_t;
 typedef struct _request_xly_t request_xly_t;
 
+typedef struct _response_opencan_t response_opencan_t;
+typedef struct _request_opencan_t request_opencan_t;
+
 struct _response_xly_t
  {
     uchar_8 r1;
@@ -65,8 +68,25 @@ struct _response_xly_t
  };
 
  void conver_response_to_json(const char *str_json,const int len, char *frame_buf);
-
  void conver_request_xly_to_frame(const char *frame_buf,const int len, char *str_json);
+
+
+ struct _response_opencan_t
+  {
+     uchar_8 r1;
+     uchar_8 r2;
+     uchar_8 r3;
+     uchar_8 r4;
+     uchar_8 r5;
+     uchar_8 r6;//b0
+     uchar_8 r7;//b1
+     uchar_8 r8;//b2
+     uchar_8 r9;//b3
+     uchar_8 r10;//b4
+     uchar_8 r11;//b5
+     uchar_8 r12;//b6
+     uchar_8 r13;//b7
+};
 
 /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */
