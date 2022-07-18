@@ -69,7 +69,7 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
     if(!(sSocket>0)){
         return 0;
     }
-    log_debug("%d %s",size,buf);
+//    log_debug("%d %s",size,buf);
     int n = send(sSocket,(char *)buf, size, 0);
     log_debug("tcp_client_send %d",n);
 
@@ -88,3 +88,4 @@ int stop_tcp_client_th(SOCKET *sSocket)
 
     return 0;
 }
+

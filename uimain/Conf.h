@@ -4,6 +4,8 @@
 #define CONF_H
 
 #include <QString>
+#include <QStringList>
+#include <map>
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -40,6 +42,11 @@ public:
         int canOpenPort;//CAN服务端口
 
         int websocketPort;//WEBSOCKET服务端口
+
+        std::map<std::string,QByteArray> conf_can_packs;//设备控制报文
+
+        QStringList controlNameList;//设备控制名称
+        QStringList controlValueList;//设备控制报文
 public:
         ~Conf();
         static Conf * getInstance()//2.提供全局访问点

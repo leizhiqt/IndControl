@@ -91,7 +91,7 @@ void WebSocket::recvBinaryMessage(const QByteArray &message)
     tcp_server_broadcast(controlMain->xly_srv,(char *)recvBuf,strlen(recvBuf));
 }
 
-/* 收到消息 */
+/* 这是websocket 收到消息 */
 void WebSocket::recvTextMessage(const QString &content)
 {
     //JAVA发来的消息
@@ -118,7 +118,7 @@ void WebSocket::recvTextMessage(const QString &content)
 
     //如果消息内容是参数配置
     if(cmdName.toString() == "paramset"){
-
+        //{"version":"1.0","method":"paramset","params":{"字段1":"值1","字段2":"值2",...,"字段N":"值N"}}
         QJsonValue paramObject = jsonObject.value("params");
         if(!paramObject.isObject()){
             log_debug("Websocket解析结果：参数格式不正确");
@@ -218,12 +218,91 @@ void WebSocket::recvTextMessage(const QString &content)
         printf_hex((unsigned char *)&response_xly,sizeof(response_xly_t));
 
         //将报文下发给位姿系统客户端
-        for(size_t i = 0; i < controlMain->xly_cliens.size(); ++i)
-        {
-            tcp_client_send((controlMain->xly_cliens[i]),(char *)&response_xly,sizeof(response_xly_t));
-        }
+        tcp_server_broadcast(controlMain->xly_srv,(char *)&response_xly,sizeof(response_xly_t));
+
         //给WEBSOCKET客户端推送消息
         emit broadcast_msg("{\"version\":\"1.0\",\"method\":\"paramset\",\"result\":\"参数设置发送完毕\"}");
+        return;
+    }
+
+     if(cmdName.toString() == "devicecontrol"){
+         log_debug("devicecontrol");
+//         response_opencan13_t contr_can={0};
+        //{"version":"1.0","method":"devicecontrol","params":"字段1"}}
+        //解析得到命令内容封装协议并转发给交换机
+        QJsonValue cmdText = jsonObject.value("params");
+        QString cmdstr = cmdText.toString();
+        //紧急停止
+        if(cmdText.toString()=="Control001" || cmdText.toString()=="Control002"
+                ||cmdText.toString()=="Control003"||cmdText.toString()=="Control004"
+                ||cmdText.toString()=="Control005"||cmdText.toString()=="Control006"){
+
+            cmdstr = "ControlSet/"+cmdstr;
+
+            std::string stdcmd=cmdstr.toStdString();
+            log_debug("cmdText %s",stdcmd.c_str());
+
+            std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
+            if(iter != Conf::getInstance()->conf_can_packs.end())
+            {
+                log_debug("is find %s",cmdstr.toLatin1().data());
+                QByteArray qbuf = iter->second;
+                char *buf = qbuf.begin();
+                printf_hex((unsigned char *)buf,qbuf.length());
+                tcp_client_send(controlMain->canOpenSocket,buf,qbuf.length());
+            }
+            else{
+                log_debug("not find %s",cmdstr.toLatin1().data());
+            }
+
+            return;
+        }
+/*
+        //一键启动
+        if(cmdText.toString()=="control002"){
+            //根据收到的命令封装can桢
+            contr_can.r1=0x08;
+            contr_can.r4=0x01;
+            contr_can.r5=0x9d;
+            contr_can.r7=0x30;//只修改这个值就可以了
+//            tcp_client_send(canOpenSocket,(char *)&contr_can,sizeof(response_opencan11_t));
+            return;
+        }
+        //启动智能通风
+         if(cmdText.toString()=="control003"){
+            //根据收到的命令封装can桢
+            contr_can.r1=0x08;
+            contr_can.r4=0x01;
+            contr_can.r5=0x9d;
+            contr_can.r7=0x10;//只修改这个值就可以了
+//            tcp_client_send(canOpenSocket,(char *)&contr_can,sizeof(response_opencan11_t));
+
+        }
+        //停止智能通风
+        if(cmdText.toString()=="control004"){
+            //根据收到的命令封装can桢
+            contr_can.r1=0x08;
+            contr_can.r4=0x01;
+            contr_can.r5=0x9d;
+            contr_can.r7=0x10;//只修改这个值就可以了
+        }
+        //启动智能运输
+        if(cmdText.toString()=="control005"){
+            //根据收到的命令封装can桢
+            contr_can.r1=0x08;
+            contr_can.r4=0x01;
+            contr_can.r5=0x9d;
+            contr_can.r7=0x10;//只修改这个值就可以了
+        }
+        //停止智能运输
+        if(cmdText.toString()=="control006"){
+            //根据收到的命令封装can桢
+            contr_can.r1=0x08;
+            contr_can.r4=0x01;
+            contr_can.r5=0x9d;
+            contr_can.r7=0x10;//只修改这个值就可以了
+        }
+        */
     }
 }
 

@@ -7,6 +7,7 @@
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
+#include<vector>
 
 int serv_dowork(server_info_t *s_info);
 
@@ -28,9 +29,13 @@ void tcp_server_stop(server_info_t* s_info){
 
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len){
     log_debug(__FUNCTION__);
-    for(size_t i = 0; i < controlMain->xly_cliens.size(); ++i)
+
+   std::vector<SOCKET> cliens_p = *(s_info->cliens_p);
+//   if(cliens_p==NULL) return 1;
+
+    for(size_t i = 0; i < cliens_p.size(); ++i)
     {
-        tcp_client_send((controlMain->xly_cliens[i]),buf,len);
+        tcp_client_send(cliens_p[i],buf,len);
     }
     return 0;
 }
@@ -132,7 +137,7 @@ int serv_dowork(server_info_t *s_info)
             break; //出错
         }
 
-        controlMain->xly_cliens.push_back(info.acceptSocket);
+        s_info->cliens_p->push_back(info.acceptSocket);
 
         //启动线程
         DWORD dwThread;
@@ -176,6 +181,8 @@ void recvModbusTcp(char *buf,int len)
     if(buf==NULL || len<1)
         return;
 
+  //这里才是MODBUS 接收
+//但是这里你不能直接转发出去撒，需要转成CAN的报文先
     //发送交换机
-    tcp_client_send((controlMain->canOpenSocket),buf,len);
+    //tcp_client_send((controlMain->canOpenSocket),buf,len);
 }

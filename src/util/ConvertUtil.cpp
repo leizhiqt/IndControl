@@ -7,7 +7,7 @@
 #include "UTypes.h"
 #include <QDebug>
 
-int hexs_to_binary(char *in,int len, unsigned char *out) {
+int hexs_to_binary(const char *in,int len, unsigned char *out) {
 //    int len = (int)strlen(in);
     char *str = (char *)malloc(len);
     memset(str, 0, len);

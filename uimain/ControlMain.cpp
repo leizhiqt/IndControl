@@ -26,6 +26,8 @@ ControlMain::ControlMain(){
     xly_srv->port=conf->xueLangPort;
     xly_srv->s_forever=1;
     xly_srv->recvFun=recvXly;
+    xly_srv->cliens_p =&xly_cliens;
+
     tcp_server_start(xly_srv);
     log_debug("xly_srv:%p",xly_srv);
 
@@ -35,6 +37,7 @@ ControlMain::ControlMain(){
     modbus_srv->port=conf->modBusPort;
     modbus_srv->s_forever=1;
     modbus_srv->recvFun=recvModbusTcp;
+    modbus_srv->cliens_p =&modbus_cliens;
     tcp_server_start(modbus_srv);
     log_debug("modbus_srv:%p",modbus_srv);
 

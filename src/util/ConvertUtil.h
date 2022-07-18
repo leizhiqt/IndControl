@@ -17,7 +17,7 @@ void sprintf_hex(char *hexs,unsigned char const *p,int size);
 
 void printf_hex(unsigned char *hexs,int len);
 
-int hexs_to_binary(char *in,int len, unsigned char *out);
+int hexs_to_binary(const char *in,int len, unsigned char *out);
 
 int binary_to_hexs(unsigned char *in, int len, char *out);
 

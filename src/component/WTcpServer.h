@@ -7,6 +7,7 @@
 #include<WinSock2.h>
 #include<WS2tcpip.h>
 #include<thread>
+#include<vector>
 
 typedef struct _client_info client_info;
 typedef struct _server_info server_info_t;
@@ -17,6 +18,8 @@ typedef struct _server_info
   void (*recvFun)(char *buf,int len);
   int port;
   int s_forever;
+
+  std::vector<SOCKET> *cliens_p;
 
 } server_info_t;
 

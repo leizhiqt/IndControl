@@ -24,6 +24,9 @@ class ControlMain
 private:
     void try_do();
     void th_do();
+    std::vector<SOCKET> xly_cliens;
+    std::vector<SOCKET> modbus_cliens;
+
 public:
     ControlMain();
     ~ControlMain();
@@ -40,7 +43,6 @@ public:
 
     server_info_t *modbus_srv;
     server_info_t *xly_srv;
-    std::vector<SOCKET> xly_cliens;
 };
 
 extern ControlMain *controlMain;

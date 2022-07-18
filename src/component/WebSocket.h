@@ -5,6 +5,7 @@
 
 #include <QtWebSockets/QtWebSockets>
 #include <QtWebSockets/QWebSocketServer>
+#include "Conf.h"
 
 class WebSocket :  public QThread
 {
@@ -18,6 +19,7 @@ private:
     QWebSocketServer *m_websocketserver;
     quint16 port;
 
+    Conf *conf;
 
     //1.构造函数私有
     WebSocket(quint16 port);
@@ -27,7 +29,6 @@ private:
 
     //复制构造函数不实现，防止赋值产生多个实例
     WebSocket & operator =  (const WebSocket &);
-
 
 public:
     ~WebSocket();

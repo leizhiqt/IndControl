@@ -96,7 +96,7 @@
 
         QJsonDocument doc(parms);
         QString parms_str = QString(doc.toJson(QJsonDocument::Indented));
-        response_xly_qjson.insert("parms", parms);
+        response_xly_qjson.insert("params", parms);
         QJsonDocument document;
         document.setObject(response_xly_qjson);
         QByteArray bytes = document.toJson(QJsonDocument::Indented);
