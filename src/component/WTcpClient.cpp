@@ -14,7 +14,7 @@ using namespace std;
 
 int tcp_client_doth(char* host,int port,SOCKET *sSocket)
 {
-    log_debug("tcp_client_do_conn");
+    log_debug("tcp_client_do_conn %s %d ....",host,port);
     WSADATA wsd;
     SOCKADDR_IN servAddr;
 
@@ -57,7 +57,7 @@ int tcp_client_doth(char* host,int port,SOCKET *sSocket)
         WSACleanup();//释放套接字资源
         return -3;
     }
-
+    log_debug("tcp_client_do_conn %s %d ok",host,port);
     return 0;
 }
 

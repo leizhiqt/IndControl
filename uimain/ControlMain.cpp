@@ -61,22 +61,19 @@ void ControlMain::th_do(){
     int ret=-1;
     while(1)
     {
-//        log_debug("tcp_client_send");
         //CANOPEN客户连接，用于转发控制指令，同时接收工况数据并转发给JAVA
         ret=start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort,&canOpenSocket);
         if(!ret)
             return;
 
         //CanOpen 客户端连接
-    //    start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort);
+        //start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort);
         Sleep(1000*60*5);
     }
 }
 
 void ControlMain::try_do(){
-//    log_debug("try_do");
     std::thread th(&ControlMain::th_do,this);
     Sleep(150);
     th.detach();
-//    log_debug("try_do");
 }

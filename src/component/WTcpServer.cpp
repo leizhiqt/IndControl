@@ -181,8 +181,8 @@ void recvModbusTcp(char *buf,int len)
     if(buf==NULL || len<1)
         return;
 
-  //这里才是MODBUS 接收
-//但是这里你不能直接转发出去撒，需要转成CAN的报文先
+    //这里是MODBUS 接收
+
     //发送交换机
-    //tcp_client_send((controlMain->canOpenSocket),buf,len);
+    tcp_client_send((controlMain->canOpenSocket),buf,len);
 }

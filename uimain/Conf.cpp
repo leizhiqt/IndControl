@@ -43,8 +43,7 @@ Conf::Conf()
     //WebSocket端口
     websocketPort = read.value("/WebSocket/WebSocketPort").toString().toInt();
 
-    //控制命令
-    //这里用map 加载到map 直接取了就发
+    //控制命令,这里加载到map直接取了就发
     QSettings readControl(qApp->applicationDirPath() + QString("/ControlSetting.ini"), QSettings::IniFormat);
     controlNameList = readControl.allKeys();
     char binary[128];
@@ -60,12 +59,8 @@ Conf::Conf()
           conf_can_packs.insert(std::pair<std::string,QByteArray>(stdkey,canFrame));
 
           printf_hex((unsigned char*)binary,canFrame.length());
-            log_debug("key:%s",stdkey.c_str());
-
-        //controlValueList.append(readControl.value(controlNameList.at(i)).toString());
+          //log_debug("key:%s",stdkey.c_str());
     }
-//    qDebug()<<"controlNameList:"<<controlNameList;
-//    qDebug()<<"controlValueList:"<<controlValueList;
 }
 
 /* 销毁 */
