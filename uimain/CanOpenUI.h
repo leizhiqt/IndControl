@@ -3,10 +3,15 @@
 #ifndef CANOPENUI_H
 #define CANOPENUI_H
 
-#include <QMainWindow>
-#include "Conf.h"
+//托盘配置
+//#define QTTRAY_ENABLE
+//#undef QTTRAY_ENABLE
+
+//UI配置
+//#define ENABLE_GUI
+
 #include "QTTray.h"
-#include "QTcpComponentl.h"
+#include <QMainWindow>
 #include "ui_CanOpenUI.h"
 
 namespace Ui {
@@ -40,14 +45,8 @@ private:
 
     //鼠标移动窗口移动
     QPoint mPoint;
-
     //托盘
     QTTray *qtTray;
-
-//    UIReadThread *uiReadThread;
-
-
-//     ModbusTcpClient *mtClient;
 
     void set_default_UI();
 };

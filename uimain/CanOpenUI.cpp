@@ -4,7 +4,6 @@
 
 #include <QMouseEvent>
 #include "CanOpenUI.h"
-#include "ControlMain.h"
 #include "UWLog.h"
 #include "WTcpClient.h"
 #include "WTcpServer.h"
@@ -28,12 +27,6 @@ CanOpenUI::~CanOpenUI()
 void CanOpenUI::set_default_UI()
 {
     connect(ui->CanConn, &QPushButton::clicked, [=](){
-//        int ret = start_tcp_client_th(canOpenIp,canOpenPort);
-//        QString msg;
-//        msg.append(canOpenIp);
-//        msg.append(":");
-//        msg.append(canOpenPort);
-
 //        if(ret==0)
 //            //ui->textBrowser->append("连接成功");
 //            log_debug("can连接成功");
@@ -45,24 +38,7 @@ void CanOpenUI::set_default_UI()
     });
 
     connect(ui->sendCan, &QPushButton::clicked, [=](){
-        unsigned char frame[13];
-            memset(frame,'\0',sizeof(frame));
-            frame[0]=0x06;
-            frame[1]=0x00;
-            frame[2]=0x00;
-            frame[3]=0x01;
-            frame[4]=0x8a;
 
-            frame[5]=0x00;//b0
-            frame[6]=0x00;//b1
-            frame[7]=0x0;//b2
-            frame[8]=0x01;//b3
-            frame[9]=0x00;//b4
-            frame[10]=0x00;//b5
-            frame[11]=0x00;//b6
-            frame[12]=0x00;//b7
-
-//           tcp_client_send(frame,sizeof(frame));
     });
 
     connect(ui->ModConn, &QPushButton::clicked, [=](){
@@ -74,9 +50,7 @@ void CanOpenUI::set_default_UI()
 //           //ui->ModBusView->append("Modbus Server 开启失败! 502");
 //           log_debug("Modbus开启失败");
     });
-
     connect(this,SIGNAL(AppendText(QString,int)),this,SLOT(SlotAppendText(QString,int)));
-
     //托盘
     qtTray = new QTTray(this);
 }

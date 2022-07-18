@@ -2,6 +2,7 @@
 
 #include "ControlMain.h"
 #include "UWLog.h"
+#include "ProtocolWebJson.h"
 
 ControlMain::ControlMain(){
 
@@ -10,16 +11,13 @@ ControlMain::ControlMain(){
     mWin = new CanOpenUI();
     mWin->setWindowTitle("CanOpen|ModBus|Tcp");
 
-#ifdef ENABLE_OPENCAN
-    canopenQThread = new CANopenQThread();
-#endif
-
 #ifdef ENABLE_GUI
     mWin->show();
 #endif
 
 #ifndef ENABLE_GUI
     mWin->hide();
+#endif
 
     //启动位姿系统服务（向位姿系统下发配置参数，同时接收位姿系统上报的数据
     xly_srv = (server_info_t *)malloc(sizeof(server_info_t));
@@ -41,14 +39,14 @@ ControlMain::ControlMain(){
     tcp_server_start(modbus_srv);
     log_debug("modbus_srv:%p",modbus_srv);
 
+    command = new ProtocolWebJson();
+
     //启动WEBSOCKET服务，接收来自JAVA的指令，同时向JAVA推送工况数据
-    webSocket = WebSocket::getInstance(conf->websocketPort);
+    webSocket = WebSocket::getInstance(conf->websocketPort,command);
 
     try_do();
 
     log_debug("boot OK");
-#endif
-
 }
 
 ControlMain::~ControlMain(){

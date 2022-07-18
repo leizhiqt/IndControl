@@ -3,45 +3,49 @@
 #ifndef CONTROLMAIN_H
 #define CONTROLMAIN_H
 
-//#define QTTRAY_ENABLE
-//#undef QTTRAY_ENABLE
-
-#include <QDebug>
 #include "IOTUtil.h"
 #include "Conf.h"
-#include "CanOpenUI.h"
+
 #include "WebSocket.h"
 #include "WTcpClient.h"
 #include "WTcpServer.h"
+#include "WebSocketCommand.h"
 
-#ifdef ENABLE_OPENCAN
-#include "CANopenQThread.h"
-#endif
+#include "CanOpenUI.h"
 
-#pragma execution_character_set("utf-8")
 class ControlMain
 {
 private:
     void try_do();
     void th_do();
+
+    //位姿连接的所有客户端
     std::vector<SOCKET> xly_cliens;
+    //MODbus连接的所有客户端
     std::vector<SOCKET> modbus_cliens;
 
 public:
     ControlMain();
     ~ControlMain();
 
+    //系统配置
     Conf *conf;
 
+    //UI
     CanOpenUI *mWin;
-#ifdef ENABLE_OPENCAN
-    CANopenQThread *canopenQThread;
-#endif
+
+    //websocket 解析
+    WebSocketCommand* command;
+    //websocket
     WebSocket *webSocket;
 
+    //交换机
     SOCKET canOpenSocket;
 
+    //modbusTCP
     server_info_t *modbus_srv;
+
+    //位姿系统
     server_info_t *xly_srv;
 };
 

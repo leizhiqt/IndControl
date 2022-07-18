@@ -14,7 +14,7 @@ QTcpComponentl::QTcpComponentl(){
 }
 
 QTcpComponentl::~QTcpComponentl(){
-
+    delete  visualTcpSocket;
 }
 
 void QTcpComponentl::onConnection(){

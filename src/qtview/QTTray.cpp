@@ -66,7 +66,6 @@ void QTTray::ui_release()
     delete systemTray;
 }
 
-
 void QTTray::closeEvent(QCloseEvent *event)
 {
     if(systemTray->isVisible())
@@ -88,9 +87,7 @@ int QTTray::OnSystemTrayClicked(QSystemTrayIcon::ActivationReason reason)
             parent->showNormal();
         else
             parent->hide();
-
     #endif
-
     }
     return 0;
 }

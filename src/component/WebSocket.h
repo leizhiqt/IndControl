@@ -5,7 +5,7 @@
 
 #include <QtWebSockets/QtWebSockets>
 #include <QtWebSockets/QWebSocketServer>
-#include "Conf.h"
+#include "WebSocketCommand.h"
 
 class WebSocket :  public QThread
 {
@@ -19,10 +19,10 @@ private:
     QWebSocketServer *m_websocketserver;
     quint16 port;
 
-    Conf *conf;
+    WebSocketCommand* command;
 
     //1.构造函数私有
-    WebSocket(quint16 port);
+    WebSocket(quint16 port,WebSocketCommand* command);
 
     //拷贝构造函数不实现，防止拷贝产生多个实例
     WebSocket(const WebSocket &);
@@ -32,18 +32,15 @@ private:
 
 public:
     ~WebSocket();
-    static WebSocket * getInstance(quint16 port)
+    static WebSocket * getInstance(quint16 port,WebSocketCommand* command)
     {
-        static WebSocket singleWebSocket(port);
+        static WebSocket singleWebSocket(port,command);
         return &singleWebSocket;
     }
-    QWebSocket *client_socket;
+
     void init();
     void run();
     void stop();
-    void sendMessage(QString message);
-
-    void (*fun_processText)(QString);
 
 Q_SIGNALS:
     void broadcast_binary(QByteArray message);

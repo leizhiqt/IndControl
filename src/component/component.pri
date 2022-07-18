@@ -9,7 +9,8 @@ win32 {
     $$PWD/QTcpComponentl.h \
     $$PWD/WTcpClient.h \
     $$PWD/WTcpServer.h \
-    $$PWD/WebSocket.h
+    $$PWD/WebSocket.h \
+    $$PWD/WebSocketCommand.h
 
     SOURCES += \
     $$PWD/QTcpComponentl.cpp \

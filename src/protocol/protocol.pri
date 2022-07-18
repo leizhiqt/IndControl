@@ -6,8 +6,10 @@ win32 {
     #message($$LIBS)
 
     HEADERS += \
-    $$PWD/ProtocolXly.h
+    $$PWD/ProtocolXly.h \
+    $$PWD/ProtocolWebJson.h
 
     SOURCES += \
-    $$PWD/ProtocolXly.cpp
+    $$PWD/ProtocolXly.cpp \
+    $$PWD/ProtocolWebJson.cpp
 }
