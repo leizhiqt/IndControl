@@ -267,13 +267,13 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
 
         printf_hex(frame,bin_len);
 
-        conver_request_xly_to_frame((const char*)frame,bin_len,json_buf);
+        conver_xly_frame_to_json((const char*)frame,bin_len,json_buf);
     }else{
         char *frame = (char *)content.data();
         printf_hex((unsigned char*)frame,content.length());
         log_debug("buf len=%d %d",content.length(),content.size());
         log_debug("ascii_len");
-        conver_request_xly_to_frame((const char*)frame,content.length(),json_buf);
+        conver_xly_frame_to_json((const char*)frame,content.length(),json_buf);
     }
 
     //推送消息给客户端

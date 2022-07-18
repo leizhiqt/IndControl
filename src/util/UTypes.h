@@ -3,7 +3,9 @@
 
 //#pragma pack(4)
 
-typedef unsigned char uchar_8;
+typedef unsigned char  uchar_8;
+typedef unsigned int   uint32_t;
+typedef unsigned short uint16_t;
 
 union _UStuff_t
 {

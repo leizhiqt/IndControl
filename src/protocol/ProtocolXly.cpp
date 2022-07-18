@@ -2,11 +2,10 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <Qdebug>
 #include "ConvertUtil.h"
 #include "UWLog.h"
 
- void conver_response_to_json(const char *str_json,const int len, char *frame_buf)
+ void conver_xly_json_to_frame(const char *str_json,const int len, char *frame_buf)
  {
 //     log_debug("conver_response_to_json");
 
@@ -68,7 +67,7 @@
     }
  }
 
- void conver_request_xly_to_frame(const char *frame_buf,const int len, char *str_json)
+ void conver_xly_frame_to_json(const char *frame_buf,const int len, char *str_json)
  {
      request_xly_t *p;
      char hexs[512];
@@ -104,4 +103,123 @@
         char *str_p =bytes.begin();
         memcpy(str_json,str_p,bytes.size());
      }
+ }
+
+
+ void conver_opencan_to_json(const char *frame_buf,const int len, char *str_json)
+ {
+     response_opencan13_t *p;
+
+     char hexs[512];
+     if(len>=sizeof(request_xly_t)){
+        p=(response_opencan13_t *)frame_buf;
+
+        QJsonObject response_xly_qjson;
+        response_xly_qjson.insert("version", "1.0");
+        response_xly_qjson.insert("method", "gesturedata");
+
+        QJsonObject parms;
+        to_hexc(hexs,p->r1);parms.insert("r1",hexs);
+        to_hexc(hexs,p->r2);parms.insert("r2",hexs);
+        to_hexc(hexs,p->r3);parms.insert("r3",hexs);
+        to_hexc(hexs,p->r4);parms.insert("r4",hexs);
+        to_hexc(hexs,p->r5);parms.insert("r5",hexs);
+        to_hexc(hexs,p->r6);parms.insert("r6",hexs);
+        to_hexc(hexs,p->r7);parms.insert("r7",hexs);
+        to_hexc(hexs,p->r8);parms.insert("r8",hexs);
+        to_hexc(hexs,p->r9);parms.insert("r9",hexs);
+        to_hexc(hexs,p->r10);parms.insert("r10",hexs);
+        to_hexc(hexs,p->r11);parms.insert("r11",hexs);
+        to_hexc(hexs,p->r12);parms.insert("r12",hexs);
+        to_hexc(hexs,p->r13);parms.insert("r13",hexs);
+
+        QJsonDocument doc(parms);
+        QString parms_str = QString(doc.toJson(QJsonDocument::Indented));
+        response_xly_qjson.insert("parms", parms);
+        QJsonDocument document;
+        document.setObject(response_xly_qjson);
+        QByteArray bytes = document.toJson(QJsonDocument::Indented);
+        char *str_p =bytes.begin();
+        memcpy(str_json,str_p,bytes.size());
+     }
+ }
+
+ void conver_opencan_frame(uchar_8 *frame,uint16_t len)
+ {
+     //字节1为帧信息。第7位（FF）表示帧格式，在标准帧中，FF＝0；第6位（RTR）表示帧的类型，RTR=0表示为数据帧，RTR=1表示为远程帧；DLC表示在数据帧时实际的数据长度。
+        if((*(frame)<9 && *(frame)>0))
+        {
+             return;
+        }
+
+        //第2&3字节为 帧ID 有效11位 4~11==1~7为数据帧
+         if(*(frame+1)==0x01 && *(frame+2)==0x8a){
+             return;
+         }
+
+         if(*(frame+1)==0x01 && *(frame+2)==0x8b){
+             return;
+         }
+
+         if(*(frame+1)==0x01 && *(frame+2)==0x8c){
+             return;
+         }
+
+         if(*(frame+1)==0x05 && *(frame+2)==0x01){
+             return;
+         }
+
+         if(*(frame+1)==0x05 && *(frame+2)==0x02){
+             return;
+         }
+
+         if(*(frame+1)==0x05 && (*(frame+2)==0x21 || *(frame+2)==0x22 || *(frame+2)==0x23
+                                  || *(frame+2)==0x24 || *(frame+2)==0x25 || *(frame+2)==0x26
+                                  || *(frame+2)==0x27)){
+             return;
+         }
+
+         if(*(frame+1)==0x02 && *(frame+2)==0x10){
+             return;
+         }
+
+         if(*(frame+1)==0x03 && *(frame+2)==0x10){
+             return;
+         }
+
+         if(*(frame+1)==0x04 && *(frame+2)==0x10){
+             return;
+         }
+
+         if(*(frame+1)==0x05 && *(frame+2)==0x10){
+             return;
+         }
+
+         if(*(frame+1)==0x02 && *(frame+2)==0x11){
+             return;
+         }
+
+         if(*(frame+1)==0x03 && *(frame+2)==0x11){
+             return;
+         }
+
+         if(*(frame+1)==0x02 && *(frame+2)==0x87){
+             return;
+         }
+
+         if(*(frame+1)==0x03 && *(frame+2)==0x87){
+             return;
+         }
+
+         if(*(frame+1)==0x04 && *(frame+2)==0x87){
+             return;
+         }
+
+         if(*(frame+1)==0x04 && *(frame+2)==0x0e){
+             return;
+         }
+
+         if(*(frame+1)==0x02 && *(frame+2)==0x90){
+             return;
+         }
  }
