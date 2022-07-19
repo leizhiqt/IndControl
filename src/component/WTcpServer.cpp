@@ -67,7 +67,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 
         //处理接收数据 回调函数
         if(info->s_info->recvFun!=NULL)
-            info->s_info->recvFun(recvBuf,count);
+            info->s_info->recvFun(recvBuf,count,info->acceptSocket);
 
         Sleep(300);
     }
@@ -160,7 +160,7 @@ int serv_dowork(server_info_t *s_info)
 }
 
 //位姿系统接收
-void recvXly(char *buf,int len)
+void recvXly(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
             return;
@@ -176,13 +176,45 @@ void recvXly(char *buf,int len)
 }
 
 //modbus接收
-void recvModbusTcp(char *buf,int len)
+void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
         return;
 
     //这里是MODBUS 接收
+    printf_hex((unsigned char*)buf,len);
+
+    if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
+{
+
+}
+    //buf[4] buf[5] ==len;
+
+    //id buf[6]
+    //cmd buf[7] 03是读，04是读写，06是修改
+    //buf[8][9][10][11]
+    //buf[11]*2 + 3 ;
+
+    //
+    //sbuf[5]=buf[11]*2 + 3 ;
+    //relen = sbuf[5]+5
+
+    int rlen =(buf[11]*2 + 3);
+    int slen = rlen+5;
+    unsigned char sendbuf[512];
+    memcpy(sendbuf,buf,5);
+    sendbuf[5]=rlen;
+    memcpy(sendbuf+6,buf+6,2);
+    sendbuf[8]=buf[11]*2;
+    memset(sendbuf+9,'\0',buf[11]*2);
+    sendbuf[9]=0x00;
+    sendbuf[10]=0x01;
+    printf("len=%d rlen=%d",rlen,rlen+5);
+
+    printf_hex((unsigned char*)sendbuf,slen);
+
+    tcp_client_send(recvSocket,(char *)sendbuf,slen);
 
     //发送交换机
-    tcp_client_send((controlMain->canOpenSocket),buf,len);
+    //tcp_client_send((controlMain->canOpenSocket),buf,len);
 }

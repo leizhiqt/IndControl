@@ -15,7 +15,7 @@ typedef struct _server_info server_info_t;
 typedef struct _server_info
 {
   SOCKET ListenSocket;
-  void (*recvFun)(char *buf,int len);
+  void (*recvFun)(char *buf,int len,SOCKET recvSocket);
   int port;
   int s_forever;
 
@@ -38,8 +38,8 @@ int tcp_server_start(server_info_t *s_info);
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 
 //位姿系统接收
-void recvXly(char *buf,int len);
+void recvXly(char *buf,int len,SOCKET recvSocket);
 //modbus接收
-void recvModbusTcp(char *buf,int len);
+void recvModbusTcp(char *buf,int len,SOCKET recvSocket);
 
 #endif // WTCPSERVER_H
