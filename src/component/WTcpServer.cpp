@@ -181,13 +181,12 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
     if(buf==NULL || len<1)
         return;
 
-    //这里是MODBUS 接收
     printf_hex((unsigned char*)buf,len);
 
-    if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
-{
-
-}
+    //这里是MODBUS 接收
+//    if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
+//    {
+//    }
     //buf[4] buf[5] ==len;
 
     //id buf[6]
@@ -199,7 +198,7 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
     //sbuf[5]=buf[11]*2 + 3 ;
     //relen = sbuf[5]+5
 
-    int rlen =(buf[11]*2 + 3);
+    int rlen =(buf[11]*2 + 4);
     int slen = rlen+5;
     unsigned char sendbuf[512];
     memcpy(sendbuf,buf,5);
@@ -207,14 +206,11 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
     memcpy(sendbuf+6,buf+6,2);
     sendbuf[8]=buf[11]*2;
     memset(sendbuf+9,'\0',buf[11]*2);
-    sendbuf[9]=0x00;
-    sendbuf[10]=0x01;
-    printf("len=%d rlen=%d",rlen,rlen+5);
+    sendbuf[9]=0x01;
+    sendbuf[10]=0x02;
 
     printf_hex((unsigned char*)sendbuf,slen);
-
+    //解析收到的MODBUS报文，然后去INI文件里面查对应的TCP报文
+    //通过交换机转发出去就可以了
     tcp_client_send(recvSocket,(char *)sendbuf,slen);
-
-    //发送交换机
-    //tcp_client_send((controlMain->canOpenSocket),buf,len);
 }
