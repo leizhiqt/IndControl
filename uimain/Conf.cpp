@@ -49,17 +49,21 @@ Conf::Conf()
     char binary[128];
     for(int i = 0; i < controlNameList.size(); i++){
           QString key=controlNameList.at(i);
+          key.remove(QRegExp("\\s"));
           std::string stdkey= key.toStdString();
 
           QByteArray value =readControl.value(key).toByteArray();
-          const char *p = value.constData();
+          QString qstr = QString(value);
+          qstr.remove(QRegExp("\\s"));
+//你这里是不是移除了空格
+          const char *p = qstr.toLatin1().constData();
           memset(binary,'\0',sizeof(binary));
-          hexs_to_binary(p,value.length(),(unsigned char *)binary);
-          QByteArray canFrame(binary,value.length()/2);
+          hexs_to_binary(p,qstr.length(),(unsigned char *)binary);
+          QByteArray canFrame(binary,qstr.length()/2);
           conf_can_packs.insert(std::pair<std::string,QByteArray>(stdkey,canFrame));
 
           printf_hex((unsigned char*)binary,canFrame.length());
-          //log_debug("key:%s",stdkey.c_str());
+          log_debug("key:%s",stdkey.c_str());
     }
 }
 

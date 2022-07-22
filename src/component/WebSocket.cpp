@@ -76,7 +76,7 @@ void WebSocket::recvBinaryMessage(const QByteArray &message)
 {
     qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     const char *recvBuf = message.begin();
-    tcp_client_send((controlMain->canOpenSocket),recvBuf,strlen(recvBuf));
+    tcp_client_send((controlMain->can_client.acceptSocket),recvBuf,strlen(recvBuf));
     tcp_server_broadcast(controlMain->xly_srv,(char *)recvBuf,strlen(recvBuf));
 }
 

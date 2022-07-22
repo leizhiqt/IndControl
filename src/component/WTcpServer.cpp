@@ -181,6 +181,8 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
     if(buf==NULL || len<1)
         return;
 
+    qDebug("接收到MODBUS报文");
+
     printf_hex((unsigned char*)buf,len);
 
     //这里是MODBUS 接收
@@ -211,6 +213,38 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 
     printf_hex((unsigned char*)sendbuf,slen);
     //解析收到的MODBUS报文，然后去INI文件里面查对应的TCP报文
-    //通过交换机转发出去就可以了
+
+    //这里是给操作台的响应桢撒 是
     tcp_client_send(recvSocket,(char *)sendbuf,slen);
+
+    //通过交换机转发出去就可以了
+//    tcp_client_send(controlMain->canOpenSocket,(char *)sendbuf,slen);
+//    buf
+    char hexs[512]={0};
+    sprintf_hex(hexs,(unsigned char *)(buf+2),len-2);
+
+    QString cmdstr = "ControlSet/";
+    QString hexstr(hexs);
+    hexstr.remove(QRegExp("\\s"));
+
+    cmdstr.append(hexstr.toUpper());
+//大小写好象有关系
+
+    std::string stdcmd=cmdstr.toStdString();
+    log_debug("cmdText %s",stdcmd.c_str());
+
+    std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
+    if(iter != Conf::getInstance()->conf_can_packs.end())
+    {
+        //获得命令内容
+        log_debug("is find %s",cmdstr.toLatin1().data());
+        QByteArray qbuf = iter->second;
+        char *buf = qbuf.begin();
+        printf_hex((unsigned char *)buf,qbuf.length());//这个地方多出来了6个字节
+        tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
+    }
+    else{
+        log_debug("not find %s",cmdstr.toLatin1().data());
+    }
+
 }

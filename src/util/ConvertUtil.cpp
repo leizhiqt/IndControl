@@ -153,6 +153,7 @@ void printf_hex(unsigned char *hexs,int len)
     for(int i=0;i<len;i++){
         printf(" 0x%02x",*(hexs+i));
     }
+//    printf("len=%d\n",len);
     printf("\n");
 }
 

@@ -40,7 +40,10 @@ public:
     WebSocket *webSocket;
 
     //交换机
-    SOCKET canOpenSocket;
+    client_info can_client={0};
+
+    //交换机
+    client_info modbus_client={0};
 
     //modbusTCP
     server_info_t *modbus_srv;

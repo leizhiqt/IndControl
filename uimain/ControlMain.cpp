@@ -39,6 +39,7 @@ ControlMain::ControlMain(){
     tcp_server_start(modbus_srv);
     log_debug("modbus_srv:%p",modbus_srv);
 
+
     command = new ProtocolWebJson();
 
     //启动WEBSOCKET服务，接收来自JAVA的指令，同时向JAVA推送工况数据
@@ -56,13 +57,26 @@ ControlMain::~ControlMain(){
 
 void ControlMain::th_do(){
     log_debug("th_do");
+//    can_client.ip=conf->canOpenIp.toLatin1().data();
+    strcpy(can_client.ip,conf->canOpenIp.toLatin1().data());
+    can_client.port=conf->canOpenPort;
+
+    strcpy(modbus_client.ip,conf->canOpenIp.toLatin1().data());
+    modbus_client.port=conf->canOpenPort;
+
     int ret=-1;
     while(1)
     {
         //CANOPEN客户连接，用于转发控制指令，同时接收工况数据并转发给JAVA
-        ret=start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort,&canOpenSocket);
+
+        ret=start_tcp_client_th(&can_client);
         if(!ret)
             return;
+
+        ret=start_tcp_client_th(&modbus_client);
+        if(!ret)
+            return;
+
 
         //CanOpen 客户端连接
         //start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort);

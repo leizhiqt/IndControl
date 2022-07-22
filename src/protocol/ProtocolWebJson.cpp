@@ -163,7 +163,7 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
             QByteArray qbuf = iter->second;
             char *buf = qbuf.begin();
             printf_hex((unsigned char *)buf,qbuf.length());
-            tcp_client_send(controlMain->canOpenSocket,buf,qbuf.length());
+            tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
         }
         else{
             log_debug("not find %s",cmdstr.toLatin1().data());

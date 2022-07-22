@@ -23,16 +23,7 @@ typedef struct _server_info
 
 } server_info_t;
 
-typedef struct _client_info
-{
-  SOCKET acceptSocket;
-  SOCKADDR_IN  addr;
-  char ip[128];
-  unsigned int port;
-  int len;
 
-  server_info_t *s_info;
-} client_info;
 
 int tcp_server_start(server_info_t *s_info);
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
