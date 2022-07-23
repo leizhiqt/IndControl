@@ -22,27 +22,42 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
 //    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
 //    info->port = ntohs(info->addr.sin_port);
     log_debug("recv:ip=%s port=%d ",info->ip,info->port);
+    log_debug("ThreadClient_recv recvFun =============");
 
     char recvBuf[1024] = {0};
     int count = 0;
     while(1){
+
+        //发送数据 回调函数
+        if(info->sendFun!=NULL){
+            info->sendFun(info->acceptSocket);
+        }
+        //似乎给503的包没有发出去，所以没有包回来
         memset(recvBuf,'\0',sizeof(recvBuf));
+        //好象只执行到这里，这里是CAN CLIENT 和MODBUS CLIENT都要调用吗？不影响的
         count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
+        log_debug("ThreadClient_recv recvFun %d",count);
+
         if (count == -1)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
+                log_debug("ThreadClient_recv recvFun %d",count);
                 break; //表示没有数据了
             }
             return 0; //遇见其他错误
         }
 
+        log_debug("ThreadClient_recv recvFun %d",count);
+
         if(count==0) break;//被对方关闭
 
-        //处理接收数据 回调函数
-        if(info->recvFun!=NULL)
-            info->recvFun(recvBuf,count,info->acceptSocket);
+        log_debug("tcp_client_do recvFun =============");
 
+        //处理接收数据 回调函数
+        if(info->recvFun!=NULL){
+            info->recvFun(recvBuf,count,info->acceptSocket);
+        }
         Sleep(300);
     }
     //结束连接
@@ -107,13 +122,13 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
     if(buf==NULL || size<1)
         return 0;
-
+log_debug("tcp_client_send: %d", sSocket);
     if(!(sSocket>0)){
         return 0;
     }
-//  log_debug("%d %s",size,buf);
+log_debug("tcp_client_send: %d", sSocket);
     int n = send(sSocket,(char *)buf, size, 0);
-    log_debug("tcp_client_send %d",n);
+log_debug("tcp_client_send %d %d",n, sSocket);
     return n;
 }
 
@@ -132,7 +147,7 @@ int tcp_client_recv(const SOCKET sSocket)
 
     //根据buf接收数据解析
 
-    log_debug("tcp_client_send %d",n);
+    log_debug("tcp_client_recv %d",n);
 
     return n;
 }
@@ -149,13 +164,37 @@ int stop_tcp_client_th(SOCKET *sSocket)
     return 0;
 }
 
+//接收Modbus协同控制器报文
 int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
+    log_debug("modbus_recv ==========================");
     printf_hex((unsigned char*)buf,len);
     log_debug("modbus client recv data buf len=%d",len);
     return 0;
 }
 
+//给Modbus协同控制器发送报文
+int modbus_send(SOCKET recvSocket)
+{
+    log_debug("modbus_send ==========================");
+    std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find("ControlSet/Control007");
+    if(iter != Conf::getInstance()->conf_can_packs.end())
+    {
+        //获得命令内容
+        log_debug("found send cmdline");
+
+        QByteArray qbuf = iter->second;
+        char *buf = qbuf.begin();
+        printf_hex((unsigned char *)buf,qbuf.length());
+
+        log_debug("modbus_send_socket: %d",recvSocket);
+
+        tcp_client_send(recvSocket,buf,qbuf.length());
+    }
+    return 0;
+}
+
+//接收can总线转来的报文
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
     printf_hex((unsigned char*)buf,len);

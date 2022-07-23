@@ -59,12 +59,14 @@ void ControlMain::th_do(){
     snprintf(can_client.ip,sizeof(can_client.ip),"%s",conf->canOpenIp.toLatin1().data());
     can_client.port=conf->canOpenPort;
     can_client.recvFun=can_recv;
+    can_client.sendFun=NULL;
     log_debug("load can_client conn:%s %d",conf->canOpenIp.toLatin1().data(),conf->canOpenPort);
 
     //连接Modbus协同控制器，用于请求自移尾机的工况数据
     snprintf(modbus_client.ip,sizeof(modbus_client.ip),"%s",conf->modbusSlaveIp.toLatin1().data());
     modbus_client.port=conf->modbusSlavePort;
     modbus_client.recvFun=modbus_recv;
+    modbus_client.sendFun=modbus_send;
     //这里似乎少了接收函数
 
     int ret=-1;

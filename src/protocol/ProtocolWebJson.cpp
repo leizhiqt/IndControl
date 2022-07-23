@@ -189,6 +189,8 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
             char *buf = qbuf.begin();
             printf_hex((unsigned char *)buf,qbuf.length());
             tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
+            //发送消息给WEBSOCKET
+            emit controlMain->webSocket->broadcast_msg("{\"version\":\"1.0\",\"method\":\"devicecontrol\",\"result\":\"控制命令发送完毕\"}");
         }
         else{
             log_debug("not find %s",cmdstr.toLatin1().data());

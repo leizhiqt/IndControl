@@ -20,6 +20,7 @@ typedef struct _client_info
   int len;
 
   int (*recvFun)(char *buf,int len,SOCKET recvSocket);
+  int (*sendFun)(SOCKET recvSocket);
 
   server_info_t *s_info;
 } client_info;
@@ -37,7 +38,9 @@ int start_tcp_client_th(client_info *client);
 //断开与服务器的连接
 int stop_tcp_client_th(SOCKET *sSocket);
 
+int modbus_send(SOCKET recvSocket);
 int modbus_recv(char *buf,int len,SOCKET recvSocket);
+
 int can_recv(char *buf,int len,SOCKET recvSocket);
 
 #endif //WTCPCLIENT_H
