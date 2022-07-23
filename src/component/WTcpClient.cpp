@@ -18,9 +18,9 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
 
-    // 取得ip和端口号
-    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
-    info->port = ntohs(info->addr.sin_port);
+    // 取得ip和端口号 这里没有取对
+//    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
+//    info->port = ntohs(info->addr.sin_port);
     log_debug("recv:ip=%s port=%d ",info->ip,info->port);
 
     char recvBuf[1024] = {0};
@@ -161,13 +161,13 @@ int stop_tcp_client_th(SOCKET *sSocket)
 int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
     printf_hex((unsigned char*)buf,len);
-    log_debug("buf len=%d",len);
+    log_debug("modbus client recv data buf len=%d",len);
     return 0;
 }
 
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
     printf_hex((unsigned char*)buf,len);
-    log_debug("buf len=%d",len);
+    log_debug("can client recv data buf len=%d",len);
     return 0;
 }

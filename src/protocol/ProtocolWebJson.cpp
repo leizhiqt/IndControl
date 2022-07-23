@@ -57,6 +57,7 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
         *((float *)&(response_xly.r3)) = valueContent.value("startxvalue").toString().toFloat();
 
         //data = ((data << 2) & 0xCCCC) | ((data >> 2) & 0x3333);
+        //还有这里现在数据是倒的，要换过来 现在是 00 00 49 42 正角的应该是 42 49 00 00，下面都一样
 
         //初始纬度
         *((float *)&(response_xly.r4))  = valueContent.value("startyvalue").toString().toFloat();
