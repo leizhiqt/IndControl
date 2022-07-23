@@ -43,6 +43,11 @@ Conf::Conf()
     //WebSocket端口
     websocketPort = read.value("/WebSocket/WebSocketPort").toString().toInt();
 
+    //Modbus协同控制器IP
+    modbusSlaveIp = read.value("/ModbusSlave/SlaveIp").toString();
+    //Modbus协同控制器端口
+    modbusSlavePort = read.value("/ModbusSlave/SlavePort").toString().toInt();
+
     //控制命令,这里加载到map直接取了就发
     QSettings readControl(qApp->applicationDirPath() + QString("/ControlSetting.ini"), QSettings::IniFormat);
     controlNameList = readControl.allKeys();
@@ -51,19 +56,16 @@ Conf::Conf()
           QString key=controlNameList.at(i);
           key.remove(QRegExp("\\s"));
           std::string stdkey= key.toStdString();
-
           QByteArray value =readControl.value(key).toByteArray();
           QString qstr = QString(value);
           qstr.remove(QRegExp("\\s"));
-//你这里是不是移除了空格
           const char *p = qstr.toLatin1().constData();
           memset(binary,'\0',sizeof(binary));
           hexs_to_binary(p,qstr.length(),(unsigned char *)binary);
           QByteArray canFrame(binary,qstr.length()/2);
           conf_can_packs.insert(std::pair<std::string,QByteArray>(stdkey,canFrame));
-
-          printf_hex((unsigned char*)binary,canFrame.length());
-          log_debug("key:%s",stdkey.c_str());
+          //printf_hex((unsigned char*)binary,canFrame.length());
+          //log_debug("key:%s",stdkey.c_str());
     }
 }
 

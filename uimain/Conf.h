@@ -43,6 +43,9 @@ public:
 
         int websocketPort;//WEBSOCKET服务端口
 
+        QString modbusSlaveIp;//Modbus协同控制器IP
+        int modbusSlavePort;//Modbus协同控制器端口
+
         std::map<std::string,QByteArray> conf_can_packs;//设备控制报文
 
         QStringList controlNameList;//设备控制名称

@@ -30,8 +30,7 @@ void tcp_server_stop(server_info_t* s_info){
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len){
     log_debug(__FUNCTION__);
 
-   std::vector<SOCKET> cliens_p = *(s_info->cliens_p);
-//   if(cliens_p==NULL) return 1;
+    std::vector<SOCKET> cliens_p = *(s_info->cliens_p);
 
     for(size_t i = 0; i < cliens_p.size(); ++i)
     {
@@ -47,7 +46,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
     // 取得ip和端口号
     sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
     info->port = ntohs(info->addr.sin_port);
-    log_debug("recv:ip=%s port=%d ",info->ip,info->port);
+    //log_debug("recv:ip=%s port=%d ",info->ip,info->port);
 
     char recvBuf[1024] = {0};
     int count = 0;
@@ -84,7 +83,8 @@ int serv_dowork(server_info_t *s_info)
         log_debug("WSAStartup failed with error: %ld", iResult);
         return -1;
     }
-    log_debug("初始化socket：成功");
+
+    //log_debug("初始化socket：成功");
 
     s_info->ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (s_info->ListenSocket == INVALID_SOCKET) {
@@ -92,7 +92,8 @@ int serv_dowork(server_info_t *s_info)
         WSACleanup();
         return -2;
     }
-    log_debug("建立监听，等待连接: 成功");
+
+    //log_debug("建立监听，等待连接: 成功");
 
     sockaddr_in addrServer;
     addrServer.sin_family = AF_INET;
@@ -107,7 +108,8 @@ int serv_dowork(server_info_t *s_info)
         WSACleanup();
         return -3;
     }
-    log_debug("绑定套接字到一个IP地址和一个端口上:成功");
+
+    //log_debug("绑定套接字到一个IP地址和一个端口上:成功");
 
     //将套接字设置为监听模式等待连接请求
     if (listen(s_info->ListenSocket, 5) == SOCKET_ERROR) {
@@ -116,7 +118,8 @@ int serv_dowork(server_info_t *s_info)
         WSACleanup();
         return -4;
     }
-    log_debug("将套接字设置为监听模式等待连接请求:成功");
+
+    //log_debug("将套接字设置为监听模式等待连接请求:成功");
 
     client_info info= {0};
     info.acceptSocket=0;
@@ -127,7 +130,6 @@ int serv_dowork(server_info_t *s_info)
     //以一个无限循环的方式，不停地接收客户端socket连接
     while(s_info->s_forever)
     {
-
         //请求到来后，接受连接请求，返回一个新的对应于此次连接的套接字
         info.acceptSocket=accept(s_info->ListenSocket,(SOCKADDR*)&(info.addr),&info.len);
         if(info.acceptSocket  == INVALID_SOCKET)
@@ -159,14 +161,15 @@ int serv_dowork(server_info_t *s_info)
     return -5;
 }
 
-//位姿系统接收
+/* 接收到位姿系统发来的数据 */
 void recvXly(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
             return;
 
     printf_hex((unsigned char*)buf,len);
-    log_debug("buf len=%d",len);
+
+    //log_debug("buf len=%d",len);
 
     //信号槽机制 广播websocket
     emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
@@ -175,20 +178,20 @@ void recvXly(char *buf,int len,SOCKET recvSocket)
     //ui->Append((char *)hexs,1);
 }
 
-//modbus接收
+/* 接收到modbus发来的数据 */
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
         return;
 
-    qDebug("接收到MODBUS报文");
+    //qDebug("接收到MODBUS报文");
 
     printf_hex((unsigned char*)buf,len);
 
     //这里是MODBUS 接收
-//    if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
-//    {
-//    }
+    //if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
+    //{
+    //}
     //buf[4] buf[5] ==len;
 
     //id buf[6]
@@ -212,39 +215,34 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
     sendbuf[10]=0x02;
 
     printf_hex((unsigned char*)sendbuf,slen);
-    //解析收到的MODBUS报文，然后去INI文件里面查对应的TCP报文
 
-    //这里是给操作台的响应桢撒 是
+    //这里是给操作台的响应桢
     tcp_client_send(recvSocket,(char *)sendbuf,slen);
 
-    //通过交换机转发出去就可以了
-//    tcp_client_send(controlMain->canOpenSocket,(char *)sendbuf,slen);
-//    buf
+    //以下去INI文件中匹配操作台报文
+    //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
     char hexs[512]={0};
     sprintf_hex(hexs,(unsigned char *)(buf+2),len-2);
 
     QString cmdstr = "ControlSet/";
     QString hexstr(hexs);
     hexstr.remove(QRegExp("\\s"));
-
     cmdstr.append(hexstr.toUpper());
-//大小写好象有关系
 
     std::string stdcmd=cmdstr.toStdString();
-    log_debug("cmdText %s",stdcmd.c_str());
+    //log_debug("cmdText %s",stdcmd.c_str());
 
     std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
     if(iter != Conf::getInstance()->conf_can_packs.end())
     {
         //获得命令内容
-        log_debug("is find %s",cmdstr.toLatin1().data());
+        //log_debug("is find %s",cmdstr.toLatin1().data());
         QByteArray qbuf = iter->second;
         char *buf = qbuf.begin();
-        printf_hex((unsigned char *)buf,qbuf.length());//这个地方多出来了6个字节
+        printf_hex((unsigned char *)buf,qbuf.length());
         tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
     }
     else{
         log_debug("not find %s",cmdstr.toLatin1().data());
     }
-
 }

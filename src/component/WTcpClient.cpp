@@ -13,6 +13,7 @@
 
 using namespace std;
 
+//TCP客户端接收数据
 DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
@@ -49,6 +50,7 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
     return 0;
 }
 
+//与服务器建立连接
 int tcp_client_doth(client_info *client)
 {
     log_debug("tcp_client_do_conn %s %d ....",client->ip,client->port);
@@ -94,7 +96,6 @@ int tcp_client_doth(client_info *client)
         WSACleanup();//释放套接字资源
         return -3;
     }
-    log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
 
     //启动线程
     DWORD dwThread;
@@ -105,9 +106,12 @@ int tcp_client_doth(client_info *client)
         log_debug("Thread Creat Failed!");
     }
 
+    log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
+
     return 0;
 }
 
+//TCP客户端发送数据
 int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
     if(buf==NULL || size<1)
@@ -116,9 +120,29 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
     if(!(sSocket>0)){
         return 0;
     }
-//    log_debug("%d %s",size,buf);
+//  log_debug("%d %s",size,buf);
     int n = send(sSocket,(char *)buf, size, 0);
     log_debug("tcp_client_send %d",n);
+    return n;
+}
+
+//TCP客户端接收数据
+int tcp_client_recv(const SOCKET sSocket)
+{
+    //这里解析报文要注意：tcp客户端有两种：can总线的客户端,modbus slave的客户端
+    if(!(sSocket>0)){
+        return 0;
+    }
+//  log_debug("%d %s",size,buf);
+
+    char buf[1024];
+
+    int n = recv(sSocket,(char *)buf, sizeof(buf), 0);
+
+    //根据buf接收数据解析
+
+    log_debug("tcp_client_send %d",n);
+
     return n;
 }
 
@@ -131,7 +155,6 @@ int stop_tcp_client_th(SOCKET *sSocket)
 {
     CanOpenUI *mWin = controlMain->mWin;
     mWin->Append("stop",2);
-
     return 0;
 }
 
@@ -141,6 +164,7 @@ int modbus_recv(char *buf,int len,SOCKET recvSocket)
     log_debug("buf len=%d",len);
     return 0;
 }
+
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
     printf_hex((unsigned char*)buf,len);

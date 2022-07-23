@@ -23,12 +23,16 @@ typedef struct _server_info
 
 } server_info_t;
 
+
+//启动TCP服务
 int tcp_server_start(server_info_t *s_info);
+
+//发送TCP广播
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 
-//位姿系统接收
+//接收到位姿系统发来的报文
 void recvXly(char *buf,int len,SOCKET recvSocket);
-//modbus接收
+//接收到操作台发来的报文
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket);
 
 #endif // WTCPSERVER_H

@@ -24,9 +24,17 @@ typedef struct _client_info
   server_info_t *s_info;
 } client_info;
 
+//tcp客户端发送数据
 int tcp_client_send(const SOCKET sSocket,const char *buf,int size);
 
 int start_tcp_client_th(client_info *client);
+//tcp客户端接收数据
+int tcp_client_recv(const SOCKET sSocket);
+
+//与服务器建立连接
+int start_tcp_client_th(client_info *client);
+
+//断开与服务器的连接
 int stop_tcp_client_th(SOCKET *sSocket);
 
 int modbus_recv(char *buf,int len,SOCKET recvSocket);

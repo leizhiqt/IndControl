@@ -15,7 +15,7 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
     message.remove(QRegExp("\\s"));
 
     QByteArray msgBytes = message.toLatin1().constData();
-    log_debug("%s",msgBytes.begin());
+    //log_debug("%s",msgBytes.begin());
     QJsonDocument jsonDocument = QJsonDocument::fromJson(msgBytes);
     if(jsonDocument.isNull() || (!jsonDocument.isObject() && jsonDocument.isArray())){
         log_debug("Websocket解析结果：接收到的消息不正确");
@@ -55,6 +55,8 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
 
         //初始经度
         *((float *)&(response_xly.r3)) = valueContent.value("startxvalue").toString().toFloat();
+
+        //data = ((data << 2) & 0xCCCC) | ((data >> 2) & 0x3333);
 
         //初始纬度
         *((float *)&(response_xly.r4))  = valueContent.value("startyvalue").toString().toFloat();
@@ -143,8 +145,6 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
 
      if(cmdName.toString() == "devicecontrol"){
          log_debug("devicecontrol");
-
-         //         response_opencan13_t contr_can={0};
         //{"version":"1.0","method":"devicecontrol","params":"字段1"}}
         //解析得到命令内容封装协议并转发给交换机
         QJsonValue cmdText = jsonObject.value("params");
@@ -168,7 +168,6 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
         else{
             log_debug("not find %s",cmdstr.toLatin1().data());
         }
-
         return;
     }
 }
