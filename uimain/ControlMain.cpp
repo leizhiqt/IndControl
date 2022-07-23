@@ -57,30 +57,48 @@ ControlMain::~ControlMain(){
 
 void ControlMain::th_do(){
     log_debug("th_do");
-//    can_client.ip=conf->canOpenIp.toLatin1().data();
-    strcpy(can_client.ip,conf->canOpenIp.toLatin1().data());
-    can_client.port=conf->canOpenPort;
 
-    strcpy(modbus_client.ip,conf->canOpenIp.toLatin1().data());
+    snprintf(can_client.ip,sizeof(can_client.ip),"%s",conf->canOpenIp.toLatin1().data());
+    can_client.port=conf->canOpenPort;
+    can_client.recvFun=can_recv;
+
+    snprintf(modbus_client.ip,sizeof(modbus_client.ip),"%s",conf->canOpenIp.toLatin1().data());
     modbus_client.port=conf->canOpenPort;
+    modbus_client.recvFun=modbus_recv;
 
     int ret=-1;
+    bool can_ok=false;
+    bool modbus_ok=false;
+    char buf[3]="ok";
+
     while(1)
     {
-        //CANOPEN客户连接，用于转发控制指令，同时接收工况数据并转发给JAVA
-
+        if(!can_ok){
         ret=start_tcp_client_th(&can_client);
         if(!ret)
-            return;
+            can_ok=true;
+        }
 
+        if(!modbus_ok){
         ret=start_tcp_client_th(&modbus_client);
         if(!ret)
-            return;
+            modbus_ok=true;
+        }
 
-
-        //CanOpen 客户端连接
-        //start_tcp_client_th(conf->canOpenIp.toLatin1().data(),conf->canOpenPort);
+        //心跳包检测
         Sleep(1000*60*5);
+        if(can_ok){
+            ret=tcp_client_send(can_client.acceptSocket,buf,sizeof(buf));
+            if(ret<0)
+                can_ok=false;
+        }
+
+        if(modbus_ok)
+        {
+            ret=tcp_client_send(modbus_client.acceptSocket,buf,sizeof(buf));
+            if(ret<0)
+                can_ok=false;
+        }
     }
 }
 

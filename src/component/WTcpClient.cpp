@@ -9,8 +9,45 @@
 #include "CanOpenUI.h"
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
+#include "ConvertUtil.h"
 
 using namespace std;
+
+DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
+{
+    client_info *info = (client_info *)lpParameter;
+
+    // 取得ip和端口号
+    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
+    info->port = ntohs(info->addr.sin_port);
+    log_debug("recv:ip=%s port=%d ",info->ip,info->port);
+
+    char recvBuf[1024] = {0};
+    int count = 0;
+    while(1){
+        memset(recvBuf,'\0',sizeof(recvBuf));
+        count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
+        if (count == -1)
+        {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                break; //表示没有数据了
+            }
+            return 0; //遇见其他错误
+        }
+
+        if(count==0) break;//被对方关闭
+
+        //处理接收数据 回调函数
+        if(info->recvFun!=NULL)
+            info->recvFun(recvBuf,count,info->acceptSocket);
+
+        Sleep(300);
+    }
+    //结束连接
+    closesocket(info->acceptSocket);
+    return 0;
+}
 
 int tcp_client_doth(client_info *client)
 {
@@ -59,6 +96,14 @@ int tcp_client_doth(client_info *client)
     }
     log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
 
+    //启动线程
+    DWORD dwThread;
+    HANDLE hThread = CreateThread(NULL,0,ThreadClient_recv,(LPVOID)client,0,&dwThread);
+    if(hThread==NULL)
+    {
+        closesocket(client->acceptSocket);
+        log_debug("Thread Creat Failed!");
+    }
 
     return 0;
 }
@@ -74,25 +119,7 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 //    log_debug("%d %s",size,buf);
     int n = send(sSocket,(char *)buf, size, 0);
     log_debug("tcp_client_send %d",n);
-
-    return 0;
-}
-
-int tcp_client_recv(const SOCKET sSocket)
-{
-    if(!(sSocket>0)){
-        return 0;
-    }
-//    log_debug("%d %s",size,buf);
-    char buf[1024];
-
-    int n = recv(sSocket,(char *)buf, sizeof(buf), 0);
-
-    //根据buf 接收数据解析
-
-    log_debug("tcp_client_send %d",n);
-
-    return 0;
+    return n;
 }
 
 int start_tcp_client_th(client_info *client)
@@ -108,3 +135,15 @@ int stop_tcp_client_th(SOCKET *sSocket)
     return 0;
 }
 
+int modbus_recv(char *buf,int len,SOCKET recvSocket)
+{
+    printf_hex((unsigned char*)buf,len);
+    log_debug("buf len=%d",len);
+    return 0;
+}
+int can_recv(char *buf,int len,SOCKET recvSocket)
+{
+    printf_hex((unsigned char*)buf,len);
+    log_debug("buf len=%d",len);
+    return 0;
+}

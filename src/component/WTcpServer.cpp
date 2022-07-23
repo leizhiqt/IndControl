@@ -7,7 +7,7 @@
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
-#include<vector>
+#include <vector>
 
 int serv_dowork(server_info_t *s_info);
 

@@ -23,8 +23,6 @@ typedef struct _server_info
 
 } server_info_t;
 
-
-
 int tcp_server_start(server_info_t *s_info);
 int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 
