@@ -53,11 +53,12 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
 //与服务器建立连接
 int tcp_client_doth(client_info *client)
 {
-    log_debug("tcp_client_do_conn %s %d ....",client->ip,client->port);
+    log_debug("tcp_client_do_conn [%s] [%d] ....",client->ip,client->port);
     WSADATA wsd;
     SOCKADDR_IN servAddr;
 
-    int n;
+    int ret=-1;
+
     //初始化套接字动态库
     if (WSAStartup(MAKEWORD(2, 2), &wsd) != 0)
     {
@@ -81,18 +82,8 @@ int tcp_client_doth(client_info *client)
     int nServAddrLen = sizeof(servAddr);
 
     //连接服务器
-    for(int i=0;i<3;i++){
-        n = connect(client->acceptSocket, (LPSOCKADDR)&servAddr, nServAddrLen);
-        if (SOCKET_ERROR == n) {
-            log_debug("connect failed %d %s %d",SOCKET_ERROR,client->ip,client->port);
-           Sleep(500);
-            continue;
-        }
-        break;
-    }
-
-    if (SOCKET_ERROR == n) {
-        log_debug("connect failed %d %s %d",SOCKET_ERROR,client->ip,client->port);
+    ret = connect(client->acceptSocket, (LPSOCKADDR)&servAddr, nServAddrLen);
+    if (SOCKET_ERROR == ret) {
         WSACleanup();//释放套接字资源
         return -3;
     }

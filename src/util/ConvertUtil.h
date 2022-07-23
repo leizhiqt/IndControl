@@ -13,6 +13,9 @@ QString int_to_hex(int va);
 void to_hexi(char *hexs,unsigned char* va,bool od);
 void to_hexc(char *hexs,unsigned char va);
 
+void ntoh_32(char *bytes);
+void ntoh_16(char *bytes);
+
 void sprintf_hex(char *hexs,unsigned char const *p,int size);
 
 void printf_hex(unsigned char *hexs,int len);

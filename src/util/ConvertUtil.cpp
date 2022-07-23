@@ -46,6 +46,32 @@ int binary_to_hexs(unsigned char *in, int len, char *out) {
     return 0;
 }
 
+void ntoh_32(char *net_bytes)
+{
+    unsigned char host_bytes[4]={0};
+
+    host_bytes[0]=net_bytes[3];
+    host_bytes[1]=net_bytes[2];
+    host_bytes[2]=net_bytes[1];
+    host_bytes[3]=net_bytes[0];
+
+    net_bytes[0]=host_bytes[0];
+    net_bytes[1]=host_bytes[1];
+    net_bytes[2]=host_bytes[2];
+    net_bytes[3]=host_bytes[3];
+}
+
+void ntoh_16(char *net_bytes)
+{
+    unsigned char host_bytes[2]={0};
+
+    host_bytes[0]=net_bytes[1];
+    host_bytes[1]=net_bytes[0];
+
+    net_bytes[0]=host_bytes[0];
+    net_bytes[1]=host_bytes[1];
+}
+
 void utf8ToGbk(char *utf8String, char *gbkString)
 {
     wchar_t *unicodeStr = NULL;

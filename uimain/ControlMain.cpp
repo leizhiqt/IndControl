@@ -76,10 +76,10 @@ void ControlMain::th_do(){
     {
         if(!can_ok){
             ret=start_tcp_client_th(&can_client);//第一次连接后，似乎IP和端口都被置为了0
-            log_debug("can_client conn:%s %d",can_client.ip,can_client.port);
-
+            log_debug("can_client 连接:ret=%d [%s] [%d]",ret,can_client.ip,can_client.port);
             if(!ret){
                 can_ok=true;
+                log_debug("can_ok:%s %d",can_client.ip,can_client.port);
             }else{
                 log_debug("tcp_client_connect_fail:%s %d",can_client.ip,can_client.port);
             }
@@ -87,10 +87,10 @@ void ControlMain::th_do(){
 
         if(!modbus_ok){
             ret=start_tcp_client_th(&modbus_client);
-            log_debug("modbus_client conn:%s %d",modbus_client.ip,modbus_client.port);
-
+            log_debug("modbus_client 连接:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
             if(!ret){
                 modbus_ok=true;
+                log_debug("modbus_ok:%s %d",can_client.ip,can_client.port);
             }else{
                 log_debug("modbus_client_connect_fail:%s %d",modbus_client.ip,modbus_client.port);
             }
@@ -99,19 +99,25 @@ void ControlMain::th_do(){
         //心跳包检测
 //        Sleep(1000*60*5); //时间太长了，假设程序启动时服务端没有启动，会等待很久才会重连
         Sleep(1000 * 5);
-        /*if(can_ok){
+        if(can_ok){
             ret=tcp_client_send(can_client.acceptSocket,buf,sizeof(buf));
-            if(ret<0)
+            log_debug("心跳包检测:ret=%d [%s] [%d]",ret,can_client.ip,can_client.port);
+
+            if(ret<0){
+                closesocket(can_client.acceptSocket);
                 can_ok=false;
+            }
         }
 
         if(modbus_ok)
         {
             ret=tcp_client_send(modbus_client.acceptSocket,buf,sizeof(buf));
-            if(ret<0)
+            log_debug("心跳包检测:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
+            if(ret<0){
+                closesocket(modbus_client.acceptSocket);
                 can_ok=false;
-        }*/
-
+            }
+        }
         //end
     }
 }
