@@ -32,6 +32,7 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
         if(info->sendFun!=NULL){
             info->sendFun(info->acceptSocket);
         }
+
         //似乎给503的包没有发出去，所以没有包回来
         memset(recvBuf,'\0',sizeof(recvBuf));
         //好象只执行到这里，这里是CAN CLIENT 和MODBUS CLIENT都要调用吗？不影响的
@@ -122,13 +123,11 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
     if(buf==NULL || size<1)
         return 0;
-log_debug("tcp_client_send: %d", sSocket);
     if(!(sSocket>0)){
         return 0;
     }
-log_debug("tcp_client_send: %d", sSocket);
     int n = send(sSocket,(char *)buf, size, 0);
-log_debug("tcp_client_send %d %d",n, sSocket);
+    log_debug("tcp_client_send %d %d",n, sSocket);
     return n;
 }
 

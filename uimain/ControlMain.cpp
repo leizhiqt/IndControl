@@ -111,15 +111,15 @@ void ControlMain::th_do(){
             }
         }
 
-        if(modbus_ok)
-        {
-            ret=tcp_client_send(modbus_client.acceptSocket,buf,sizeof(buf));
-            log_debug("心跳包检测:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
-            if(ret<0){
-                closesocket(modbus_client.acceptSocket);
-                can_ok=false;
-            }
-        }
+//        if(modbus_ok)
+//        {
+//            ret=tcp_client_send(modbus_client.acceptSocket,buf,sizeof(buf));
+//            log_debug("心跳包检测:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
+//            if(ret<0){
+//                closesocket(modbus_client.acceptSocket);
+//                can_ok=false;
+//            }
+//        }
         //end
     }
 }

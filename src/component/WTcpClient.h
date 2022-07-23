@@ -11,6 +11,8 @@
 typedef struct _client_info client_info;
 typedef struct _server_info server_info_t;
 
+#define MEDUBS_TEST
+
 typedef struct _client_info
 {
   SOCKET acceptSocket;
