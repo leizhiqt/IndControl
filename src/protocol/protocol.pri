@@ -13,3 +13,9 @@ win32 {
     $$PWD/ProtocolXly.cpp \
     $$PWD/ProtocolWebJson.cpp
 }
+
+HEADERS += \
+    $$PWD/ModBusTcp.h
+
+SOURCES += \
+    $$PWD/ModBusTcp.cpp

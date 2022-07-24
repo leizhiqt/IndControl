@@ -7,6 +7,7 @@
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
+#include "ModBusTcp.h"
 #include <vector>
 
 int serv_dowork(server_info_t *s_info);
@@ -183,66 +184,90 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
         return;
-
-    //qDebug("接收到MODBUS报文");
-
-    printf_hex((unsigned char*)buf,len);
-
-    //这里是MODBUS 接收
-    //if(buf[2]==0x00 && buf[3]==0x00 ) //modbus
-    //{
-    //}
-    //buf[4] buf[5] ==len;
-
-    //id buf[6]
-    //cmd buf[7] 03是读，04是读写，06是修改
-    //buf[8][9][10][11]
-    //buf[11]*2 + 3 ;
-
-    //
-    //sbuf[5]=buf[11]*2 + 3 ;
-    //relen = sbuf[5]+5
-
-    int rlen =(buf[11]*2 + 4);
-    int slen = rlen+5;
-    unsigned char sendbuf[512];
-    memcpy(sendbuf,buf,5);
-    sendbuf[5]=rlen;
-    memcpy(sendbuf+6,buf+6,2);
-    sendbuf[8]=buf[11]*2;
-    memset(sendbuf+9,'\0',buf[11]*2);
-    sendbuf[9]=0x01;
-    sendbuf[10]=0x02;
-
-    printf_hex((unsigned char*)sendbuf,slen);
-
-    //这里是给操作台的响应桢
-    tcp_client_send(recvSocket,(char *)sendbuf,slen);
-
-    //以下去INI文件中匹配操作台报文
-    //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
-    char hexs[512]={0};
-    sprintf_hex(hexs,(unsigned char *)(buf+2),len-2);
-
-    QString cmdstr = "ControlSet/";
-    QString hexstr(hexs);
-    hexstr.remove(QRegExp("\\s"));
-    cmdstr.append(hexstr.toUpper());
-
-    std::string stdcmd=cmdstr.toStdString();
-    //log_debug("cmdText %s",stdcmd.c_str());
-
-    std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
-    if(iter != Conf::getInstance()->conf_can_packs.end())
+    //printf_hex((unsigned char*)buf,len);
+    //printf_hex((unsigned char*)OldBuf,sizeof(OldBuf));
+//MBAP 00 01 FID
+    //00 00  modbus fLAT
+    //00 06  COMMAND
+    //01     slave ID
+    //06     command
+    //00	00  regID
+    //00	0A  regVale
+    //如果功能码是06(修改)
+    if(buf[7] == 0x06)
     {
-        //获得命令内容
-        //log_debug("is find %s",cmdstr.toLatin1().data());
-        QByteArray qbuf = iter->second;
-        char *buf = qbuf.begin();
-        printf_hex((unsigned char *)buf,qbuf.length());
-        tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
+        //这里是给操作台的响应桢(同请求帧相同) //这里可以放至最上面去撒
+
+        char *nth_byte = buf+8;
+        ntoh_16(nth_byte);
+
+        uint16_t ret_inx= *((uint16_t *)(nth_byte));
+
+        slave_reg.r_slave[2*ret_inx]=buf[10];
+        slave_reg.r_slave[2*ret_inx+1]=buf[11];
+
+        printf_hex((unsigned char *)buf,len);
+
+        log_debug("===================== %04x %d %02x %02x",ret_inx,ret_inx,slave_reg.r_slave[ret_inx],slave_reg.r_slave[ret_inx+1]);
+
+        printf_hex((unsigned char *)slave_reg.r_slave,10);
+
+        tcp_client_send(recvSocket,(char *)buf,len);
+
+        //我觉得这个地方，因为06修改了值，但是 slave_reg 里的值没有改，所以始终返回的全是0
+        //以下去INI文件中匹配操作台报文
+        //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
+        char hexs[512]={0};
+        sprintf_hex(hexs,(unsigned char *)(buf+2),len-2);
+        QString cmdstr = "ControlSet/";
+        QString hexstr(hexs);
+        hexstr.remove(QRegExp("\\s"));
+        cmdstr.append(hexstr.toUpper());
+
+        std::string stdcmd=cmdstr.toStdString();
+        std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
+        if(iter != Conf::getInstance()->conf_can_packs.end())
+        {
+            //获得命令内容
+            //log_debug("is find %s",cmdstr.toLatin1().data());
+            QByteArray qbuf = iter->second;
+            char *buf = qbuf.begin();
+            //printf_hex((unsigned char *)buf,qbuf.length());
+            tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
+        }
+        else{
+            log_debug("not find %s",cmdstr.toLatin1().data());
+        }
+        return ;
     }
-    else{
-        log_debug("not find %s",cmdstr.toLatin1().data());
+
+    if(buf[7] == 0x03){
+        int in = 4;
+        int rlen =(buf[11]*2 + in);//返回的数据个数
+        int slen = rlen+5;
+
+        memset(slave_reg.slave_buf,'\0',sizeof(slave_reg.slave_buf));
+
+        memcpy(slave_reg.slave_buf,buf,5);//校验信息，MODBUS协议
+
+        slave_reg.slave_buf[5]=rlen;//数据长度
+
+        slave_reg.slave_buf[6]=buf[6];//功能码
+        slave_reg.slave_buf[7]=buf[7];//ID //ID好象在功能码前面
+
+        slave_reg.slave_buf[8]=rlen-in;//数据个数
+
+        log_debug("slave_reg.slave_buf %d %02x %02x",slave_reg.slave_buf[8],slave_reg.r_slave[0],slave_reg.r_slave[1]);
+        //这里好象位置搞反了样 00 00 01 06  现在是 01 06 00 00
+        if(buf[11]%2==0){
+            memcpy(slave_reg.slave_buf+9,slave_reg.r_slave,slave_reg.slave_buf[8]);//偶数
+        }else{
+            memset(slave_reg.slave_buf+9,'\0',slave_reg.slave_buf[8]);
+        }
+
+        printf_hex((unsigned char*)slave_reg.slave_buf,slen);
+        //这里是给操作台的响应桢
+        tcp_client_send(recvSocket,(char *)slave_reg.slave_buf,slen);
+        return ;
     }
 }
