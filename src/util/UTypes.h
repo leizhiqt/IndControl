@@ -7,20 +7,15 @@ typedef unsigned char  uchar_8;
 typedef unsigned int   uint32_t;
 typedef unsigned short uint16_t;
 
-
-union _UStuff_t
+union UStuff32_t
 {
   float  va_float;
   int  va_int;
   uchar_8  ascii[4];
 };
 
-union _UStuff16_t
-{
-  uint16_t  va_int;
-  uchar_8  ascii[2];
-};
+#define hl_to_int16(l,h) ((uchar_8)h << 8 | (uchar_8)l)
 
-#define hl_to_int16(l,h) ((uchar_8)h << 8 | (uchar_8)l) //获取bit位
+#define hl_to_int32(l0,l1,h0,h1) ((uchar_8)h1 << 24 |(uchar_8)h0 << 16|(uchar_8)l1 << 8| (uchar_8)l0)
 
 #endif // UTYPES_H

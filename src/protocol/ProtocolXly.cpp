@@ -82,19 +82,19 @@
 
         QJsonObject parms;
 
-        to_hexi(hexs,p->r3,true);parms.insert("bodyxvalue",hexs);
-        to_hexi(hexs,p->r4,true);parms.insert("bodyyvalue",hexs);
-        to_hexi(hexs,p->r5,true);parms.insert("bodyzvalue",hexs);
-        to_hexi(hexs,p->r6,true);parms.insert("bodyfyangle",hexs);
-        to_hexi(hexs,p->r7,true);parms.insert("bodyhgangle",hexs);
-        to_hexi(hexs,p->r8,true);parms.insert("bodyhxangle",hexs);
-        to_hexi(hexs,p->r9,true);parms.insert("headxvalue",hexs);
-        to_hexi(hexs,p->r10,true);parms.insert("headyvalue",hexs);
-        to_hexi(hexs,p->r11,true);parms.insert("headzvalue",hexs);
-        to_hexi(hexs,p->r12,true);parms.insert("headfyangle",hexs);
-        to_hexi(hexs,p->r13,true);parms.insert("headhgangle",hexs);
-        to_hexi(hexs,p->r14,true);parms.insert("headhxangle",hexs);
-        to_hexc(hexs,p->r15);parms.insert("qzystate",hexs);
+        byte4_to_int(hexs,p->r3);parms.insert("bodyxvalue",hexs);
+        byte4_to_int(hexs,p->r4);parms.insert("bodyyvalue",hexs);
+        byte4_to_int(hexs,p->r5);parms.insert("bodyzvalue",hexs);
+        byte4_to_int(hexs,p->r6);parms.insert("bodyfyangle",hexs);
+        byte4_to_int(hexs,p->r7);parms.insert("bodyhgangle",hexs);
+        byte4_to_int(hexs,p->r8);parms.insert("bodyhxangle",hexs);
+        byte4_to_int(hexs,p->r9);parms.insert("headxvalue",hexs);
+        byte4_to_int(hexs,p->r10);parms.insert("headyvalue",hexs);
+        byte4_to_int(hexs,p->r11);parms.insert("headzvalue",hexs);
+        byte4_to_int(hexs,p->r12);parms.insert("headfyangle",hexs);
+        byte4_to_int(hexs,p->r13);parms.insert("headhgangle",hexs);
+        byte4_to_int(hexs,p->r14);parms.insert("headhxangle",hexs);
+        byte1_to_char(hexs,p->r15);parms.insert("qzystate",hexs);
 
         QJsonDocument doc(parms);
         QString parms_str = QString(doc.toJson(QJsonDocument::Indented));
@@ -123,14 +123,9 @@
         QJsonObject parms;
 
         //先把COBID算出
-        _UStuff_t cobid_t;
-        cobid_t.ascii[0] = p->cobid_4;
-        cobid_t.ascii[1] = p->cobid_12;
-        cobid_t.ascii[2] = p->cobid_20;
-        cobid_t.ascii[3] = p->cobid_28;
-        sprintf(hexs,"%d",cobid_t.va_int);
-        printf(hexs,"%d\n",cobid_t.va_int);
-        int cobid = cobid_t.va_int;
+        uint32_t cobid = hl_to_int32(p->cobid_4,p->cobid_12,p->cobid_20,p->cobid_28);
+        sprintf(hexs,"%d",cobid);
+        printf(hexs,"%d\n",cobid);
         if(cobid == 210){
             send_can_son.insert("method", "data210");
             sprintf(hexs,"%d",hl_to_int16(p->data0[1],p->data0[0]));

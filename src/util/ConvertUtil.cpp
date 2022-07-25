@@ -7,6 +7,67 @@
 #include "UTypes.h"
 #include <QDebug>
 
+void byte1_to_char(char *hexs,unsigned char va)
+{
+    memset(hexs,'\0',21);
+    sprintf(hexs,"%02x",va);
+}
+
+void byte4_to_int(char *hexs,unsigned char* va)
+{
+    memset(hexs,'\0',512);
+    uint32_t va_int=hl_to_int32(va[3],va[2],va[1],va[0]);
+    sprintf(hexs,"%d",va_int);
+//    sprintf(hexs,"%5.2f",va_float);
+}
+
+void ntoh_32(char *net_bytes)
+{
+    unsigned char host_bytes[4]={0};
+
+    host_bytes[0]=net_bytes[3];
+    host_bytes[1]=net_bytes[2];
+    host_bytes[2]=net_bytes[1];
+    host_bytes[3]=net_bytes[0];
+
+    net_bytes[0]=host_bytes[0];
+    net_bytes[1]=host_bytes[1];
+    net_bytes[2]=host_bytes[2];
+    net_bytes[3]=host_bytes[3];
+}
+
+void ntoh_16(char *net_bytes)
+{
+    unsigned char host_bytes[2]={0};
+
+    host_bytes[0]=net_bytes[1];
+    host_bytes[1]=net_bytes[0];
+
+    net_bytes[0]=host_bytes[0];
+    net_bytes[1]=host_bytes[1];
+}
+
+void sprintf_hex(char *hexs,unsigned char const *p,int size)
+{
+    unsigned char bufs[1024];
+    memset(bufs,'\0',sizeof(bufs));
+    char buf[20];
+    for (int i = 0; i < size;i++) {
+        memset(buf,'\0',sizeof(buf));
+        sprintf(buf,"%02x ",(unsigned char)*(p+i));
+        strcat((char *)bufs,buf);
+    }
+    strcpy((char *)hexs,(char *)bufs);
+}
+
+void printf_hex(unsigned char *hexs,int len)
+{
+    for(int i=0;i<len;i++){
+        printf(" 0x%02x",*(hexs+i));
+    }
+    printf("\n");
+}
+
 int hexs_to_binary(const char *in,int len, unsigned char *out) {
     char *str = (char *)malloc(len);
     memset(str, 0, len);
@@ -45,32 +106,6 @@ int binary_to_hexs(unsigned char *in, int len, char *out) {
     return 0;
 }
 
-void ntoh_32(char *net_bytes)
-{
-    unsigned char host_bytes[4]={0};
-
-    host_bytes[0]=net_bytes[3];
-    host_bytes[1]=net_bytes[2];
-    host_bytes[2]=net_bytes[1];
-    host_bytes[3]=net_bytes[0];
-
-    net_bytes[0]=host_bytes[0];
-    net_bytes[1]=host_bytes[1];
-    net_bytes[2]=host_bytes[2];
-    net_bytes[3]=host_bytes[3];
-}
-
-void ntoh_16(char *net_bytes)
-{
-    unsigned char host_bytes[2]={0};
-
-    host_bytes[0]=net_bytes[1];
-    host_bytes[1]=net_bytes[0];
-
-    net_bytes[0]=host_bytes[0];
-    net_bytes[1]=host_bytes[1];
-}
-
 void utf8ToGbk(char *utf8String, char *gbkString)
 {
     wchar_t *unicodeStr = NULL;
@@ -92,84 +127,11 @@ void utf8ToGbk(char *utf8String, char *gbkString)
     free(unicodeStr);
 }
 
-void sprintf_hex(char *hexs,unsigned char const *p,int size)
-{
-    unsigned char bufs[1024];
-    memset(bufs,'\0',sizeof(bufs));
-    char buf[20];
-    for (int i = 0; i < size;i++) {
-        memset(buf,'\0',sizeof(buf));
-        sprintf(buf,"%02x ",(unsigned char)*(p+i));
-        strcat((char *)bufs,buf);
-    }
-    strcpy((char *)hexs,(char *)bufs);
-}
-
-void to_hexi(char *hexs,unsigned char* va,bool od)
-{
-    memset(hexs,'\0',512);
-   _UStuff_t value;
-    value.va_float=0.0;
-
-    if(od)
-    {
-        value.ascii[3] = va[0];
-        value.ascii[2] = va[1];
-        value.ascii[1] = va[2];
-        value.ascii[0] = va[3];
-    }else{
-        value.ascii[3] = va[3];
-        value.ascii[2] = va[2];
-        value.ascii[1] = va[1];
-        value.ascii[0] = va[0];
-    }
-
-    sprintf(hexs,"%5.2f",value.va_float);
-}
-
-void to_hexint(char *hexs,unsigned char* va)
-{
-    memset(hexs,'\0',512);
-   _UStuff_t value;
-    value.va_int=0;
-qDebug()<<"va:"<<va;
-    value.ascii[3] = va[0];
-    value.ascii[2] = va[1];
-    value.ascii[1] = va[2];
-    value.ascii[0] = va[3];
-
-    sprintf(hexs,"%d",value.va_int);
-}
-
-void ito16_hex(char *hexs,unsigned char* va,bool od)
-{
-    memset(hexs,'\0',512);
-
-    _UStuff16_t value={0};
-    value.va_int=0;
-    if(od)
-    {
-        value.ascii[1] = va[0];
-        value.ascii[0] = va[1];
-    }else{
-        value.ascii[1] = va[1];
-        value.ascii[0] = va[0];
-    }
-
-    sprintf(hexs,"%u",value.va_int);
-}
-
-void to16_hexs(char *hexs,unsigned char* va)
-{
-    memset(hexs,'\0',512);
-    sprintf(hexs,"%02x %02x",*va,*(va+1));
-}
-
 QString float_to_hex(float va)
 {
    char hexs[128];
    memset(hexs,'\0',sizeof(hexs));
-   _UStuff_t value;
+   UStuff32_t value;
    value.va_float=va;
    sprintf(hexs,"%02x%02x%02x%02x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0]);
    return QString(hexs);
@@ -179,22 +141,10 @@ QString int_to_hex(int va)
 {
     char hexs[128];
     memset(hexs,'\0',sizeof(hexs));
-    _UStuff_t value;
+    UStuff32_t value;
     value.va_int=va;
     sprintf(hexs,"%02x%02x%02x%02x",value.ascii[3],value.ascii[2],value.ascii[1],value.ascii[0]);
     return QString(hexs);
 }
 
-void to_hexc(char *hexs,unsigned char va)
-{
-    memset(hexs,'\0',21);
-    sprintf(hexs,"%02x",va);
-}
 
-void printf_hex(unsigned char *hexs,int len)
-{
-    for(int i=0;i<len;i++){
-        printf(" 0x%02x",*(hexs+i));
-    }
-    printf("\n");
-}

@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "ControlMain.h"
 #include "ConvertUtil.h"
+#include "UTypes.h"
 
 ControlMain *controlMain;
 
@@ -26,13 +27,13 @@ int main(int argc, char *argv[])
     }
     semaphore.release();
     
-//    UStuff value;
-//    value.numeric=0.0;
+//    uchar_8 value[4];
+//    value[0] = 0x00;
+//    value[1] = 0x01;
+//    value[2] = 0x01;
+//    value[3] = 0x11;
 
-//    value.ascii[3] = 0x66;
-//    value.ascii[2] = 0x41;
-//    value.ascii[1] = 0x7c;
-//    value.ascii[0] = 0xcc;
+//    printf("=====%d\n",hl_to_int32(value[0],value[1],value[2],value[3]));
 
 //    qDebug()<<value.numeric;
 //        printf("=====%f\n",value.numeric);
