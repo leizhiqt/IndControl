@@ -45,14 +45,20 @@ public:
 Q_SIGNALS:
     void broadcast_binary(QByteArray message);
     void broadcast_msg(QString message);
+    void broadcast_binary_move(QByteArray message);
+    void broadcast_binary_can(QByteArray message);
 
 public Q_SLOTS:
     void onNewConnection();
     void recvTextMessage(const QString &message);
     void socketDisconnected();
     void recvBinaryMessage(const QByteArray &message);
-
-    void slot_broadcast_binary(QByteArray message);
+    //推送位姿数据给JAVA
+    void slot_broadcast_binary(QByteArray content);
+    //推送自移尾机数据给JAVA
+    void slot_broadcast_binary_move(QByteArray content);
+    //推送掘进机工况数据给JAVA
+    void slot_broadcast_binary_can(QByteArray content);
     void slot_broadcast_msg(QString message);
 };
 #endif //WEBSOCKET_H

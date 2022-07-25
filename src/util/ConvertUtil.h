@@ -3,6 +3,8 @@
 
 #include <QString>
 
+#define GET_BIT(x,bit) ((x&(1<<bit))>>bit) //获取bit位
+
 QString float_to_hex(float va);
 QString int_to_hex(int va);
 
@@ -12,6 +14,10 @@ QString int_to_hex(int va);
 
 void to_hexi(char *hexs,unsigned char* va,bool od);
 void to_hexc(char *hexs,unsigned char va);
+void to_hexint(char *hexs,unsigned char* va);
+void to16_hexs(char *hexs,unsigned char* va);
+
+void ito16_hex(char *hexs,unsigned char* va,bool od);
 
 void ntoh_32(char *bytes);
 void ntoh_16(char *bytes);

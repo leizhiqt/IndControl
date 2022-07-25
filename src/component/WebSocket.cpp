@@ -5,6 +5,7 @@
 #include "ProtocolXly.h"
 #include "ConvertUtil.h"
 #include "UWLog.h"
+#include "SelfMovingtail.h"
 
 WebSocket::WebSocket(quint16 port,WebSocketCommand* command)
 {
@@ -26,6 +27,8 @@ void WebSocket::init()
 
     connect(this, SIGNAL(broadcast_binary(QByteArray)), this, SLOT(slot_broadcast_binary(QByteArray)));
     connect(this, SIGNAL(broadcast_msg(QString)), this, SLOT(slot_broadcast_msg(QString)));
+    connect(this, SIGNAL(broadcast_binary_move(QByteArray)), this, SLOT(slot_broadcast_binary_move(QByteArray)));
+    connect(this, SIGNAL(broadcast_binary_can(QByteArray)), this, SLOT(slot_broadcast_binary_can(QByteArray)));
 }
 
 WebSocket::~WebSocket()
@@ -92,7 +95,7 @@ void WebSocket::socketDisconnected()
     qDebug()<<__FILE__<<__LINE__<<"socketDisconnected.";
 }
 
-//推送消息给客户端message
+//推送消息给客户端
 void WebSocket::slot_broadcast_msg(QString message)
 {
     for (auto socket:m_clients) {
@@ -100,7 +103,7 @@ void WebSocket::slot_broadcast_msg(QString message)
     }
 }
 
-//推送消息给客户端binary
+//推送位姿数据给客户
 void WebSocket::slot_broadcast_binary(QByteArray content)
 {
     int len = content.size();
@@ -110,25 +113,69 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
     if(len>=104){
         QString message = QString(content);
         message.remove(QRegExp("\\s"));
-
         char *str_ascii = message.toLatin1().data();
         int ascii_len =message.toLatin1().length();
         int bin_len = ascii_len/2;
-
         unsigned char frame[1024];
         hexs_to_binary(str_ascii,ascii_len,frame);
-
-        printf_hex(frame,bin_len);
-
         conver_xly_frame_to_json((const char*)frame,bin_len,json_buf);
     }else{
         char *frame = (char *)content.data();
-        printf_hex((unsigned char*)frame,content.length());
-        log_debug("buf len=%d %d",content.length(),content.size());
-        log_debug("ascii_len");
         conver_xly_frame_to_json((const char*)frame,content.length(),json_buf);
     }
+    //推送消息给客户端
+    for (auto socket:m_clients) {
+        socket->sendTextMessage(json_buf);
+    }
+}
 
+//推送消息自移尾机工况数据给客户端
+void WebSocket::slot_broadcast_binary_move(QByteArray content)
+{
+    int len = content.size();
+    char json_buf[1024];
+    memset(json_buf,'\0',sizeof(json_buf));
+
+    if(len>=104){
+        QString message = QString(content);
+        message.remove(QRegExp("\\s"));
+        char *str_ascii = message.toLatin1().data();
+        int ascii_len =message.toLatin1().length();
+        int bin_len = ascii_len/2;
+        unsigned char frame[1024];
+        hexs_to_binary(str_ascii,ascii_len,frame);
+        conver_selfmovetail_to_json((const char*)frame,bin_len,json_buf);
+    }else{
+        char *frame = (char *)content.data();
+        conver_selfmovetail_to_json((const char*)frame,content.length(),json_buf);
+    }
+    //推送消息给客户端
+    for (auto socket:m_clients) {
+        socket->sendTextMessage(json_buf);
+    }
+}
+
+//推送掘进机工况数据给客户端
+void WebSocket::slot_broadcast_binary_can(QByteArray content){
+    //数据长度
+    int len = content.size();
+    char json_buf[1024];
+    memset(json_buf,'\0',sizeof(json_buf));
+
+    if(len >= 104){
+        QString message = QString(content);
+        message.remove(QRegExp("\\s"));
+        char *str_ascii = message.toLatin1().data();
+        int ascii_len =message.toLatin1().length();
+        int bin_len = ascii_len/2;
+        unsigned char frame[1024];
+        hexs_to_binary(str_ascii,ascii_len,frame);
+        conver_opencan_to_json((const char*)frame,bin_len,json_buf);
+    }
+    else{
+        char *frame = (char *)content.data();
+        conver_opencan_to_json((const char*)frame, content.length(), json_buf);
+    }
     //推送消息给客户端
     for (auto socket:m_clients) {
         socket->sendTextMessage(json_buf);

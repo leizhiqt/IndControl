@@ -67,7 +67,6 @@ void ControlMain::th_do(){
     modbus_client.port=conf->modbusSlavePort;
     modbus_client.recvFun=modbus_recv;
     modbus_client.sendFun=modbus_send;
-    //这里似乎少了接收函数
 
     int ret=-1;
     bool can_ok=false;
@@ -99,7 +98,7 @@ void ControlMain::th_do(){
         }
 
         //心跳包检测
-//        Sleep(1000*60*5); //时间太长了，假设程序启动时服务端没有启动，会等待很久才会重连
+//      Sleep(1000*60*5); //时间太长了，假设程序启动时服务端没有启动，会等待很久才会重连
         Sleep(1000 * 5);
         if(can_ok){
             ret=tcp_client_send(can_client.acceptSocket,buf,sizeof(buf));
@@ -111,15 +110,6 @@ void ControlMain::th_do(){
             }
         }
 
-//        if(modbus_ok)
-//        {
-//            ret=tcp_client_send(modbus_client.acceptSocket,buf,sizeof(buf));
-//            log_debug("心跳包检测:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
-//            if(ret<0){
-//                closesocket(modbus_client.acceptSocket);
-//                can_ok=false;
-//            }
-//        }
         //end
     }
 }

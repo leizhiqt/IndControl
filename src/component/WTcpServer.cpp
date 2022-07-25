@@ -170,13 +170,8 @@ void recvXly(char *buf,int len,SOCKET recvSocket)
 
     printf_hex((unsigned char*)buf,len);
 
-    //log_debug("buf len=%d",len);
-
     //信号槽机制 广播websocket
     emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
-
-    //CanOpenUI *ui=controlMain->mWin;
-    //ui->Append((char *)hexs,1);
 }
 
 /* 接收到modbus发来的数据 */
@@ -184,37 +179,25 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
         return;
-    //printf_hex((unsigned char*)buf,len);
-    //printf_hex((unsigned char*)OldBuf,sizeof(OldBuf));
-//MBAP 00 01 FID
-    //00 00  modbus fLAT
-    //00 06  COMMAND
-    //01     slave ID
-    //06     command
-    //00	00  regID
-    //00	0A  regVale
+
     //如果功能码是06(修改)
     if(buf[7] == 0x06)
     {
-        //这里是给操作台的响应桢(同请求帧相同) //这里可以放至最上面去撒
-
         char *nth_byte = buf+8;
         ntoh_16(nth_byte);
-
+        //得到数据修改地址
         uint16_t ret_inx= *((uint16_t *)(nth_byte));
-
+        //替换相应数据
         slave_reg.r_slave[2*ret_inx]=buf[10];
         slave_reg.r_slave[2*ret_inx+1]=buf[11];
 
-        printf_hex((unsigned char *)buf,len);
+        //printf_hex((unsigned char *)buf,len);
+        //log_debug("===================== %04x %d %02x %02x",ret_inx,ret_inx,slave_reg.r_slave[ret_inx],slave_reg.r_slave[ret_inx+1]);
+        //printf_hex((unsigned char *)slave_reg.r_slave,10);
 
-        log_debug("===================== %04x %d %02x %02x",ret_inx,ret_inx,slave_reg.r_slave[ret_inx],slave_reg.r_slave[ret_inx+1]);
-
-        printf_hex((unsigned char *)slave_reg.r_slave,10);
-
+        //给操作台的响应桢(同请求帧相同)
         tcp_client_send(recvSocket,(char *)buf,len);
 
-        //我觉得这个地方，因为06修改了值，但是 slave_reg 里的值没有改，所以始终返回的全是0
         //以下去INI文件中匹配操作台报文
         //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
         char hexs[512]={0};
@@ -245,27 +228,17 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
         int in = 4;
         int rlen =(buf[11]*2 + in);//返回的数据个数
         int slen = rlen+5;
-
         memset(slave_reg.slave_buf,'\0',sizeof(slave_reg.slave_buf));
-
         memcpy(slave_reg.slave_buf,buf,5);//校验信息，MODBUS协议
-
         slave_reg.slave_buf[5]=rlen;//数据长度
-
         slave_reg.slave_buf[6]=buf[6];//功能码
-        slave_reg.slave_buf[7]=buf[7];//ID //ID好象在功能码前面
-
+        slave_reg.slave_buf[7]=buf[7];//ID
         slave_reg.slave_buf[8]=rlen-in;//数据个数
-
-        log_debug("slave_reg.slave_buf %d %02x %02x",slave_reg.slave_buf[8],slave_reg.r_slave[0],slave_reg.r_slave[1]);
-        //这里好象位置搞反了样 00 00 01 06  现在是 01 06 00 00
         if(buf[11]%2==0){
             memcpy(slave_reg.slave_buf+9,slave_reg.r_slave,slave_reg.slave_buf[8]);//偶数
         }else{
             memset(slave_reg.slave_buf+9,'\0',slave_reg.slave_buf[8]);
         }
-
-        printf_hex((unsigned char*)slave_reg.slave_buf,slen);
         //这里是给操作台的响应桢
         tcp_client_send(recvSocket,(char *)slave_reg.slave_buf,slen);
         return ;

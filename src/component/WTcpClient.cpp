@@ -10,6 +10,9 @@
 #include "ControlMain.h"
 #include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
+#include "UTypes.h"
+#include "SelfMovingtail.h"
+#include "ProtocolXly.h"
 
 using namespace std;
 
@@ -17,27 +20,16 @@ using namespace std;
 DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
-
-    // 取得ip和端口号 这里没有取对
-//    sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
-//    info->port = ntohs(info->addr.sin_port);
-    log_debug("recv:ip=%s port=%d ",info->ip,info->port);
-//    log_debug("ThreadClient_recv recvFun =============");
-
     char recvBuf[1024] = {0};
     int count = 0;
     while(1){
-
-        //发送数据 回调函数
+        //发送数据
         if(info->sendFun!=NULL){
             info->sendFun(info->acceptSocket);
         }
-
-        //似乎给503的包没有发出去，所以没有包回来
         memset(recvBuf,'\0',sizeof(recvBuf));
-        //好象只执行到这里，这里是CAN CLIENT 和MODBUS CLIENT都要调用吗？不影响的
         count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
-        log_debug("ThreadClient_recv recvFun %d",count);
+        //log_debug("ThreadClient_recv recvFun %d",count);
 
         if (count == -1)
         {
@@ -48,13 +40,7 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
             }
             return 0; //遇见其他错误
         }
-
-//        log_debug("ThreadClient_recv recvFun %d",count);
-
         if(count==0) break;//被对方关闭
-
-//        log_debug("tcp_client_do recvFun =============");
-
         //处理接收数据 回调函数
         if(info->recvFun!=NULL){
             info->recvFun(recvBuf,count,info->acceptSocket);
@@ -127,27 +113,21 @@ int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
         return 0;
     }
     int n = send(sSocket,(char *)buf, size, 0);
-    log_debug("tcp_client_send %d %d",n, sSocket);
+    //log_debug("tcp_client_send %d %d",n, sSocket);
     return n;
 }
 
 //TCP客户端接收数据
 int tcp_client_recv(const SOCKET sSocket)
 {
-    //这里解析报文要注意：tcp客户端有两种：can总线的客户端,modbus slave的客户端
     if(!(sSocket>0)){
         return 0;
     }
-//  log_debug("%d %s",size,buf);
-
     char buf[1024];
-
     int n = recv(sSocket,(char *)buf, sizeof(buf), 0);
 
     //根据buf接收数据解析
-
-    log_debug("tcp_client_recv %d",n);
-
+    //log_debug("tcp_client_recv %d",n);
     return n;
 }
 
@@ -163,40 +143,53 @@ int stop_tcp_client_th(SOCKET *sSocket)
     return 0;
 }
 
-//接收Modbus协同控制器报文
+//接收到Modbus协同控制器报文
 int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
-//    log_debug("modbus_recv ==========================");
-    printf_hex((unsigned char*)buf,len);
-    log_debug("modbus client recv data buf len=%d",len);
+    if(buf==NULL || len<1)
+        return 0;
+    //处理报文并推送给JAVA
+    emit controlMain->webSocket->broadcast_binary_move(QByteArray(buf,len));
     return 0;
 }
 
-//给Modbus协同控制器发送报文
+//给Modbus协同控制器发送报文请求数据
 int modbus_send(SOCKET recvSocket)
 {
-    std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find("ControlSet/Control007");
+    static uint16_t selfMoveCount=0x0500;//这里只有modbus master用的计数器
+    //获得命令内容
+    std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find("ControlSet/SelfMoveData");
     if(iter != Conf::getInstance()->conf_can_packs.end())
     {
-        //获得命令内容
-//        log_debug("found send cmdline");
+        //ID号加1
+        selfMoveCount ++;
+        if(selfMoveCount == 0xFFFF){
+            selfMoveCount = 0x0500;
+        }
 
         QByteArray qbuf = iter->second;
         char *buf = qbuf.begin();
-        printf_hex((unsigned char *)buf,qbuf.length());
 
-        log_debug("modbus_send_socket: %d",recvSocket);
+        char *send_p = (char *)malloc(qbuf.length() + 2);
+        char *p = (char *)&selfMoveCount;
+        *(send_p+0) = *(char*)(p+1);
+        *(send_p+1) = *(char*)(p+0);
 
-        tcp_client_send(recvSocket,buf,qbuf.length());
+        memcpy(send_p+2,buf,qbuf.length());
+
+        tcp_client_send(recvSocket,send_p,qbuf.length()+2);
+
+        free(send_p);//堆上释放空间
     }
     return 0;
 }
 
-//接收can总线转来的报文
+//接收到can总线转来的报文
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
-    log_debug("can client recv data ==========================");
-    printf_hex((unsigned char*)buf,len);
-    log_debug("can client recv data buf len=%d",len);
+    if(buf == NULL || len < 1)
+        return 0;
+    //处理报文并推送给JAVA
+    emit controlMain->webSocket->broadcast_binary_can(QByteArray(buf,len));
     return 0;
 }

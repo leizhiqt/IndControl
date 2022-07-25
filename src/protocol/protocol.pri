@@ -15,7 +15,9 @@ win32 {
 }
 
 HEADERS += \
-    $$PWD/ModBusTcp.h
+    $$PWD/ModBusTcp.h \
+    $$PWD/SelfMovingtail.h
 
 SOURCES += \
-    $$PWD/ModBusTcp.cpp
+    $$PWD/ModBusTcp.cpp \
+    $$PWD/SelfMovingtail.cpp

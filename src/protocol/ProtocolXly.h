@@ -73,61 +73,43 @@ struct _response_xly_t
  //标准帧
  struct _response_opencan11_t
   {
-     //字节1为帧信息。第7位（FF）表示帧格式，在标准帧中，FF＝0；第6位（RTR）表示帧的类型，RTR=0表示为数据帧，RTR=1表示为远程帧；DLC表示在数据帧时实际的数据长度。
-
+     //字节1为帧信息,第7位（FF）表示帧格式，在标准帧中，FF＝0；第6位（RTR）表示帧的类型，RTR=0表示为数据帧，RTR=1表示为远程帧；DLC表示在数据帧时实际的数据长度。
      //FF
      //r1.7==0 标准帧
-
      //RTR
      //r1.6==0 数据帧
      //r1.6==1 远程帧
-
      //r1.4~0==1 数据帧时实际的数据长度
      uchar_8 r1;
-
-     //第2&3字节为 帧ID 有效11位 4~11==1~7为数据帧
+     //第2&3字节为帧ID有效11位4~11==1~7为数据帧
      //r2.0->r2.7 == id.3->id.10
-     uchar_8 r2;
+     uchar_8 cobid_h;
      //r3.5->r3.7 == id.0->id.2
-     uchar_8 r3;
-
-     // ID = (r2<<3 & (r3&0xe0)>>5)
-
-     uchar_8 r4;//b0
-     uchar_8 r5;//b1
-     uchar_8 r6;//b2
-     uchar_8 r7;//b3
-     uchar_8 r8;//b4
-     uchar_8 r9;//b5
-     uchar_8 r10;//b6
-     uchar_8 r11;//b7
+     uchar_8 cobid_l;
+     //ID = (r2<<3 & (r3&0xe0)>>5)
+     uchar_8 data0[2];
+     uchar_8 data1[2];
+     uchar_8 data2[2];
+     uchar_8 data3[2];
 };
 
-//扩展帧
- struct _response_opencan13_t
+//13个字节帧
+struct _response_opencan13_t
   {
-     //字节1为帧信息。第7位（FF）表示帧格式，在标准帧中，FF＝0；第6位（RTR）表示帧的类型，RTR=0表示为数据帧，RTR=1表示为远程帧；DLC表示在数据帧时实际的数据长度。
-     uchar_8 r1;
-
-     //第2&3字节为 帧ID 有效11位 4~11==1~7为数据帧
-     uchar_8 r2;
-     uchar_8 r3;
-
-     //扩展ID
-     uchar_8 r4;
-     uchar_8 r5;
-
-     uchar_8 r6;//b0
-     uchar_8 r7;//b1
-     uchar_8 r8;//b2
-     uchar_8 r9;//b3
-     uchar_8 r10;//b4
-     uchar_8 r11;//b5
-     uchar_8 r12;//b6
-     uchar_8 r13;//b7
+     //08 00 00 00 D2 05 DC 0D AC 11 94 15 7C
+     uchar_8 r1;//数据长度（1个字节）08后面有两个00 00 你好象取成了这两个了
+     uchar_8 cobid_28;//数据1    这里是什么意思，怎么要这样取
+     uchar_8 cobid_20;//帧格式（1个字节）
+     uchar_8 cobid_12;//帧类型（1个字节）
+     uchar_8 cobid_4;
+//     uchar_8 cobid[2];//cobid
+     uchar_8 data0[2];//数据1
+     uchar_8 data1[2];//数据2
+     uchar_8 data2[2];//数据3
+     uchar_8 data3[2];//数据4
 };
 
-  void conver_opencan_to_json(const char *frame_buf,const int len, char *str_json);
+void conver_opencan_to_json(const char *frame_buf,const int len, char *str_json);
 
 /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */

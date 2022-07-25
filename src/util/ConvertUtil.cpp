@@ -8,7 +8,6 @@
 #include <QDebug>
 
 int hexs_to_binary(const char *in,int len, unsigned char *out) {
-//    int len = (int)strlen(in);
     char *str = (char *)malloc(len);
     memset(str, 0, len);
     memcpy(str, in, len);
@@ -104,15 +103,11 @@ void sprintf_hex(char *hexs,unsigned char const *p,int size)
         strcat((char *)bufs,buf);
     }
     strcpy((char *)hexs,(char *)bufs);
-//    log_debug((char *)bufs);
-    //printf(bufs);
 }
 
 void to_hexi(char *hexs,unsigned char* va,bool od)
 {
     memset(hexs,'\0',512);
-//    sprintf(hexs,"%.4f",va);
-//    printf("%s %x\n",hexs,va);
    _UStuff_t value;
     value.va_float=0.0;
 
@@ -130,6 +125,44 @@ void to_hexi(char *hexs,unsigned char* va,bool od)
     }
 
     sprintf(hexs,"%5.2f",value.va_float);
+}
+
+void to_hexint(char *hexs,unsigned char* va)
+{
+    memset(hexs,'\0',512);
+   _UStuff_t value;
+    value.va_int=0;
+qDebug()<<"va:"<<va;
+    value.ascii[3] = va[0];
+    value.ascii[2] = va[1];
+    value.ascii[1] = va[2];
+    value.ascii[0] = va[3];
+
+    sprintf(hexs,"%d",value.va_int);
+}
+
+void ito16_hex(char *hexs,unsigned char* va,bool od)
+{
+    memset(hexs,'\0',512);
+
+    _UStuff16_t value={0};
+    value.va_int=0;
+    if(od)
+    {
+        value.ascii[1] = va[0];
+        value.ascii[0] = va[1];
+    }else{
+        value.ascii[1] = va[1];
+        value.ascii[0] = va[0];
+    }
+
+    sprintf(hexs,"%u",value.va_int);
+}
+
+void to16_hexs(char *hexs,unsigned char* va)
+{
+    memset(hexs,'\0',512);
+    sprintf(hexs,"%02x %02x",*va,*(va+1));
 }
 
 QString float_to_hex(float va)
@@ -163,37 +196,5 @@ void printf_hex(unsigned char *hexs,int len)
     for(int i=0;i<len;i++){
         printf(" 0x%02x",*(hexs+i));
     }
-//    printf("len=%d\n",len);
     printf("\n");
 }
-
-/*
-int main(int argc, const char * argv[]) {
-//    unsigned char* binary = (unsigned char*)malloc(sizeof(unsigned char )*((len/2)+1));
-//    hexs_to_binary(buf,len,binary);
-//    printf_hex(binary,len/2);
-//    emit controlMain->webSocket->broadcast_msg((char *)binary);
-//    char hexs[512];
-//    sprintf_hex(hexs,(char*)binary,(len/2));
-//    log_debug("hexs len=%d %s",len,hexs);
-
-//    free(binary);
-    //接收到的数据
-//        PGSQLDriveHelper::getInstance()->pg_add_exec((char *)hexs);
-//        PGSQLDriveHelper::getInstance()->pg_add_exec("prog_postures_recv",info.ip,info.port,(char *)hexs);
-
-    //printf_hex(hexs,(char*)recvBuf,count);
-    //log_debug("recv csocket=%d len=%d %s",info.acceptSocket,strlen((char *)hexs),hexs);
-
-    char *str = "fa32333435363738393a3b3c3d3e3f40";
-    unsigned char temp[16] = {0};
-    hexstringtobyte(str, temp);
-    for (int i = 0; i < 16; i++) {
-        printf("%d ", temp[i]);
-    }
-    printf("\n");
-    char out[33] = {0}; // 多留了一位存放 '\0'
-    bytetohexstring(temp, 16, out);
-    printf("%s\n", out);
-    return 0;
-}*/
