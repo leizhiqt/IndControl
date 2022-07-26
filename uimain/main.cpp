@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
     semaphore.release();
     
 //    uchar_8 value[4];
-//    value[0] = 0x00;
-//    value[1] = 0x01;
-//    value[2] = 0x01;
-//    value[3] = 0x11;
+//    value[0] = 0x42;
+//    value[1] = 0x49;
+//    value[2] = 0x00;
+//    value[3] = 0x00;
 
-//    printf("=====%d\n",hl_to_int32(value[0],value[1],value[2],value[3]));
+//    printf("=====%5.2f\n",hl_to_int32(value[0],value[1],value[2],value[3]));
 
 //    qDebug()<<value.numeric;
 //        printf("=====%f\n",value.numeric);

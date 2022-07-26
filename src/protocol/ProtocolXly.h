@@ -68,7 +68,7 @@ struct _response_xly_t
  };
 
  void conver_xly_frame_to_json(const char *str_json,const int len, char *frame_buf);
- void conver_xly_json_to_frame(const char *frame_buf,const int len, char *str_json);
+ //void conver_xly_json_to_frame(const char *frame_buf,const int len, char *str_json);
 
  //标准帧
  struct _response_opencan11_t

@@ -2,6 +2,7 @@
 #define CONVERTUTIL_H
 
 #include <QString>
+#include "UTypes.h"
 
 #define GET_BIT(x,bit) ((x&(1<<bit))>>bit) //获取bit位
 
@@ -13,9 +14,10 @@ QString int_to_hex(int va);
 #endif
 
 void byte1_to_char(char *hexs,unsigned char va);
-//void to_hex_float(char *hexs,unsigned char* va,bool od);
-void byte4_to_int(char *hexs,unsigned char* va);
+float32_t byte4_to_float32(uchar_8 *va);
 
+void swap_byte32(uchar_8 *htol,const uchar_8 *ltoh);
+void copy_byte32(uchar_8 *htol,const uchar_8 *ltoh);
 
 void ntoh_32(char *bytes);
 void ntoh_16(char *bytes);

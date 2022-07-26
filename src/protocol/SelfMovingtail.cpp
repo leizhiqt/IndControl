@@ -31,7 +31,7 @@ void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_
        parmsSelf.insert("集控模式",GET_BIT(p->r_40003[0],7));
        parmsSelf.insert("油位低",GET_BIT(p->r_40003[1],0));
 
-       sprintf(hexs,"%d",hl_to_int16(p->r_40004[1],p->r_40004[0]));
+       sprintf(hexs,"%d",hl_to_int16(p->r_40004[0],p->r_40004[1]));
        parmsSelf.insert("主泵压力",hexs);
 
        sprintf(hexs,"%d",hl_to_int16(p->r_40005[1],p->r_40005[0]));

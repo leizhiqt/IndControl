@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <cmath>
 #include "ControlMain.h"
 #include "ProtocolXly.h"
 #include "ConvertUtil.h"
@@ -53,109 +54,112 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
         response_xly.r1=(uchar_8)0xAA;
         response_xly.r2=(uchar_8)0xBB;
 
-        //初始经度
-        *((float *)&(response_xly.r3)) = valueContent.value("startxvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r3));
-
+        UStuff32_t ust_value;
+        //初始经度(这里应该可以四舍五入取两位小数哈)
+        QString str = QString::number(valueContent.value("startxvalue").toDouble(),'f',2);
+        ust_value.va_float = str.toFloat();//valueContent.value("startxvalue").toString().toFloat();
+//        ust_value.va_float = round(ust_value.va_float,2);
+        swap_byte32(response_xly.r3,ust_value.ascii);
+log_debug("va_float %f",ust_value.va_float);
         //初始纬度
-        *((float *)&(response_xly.r4))  = valueContent.value("startyvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r4));
+        ust_value.va_float  = valueContent.value("startyvalue").toString().toFloat();
+        swap_byte32(response_xly.r4,ust_value.ascii);
 
         //初始高度
-        *((float *)&(response_xly.r5))  = valueContent.value("startzvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r5));
+        ust_value.va_float  = valueContent.value("startzvalue").toString().toFloat();
+        swap_byte32(response_xly.r5,ust_value.ascii);
 
         //惯导标定
-        *((int *)&(response_xly.r6))  = valueContent.value("stationstatus").toString().toInt();
-        ntoh_32((char *)&(response_xly.r6));
+        short s_val = valueContent.value("stationstatus").toString().toShort();
+        response_xly.r6 = *((uchar_8 *)&s_val);
 
         //前置视觉标定
-        *((int *)&(response_xly.r7)) = valueContent.value("frontview").toString().toInt();
-        ntoh_32((char *)&(response_xly.r7));
+        s_val = valueContent.value("frontview").toString().toShort();
+        response_xly.r7 = *((uchar_8 *)&s_val);
 
         //后置视觉标定
-        *((int *)&(response_xly.r8)) = valueContent.value("rearview").toString().toInt();
-        ntoh_32((char *)&(response_xly.r8));
+        s_val = valueContent.value("rearview").toString().toShort();
+        response_xly.r8 = *((uchar_8 *)&s_val);
 
         //激光A点X坐标
-        *((float *)&(response_xly.r9)) = valueContent.value("laseraxvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r9));
+        ust_value.va_float = valueContent.value("laseraxvalue").toString().toFloat();
+        swap_byte32(response_xly.r9,ust_value.ascii);
 
         //激光A点Y坐标
-        *((float *)&(response_xly.r10)) = valueContent.value("laserayvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r10));
+        ust_value.va_float = valueContent.value("laserayvalue").toString().toFloat();
+        swap_byte32(response_xly.r10,ust_value.ascii);
 
         //激光A点Z坐标
-        *((float *)&(response_xly.r11)) = valueContent.value("laserazvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r11));
+        ust_value.va_float = valueContent.value("laserazvalue").toString().toFloat();
+        swap_byte32(response_xly.r11,ust_value.ascii);
 
         //激光B点X坐标
-        *((float *)&(response_xly.r12)) = valueContent.value("laserbxvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r12));
+        ust_value.va_float = valueContent.value("laserbxvalue").toString().toFloat();
+        swap_byte32(response_xly.r12,ust_value.ascii);
 
         //激光B点Y坐标
-        *((float *)&(response_xly.r13)) = valueContent.value("laserbyvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r13));
+        ust_value.va_float = valueContent.value("laserbyvalue").toString().toFloat();
+        swap_byte32(response_xly.r13,ust_value.ascii);
 
         //激光B点Z坐标
-        *((float *)&(response_xly.r14)) = valueContent.value("laserbzvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r14));
+        ust_value.va_float = valueContent.value("laserbzvalue").toString().toFloat();
+        swap_byte32(response_xly.r14,ust_value.ascii);
 
         //激光C点X坐标
-        *((float *)&(response_xly.r15)) = valueContent.value("lasercxvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r15));
+        ust_value.va_float = valueContent.value("lasercxvalue").toString().toFloat();
+        swap_byte32(response_xly.r15,ust_value.ascii);
 
         //激光C点Y坐标
-        *((float *)&(response_xly.r16)) = valueContent.value("lasercyvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r16));
+        ust_value.va_float = valueContent.value("lasercyvalue").toString().toFloat();
+        swap_byte32(response_xly.r16,ust_value.ascii);
 
         //激光C点Z坐标
-        *((float *)&(response_xly.r17)) = valueContent.value("laserczvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r17));
+        ust_value.va_float = valueContent.value("laserczvalue").toString().toFloat();
+        swap_byte32(response_xly.r17,ust_value.ascii);
 
         //激光A1点X坐标
-        *((float *)&(response_xly.r18)) = valueContent.value("lasera1xvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r18));
+        ust_value.va_float = valueContent.value("lasera1xvalue").toString().toFloat();
+        swap_byte32(response_xly.r18,ust_value.ascii);
 
         //激光A1点Y坐标
-        *((float *)&(response_xly.r19)) = valueContent.value("lasera1yvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r19));
+        ust_value.va_float = valueContent.value("lasera1yvalue").toString().toFloat();
+        swap_byte32(response_xly.r19,ust_value.ascii);
 
         //激光A1点Z坐标
-        *((float *)&(response_xly.r20)) = valueContent.value("lasera1zvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r20));
+        ust_value.va_float = valueContent.value("lasera1zvalue").toString().toFloat();
+        swap_byte32(response_xly.r20,ust_value.ascii);
 
         //激光B1点X坐标
-        *((float *)&(response_xly.r21)) = valueContent.value("laserb1xvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r21));
+        ust_value.va_float = valueContent.value("laserb1xvalue").toString().toFloat();
+        swap_byte32(response_xly.r21,ust_value.ascii);
 
         //激光B1点Y坐标
-        *((float *)&(response_xly.r22)) = valueContent.value("laserb1yvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r22));
+        ust_value.va_float = valueContent.value("laserb1yvalue").toString().toFloat();
+        swap_byte32(response_xly.r22,ust_value.ascii);
 
         //激光B1点Z坐标
-        *((float *)&(response_xly.r23)) = valueContent.value("laserb1zvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r23));
+        ust_value.va_float = valueContent.value("laserb1zvalue").toString().toFloat();
+        swap_byte32(response_xly.r23,ust_value.ascii);
 
         //激光C1点X坐标
-        *((float *)&(response_xly.r24)) = valueContent.value("laserc1xvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r5));
+        ust_value.va_float = valueContent.value("laserc1xvalue").toString().toFloat();
+        swap_byte32(response_xly.r24,ust_value.ascii);
 
         //激光C1点Y坐标
-        *((float *)&(response_xly.r25)) = valueContent.value("laserc1yvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r25));
+        ust_value.va_float = valueContent.value("laserc1yvalue").toString().toFloat();
+        swap_byte32(response_xly.r25,ust_value.ascii);
 
         //激光C1点Z坐标
-        *((float *)&(response_xly.r26)) = valueContent.value("laserc1zvalue").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r26));
+        ust_value.va_float = valueContent.value("laserc1zvalue").toString().toFloat();
+        swap_byte32(response_xly.r26,ust_value.ascii);
 
         //截割深度
-        *((float *)&(response_xly.r27)) = valueContent.value("cutdepth").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r27));
+        ust_value.va_float = valueContent.value("cutdepth").toString().toFloat();
+        swap_byte32(response_xly.r27,ust_value.ascii);
 
         //掘进速度
-        *((float *)&(response_xly.r28)) = valueContent.value("diginspeed").toString().toFloat();
-        ntoh_32((char *)&(response_xly.r28));
+        ust_value.va_float = valueContent.value("diginspeed").toString().toFloat();
+        swap_byte32(response_xly.r28,ust_value.ascii);
 
         response_xly.r29 = 0xBF;
         printf_hex((unsigned char *)&response_xly,sizeof(response_xly_t));

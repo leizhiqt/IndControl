@@ -4,7 +4,6 @@
 #include <string.h>
 #include <Windows.h>
 #include "UWLog.h"
-#include "UTypes.h"
 #include <QDebug>
 
 void byte1_to_char(char *hexs,unsigned char va)
@@ -13,13 +12,46 @@ void byte1_to_char(char *hexs,unsigned char va)
     sprintf(hexs,"%02x",va);
 }
 
-void byte4_to_int(char *hexs,unsigned char* va)
+float32_t byte4_to_float32(uchar_8 *va)
 {
-    memset(hexs,'\0',512);
-    uint32_t va_int=hl_to_int32(va[3],va[2],va[1],va[0]);
-    sprintf(hexs,"%d",va_int);
-//    sprintf(hexs,"%5.2f",va_float);
+    UStuff32_t value;
+    value.ascii[3]=*va;
+    value.ascii[2]=*(va+1);
+    value.ascii[1]=*(va+2);
+    value.ascii[0]=*(va+3);
+
+//    value.va_float=va;
+    /*
+    // 求符号位
+    float sig = 1.;
+
+    if (*va >=128.)
+        sig = -1.;
+//求阶码
+    float jie = 0.;
+    if (*va >=128.)
+    {
+        jie = *va-128.  ;
+    }
+    else
+    {
+        jie = *va;
+    }
+    jie = jie * 2.;
+    if (*(va+1) >=128.)
+        jie += 1.;
+    jie -= 127.;
+//求尾码
+    float tail = 0.;
+    if (*(va+1) >=128.)
+        *(va+1) -= 128.;
+    tail =  *(va+3) + (*(va+2) + *(va+1) * 256.) * 256.;
+    tail  = (tail)/8388608;   //   8388608 = 2^23
+    float f = sig * pow(2., jie) * (1+tail);
+*/
+    return value.va_float;
 }
+
 
 void ntoh_32(char *net_bytes)
 {
@@ -34,6 +66,23 @@ void ntoh_32(char *net_bytes)
     net_bytes[1]=host_bytes[1];
     net_bytes[2]=host_bytes[2];
     net_bytes[3]=host_bytes[3];
+}
+
+void swap_byte32(uchar_8 *htol,const uchar_8 *ltoh)
+{
+    *(htol+0)=*(ltoh+3);
+    *(htol+1)=*(ltoh+2);
+    *(htol+2)=*(ltoh+1);
+    *(htol+3)=*(ltoh+0);
+}
+
+
+void copy_byte32(uchar_8 *htol,const uchar_8 *ltoh)
+{
+    *(htol+0)=*(ltoh+0);
+    *(htol+1)=*(ltoh+1);
+    *(htol+2)=*(ltoh+2);
+    *(htol+3)=*(ltoh+3);
 }
 
 void ntoh_16(char *net_bytes)
