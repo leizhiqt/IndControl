@@ -286,13 +286,19 @@ QString ByteArrayToHexString(QByteArray data){
 
 int example_convert()
 {
-//    QCoreApplication a(argc, argv);
+    QString str="12abcd";
 
-    QString str="aabbcc";
+    QString str1=str.toLatin1().toHex(' ');
+
+    printf("%s\n",str1.toLatin1().data());
+
+    str1.replace(" ","");
+
+    printf("%s\n",str1.toLatin1().data());
 
     QByteArray ba;
     char *p = ba.begin();
-    convertStringToHex(str,ba);
+    convertStringToHex(str1,ba);
 
     printf("%d\n",ba.length());
     int len=ba.length();
@@ -302,5 +308,4 @@ int example_convert()
 
     QString hexs=ByteArrayToHexString(ba);
     printf("%s\n",hexs.toLatin1().data());
-//    return a.exec();
 }
