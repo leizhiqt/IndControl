@@ -66,8 +66,10 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
         if(count==0) break;//被对方关闭
 
         //处理接收数据 回调函数
-        if(info->s_info->recvFun!=NULL)
+        if(info->s_info->recvFun!=NULL){
+
             info->s_info->recvFun(recvBuf,count,info->acceptSocket);
+        }
 
         Sleep(300);
     }

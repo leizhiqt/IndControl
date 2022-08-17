@@ -253,6 +253,16 @@ QString ByteArrayToHexString(QByteArray data){
     return ret;
 }
 
+void str_trim(const char *s1,const int len,char *s2)
+{
+    for(int i=0;i<len;i++){
+         if(!isspace((int)*(s1+i))){
+            *s2 = *(s1+i);
+             s2++;
+         }
+    }
+    *s2 = '\0';
+}
 
 int example_convert()
 {

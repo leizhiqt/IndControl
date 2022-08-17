@@ -13,6 +13,8 @@ QString int_to_hex(int va);
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
 #endif
 
+void str_trim(const char *s1,const int len,char *s2);
+
 void byte1_to_char(char *hexs,unsigned char va);
 float32_t byte4_to_float32(uchar_8 *va);
 

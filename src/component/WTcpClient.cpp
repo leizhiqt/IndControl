@@ -195,7 +195,11 @@ log_debug("Rece Data From can: %d",len);
     if(buf == NULL || len < 1)
         return 0;
 
+    QByteArray bytes = QByteArray(buf,len);
+
     //处理报文并推送给JAVA
-    emit controlMain->webSocket->broadcast_binary_can(QByteArray(buf,len));
+    emit controlMain->webSocket->broadcast_binary_can(bytes);
+
+    log_debug("can_recv=========");
     return 0;
 }
