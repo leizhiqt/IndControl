@@ -19,36 +19,6 @@ float32_t byte4_to_float32(uchar_8 *va)
     value.ascii[2]=*(va+1);
     value.ascii[1]=*(va+2);
     value.ascii[0]=*(va+3);
-
-//    value.va_float=va;
-    /*
-    // 求符号位
-    float sig = 1.;
-
-    if (*va >=128.)
-        sig = -1.;
-//求阶码
-    float jie = 0.;
-    if (*va >=128.)
-    {
-        jie = *va-128.  ;
-    }
-    else
-    {
-        jie = *va;
-    }
-    jie = jie * 2.;
-    if (*(va+1) >=128.)
-        jie += 1.;
-    jie -= 127.;
-//求尾码
-    float tail = 0.;
-    if (*(va+1) >=128.)
-        *(va+1) -= 128.;
-    tail =  *(va+3) + (*(va+2) + *(va+1) * 256.) * 256.;
-    tail  = (tail)/8388608;   //   8388608 = 2^23
-    float f = sig * pow(2., jie) * (1+tail);
-*/
     return value.va_float;
 }
 
@@ -308,4 +278,6 @@ int example_convert()
 
     QString hexs=ByteArrayToHexString(ba);
     printf("%s\n",hexs.toLatin1().data());
+
+    return 0;
 }

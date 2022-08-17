@@ -97,12 +97,12 @@ struct _response_xly_t
 struct _response_opencan13_t
   {
      //08 00 00 00 D2 05 DC 0D AC 11 94 15 7C
-     uchar_8 r1;//数据长度（1个字节）08后面有两个00 00 你好象取成了这两个了
-     uchar_8 cobid_28;//数据1    这里是什么意思，怎么要这样取
+     uchar_8 r1;//数据长度（1个字节）
+     uchar_8 cobid_28;//数据1
      uchar_8 cobid_20;//帧格式（1个字节）
      uchar_8 cobid_12;//帧类型（1个字节）
      uchar_8 cobid_4;
-//     uchar_8 cobid[2];//cobid
+//   uchar_8 cobid[2];//cobid
      uchar_8 data0[2];//数据1
      uchar_8 data1[2];//数据2
      uchar_8 data2[2];//数据3

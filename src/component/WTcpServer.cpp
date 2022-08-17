@@ -47,7 +47,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
     // 取得ip和端口号
     sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
     info->port = ntohs(info->addr.sin_port);
-    //log_debug("recv:ip=%s port=%d ",info->ip,info->port);
+    log_debug("recv:ip=%s port=%d ",info->ip,info->port);
 
     char recvBuf[1024] = {0};
     int count = 0;

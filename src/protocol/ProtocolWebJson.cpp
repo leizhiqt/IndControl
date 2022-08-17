@@ -2,7 +2,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <cmath>
 #include "ControlMain.h"
 #include "ProtocolXly.h"
 #include "ConvertUtil.h"
@@ -55,12 +54,10 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
         response_xly.r2=(uchar_8)0xBB;
 
         UStuff32_t ust_value;
-        //初始经度(这里应该可以四舍五入取两位小数哈)
-        QString str = QString::number(valueContent.value("startxvalue").toDouble(),'f',2);
-        ust_value.va_float = str.toFloat();//valueContent.value("startxvalue").toString().toFloat();
-//        ust_value.va_float = round(ust_value.va_float,2);
+        //初始经度
+        ust_value.va_float = valueContent.value("startxvalue").toString().toFloat();
         swap_byte32(response_xly.r3,ust_value.ascii);
-log_debug("va_float %f",ust_value.va_float);
+
         //初始纬度
         ust_value.va_float  = valueContent.value("startyvalue").toString().toFloat();
         swap_byte32(response_xly.r4,ust_value.ascii);

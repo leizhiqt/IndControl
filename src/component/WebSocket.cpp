@@ -77,7 +77,8 @@ void WebSocket::onNewConnection()
 /* 收到消息 */
 void WebSocket::recvBinaryMessage(const QByteArray &message)
 {
-    qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
+log_debug("WebSocket rece Byte Message");
+    //qDebug()<<__FILE__<<__LINE__<<__FUNCTION__;
     const char *recvBuf = message.begin();
     tcp_client_send((controlMain->can_client.acceptSocket),recvBuf,strlen(recvBuf));
     tcp_server_broadcast(controlMain->xly_srv,(char *)recvBuf,strlen(recvBuf));
@@ -86,6 +87,7 @@ void WebSocket::recvBinaryMessage(const QByteArray &message)
 /* 这是websocket 收到消息 */
 void WebSocket::recvTextMessage(const QString &content)
 {
+log_debug("WebSocket rece Text Message");
     command->recvTextMessage(content);
 }
 
@@ -110,7 +112,19 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
     char json_buf[1024];
     memset(json_buf,'\0',sizeof(json_buf));
 
-    if(len>=104){
+    if(len > 13){
+        int newLen = len / 13;
+        int i = 0;
+        for(int d = 0; d < newLen; d++){
+            QByteArray sonContent = content.mid(i,13);
+            char *frame = (char *)sonContent.data();
+            conver_xly_frame_to_json((const char*)frame,sonContent.length(),json_buf);
+            for (auto socket:m_clients) {
+                socket->sendTextMessage(json_buf);
+            }
+            i = i + 13;
+        }
+        /*
         QString message = QString(content);
         message.remove(QRegExp("\\s"));
         char *str_ascii = message.toLatin1().data();
@@ -119,6 +133,7 @@ void WebSocket::slot_broadcast_binary(QByteArray content)
         unsigned char frame[1024];
         hexs_to_binary(str_ascii,ascii_len,frame);
         conver_xly_frame_to_json((const char*)frame,bin_len,json_buf);
+        */
     }else{
         char *frame = (char *)content.data();
         conver_xly_frame_to_json((const char*)frame,content.length(),json_buf);
@@ -135,8 +150,22 @@ void WebSocket::slot_broadcast_binary_move(QByteArray content)
     int len = content.size();
     char json_buf[1024];
     memset(json_buf,'\0',sizeof(json_buf));
-
-    if(len>=104){
+    //要考虑报文拼接的情况，多条报文组合成一条报文发送
+    //这里需要对原始报文进行拆分，分成单条报文进行处理
+    //一条报文有13个字节
+    if(len>=13){
+        int newLen = len / 13;
+        int i = 0;
+        for(int d = 0; d < newLen; d++){
+            QByteArray sonContent = content.mid(i,13);
+            char *frame = (char *)sonContent.data();
+            conver_selfmovetail_to_json((const char*)frame,sonContent.length(),json_buf);
+            for (auto socket:m_clients) {
+                socket->sendTextMessage(json_buf);
+            }
+            i = i + 13;
+        }
+        /*
         QString message = QString(content);
         message.remove(QRegExp("\\s"));
         char *str_ascii = message.toLatin1().data();
@@ -145,6 +174,7 @@ void WebSocket::slot_broadcast_binary_move(QByteArray content)
         unsigned char frame[1024];
         hexs_to_binary(str_ascii,ascii_len,frame);
         conver_selfmovetail_to_json((const char*)frame,bin_len,json_buf);
+        */
     }else{
         char *frame = (char *)content.data();
         conver_selfmovetail_to_json((const char*)frame,content.length(),json_buf);
@@ -159,25 +189,47 @@ void WebSocket::slot_broadcast_binary_move(QByteArray content)
 void WebSocket::slot_broadcast_binary_can(QByteArray content){
     //数据长度
     int len = content.size();
+log_debug("The Data Length is: %d",len);
     char json_buf[1024];
     memset(json_buf,'\0',sizeof(json_buf));
 
-    if(len >= 104){
-        QString message = QString(content);
-        message.remove(QRegExp("\\s"));
-        char *str_ascii = message.toLatin1().data();
-        int ascii_len =message.toLatin1().length();
-        int bin_len = ascii_len/2;
-        unsigned char frame[1024];
-        hexs_to_binary(str_ascii,ascii_len,frame);
-        conver_opencan_to_json((const char*)frame,bin_len,json_buf);
-    }
-    else{
-        char *frame = (char *)content.data();
-        conver_opencan_to_json((const char*)frame, content.length(), json_buf);
-    }
-    //推送消息给客户端
-    for (auto socket:m_clients) {
-        socket->sendTextMessage(json_buf);
+    //生产环境中有连接报文的情况,在这里来分解，按每条报文13个字节进行分解，分解成多条报文
+    if(len > 13){
+        //计算有多少条报文
+        int newLen = len / 13;
+log_debug("Need to Handle Message Count: %d",newLen);
+        //循环处理每条报文
+        int i = 0;
+        for(int d = 0; d < newLen; d++){
+            //取出一条报文进行处理
+log_debug("Now Message index: %d", d+1);
+            QByteArray sonContent = content.mid(i,13);
+            char *frame = (char *)sonContent.data();
+            conver_opencan_to_json((const char*)frame, sonContent.length(), json_buf);
+            for (auto socket:m_clients) {
+                socket->sendTextMessage(json_buf);
+            }
+            i = i + 13;
+        }
+    }else{
+        /*if(len >= 104){
+            QString message = QString(content);
+            message.remove(QRegExp("\\s"));
+            char *str_ascii = message.toLatin1().data();
+            int ascii_len =message.toLatin1().length();
+            int bin_len = ascii_len/2;
+            unsigned char frame[1024];
+            hexs_to_binary(str_ascii,ascii_len,frame);
+            conver_opencan_to_json((const char*)frame,bin_len,json_buf);
+        }
+        else{*/
+            char *frame = (char *)content.data();
+            conver_opencan_to_json((const char*)frame, content.length(), json_buf);
+        //}
+        //推送消息给客户端
+        for (auto socket:m_clients) {
+            socket->sendTextMessage(json_buf);
+        }
+//log_debug("Send Message to Client is Complete: %s", json_buf);
     }
 }

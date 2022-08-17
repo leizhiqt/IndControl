@@ -20,7 +20,7 @@ void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_
        QJsonObject parmsSelf;
 
 //       to16_hexs(hexs,p->r_40003);
-       sprintf(hexs,"%02x %02x",p->r_40003,p->r_40003[1]);
+       //sprintf(hexs,"%02x %02x",p->r_40003,p->r_40003[1]);
        parmsSelf.insert("风机启动标识",GET_BIT(p->r_40003[0],0));
        parmsSelf.insert("泵站启动标识",GET_BIT(p->r_40003[0],1));
        parmsSelf.insert("整机运行标识",GET_BIT(p->r_40003[0],2));
@@ -30,26 +30,19 @@ void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_
        parmsSelf.insert("遥控模式",GET_BIT(p->r_40003[0],6));
        parmsSelf.insert("集控模式",GET_BIT(p->r_40003[0],7));
        parmsSelf.insert("油位低",GET_BIT(p->r_40003[1],0));
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40004[0],p->r_40004[1]));
        parmsSelf.insert("主泵压力",hexs);
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40005[1],p->r_40005[0]));
        parmsSelf.insert("副泵压力",hexs);
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40006[1],p->r_40006[0]));
        parmsSelf.insert("油温",hexs);
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40007[1],p->r_40007[0]));
        parmsSelf.insert("泵站电机温度",hexs);
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40008[1],p->r_40008[0]));
        parmsSelf.insert("风机电机温度",hexs);
-
        sprintf(hexs,"%d",hl_to_int16(p->r_40009[1],p->r_40009[0]));
        parmsSelf.insert("激光测距",hexs);
-
-        sprintf(hexs,"%02x %02x",p->r_40010,p->r_40010[1]);
+       sprintf(hexs,"%02x %02x",p->r_40010,p->r_40010[1]);
        parmsSelf.insert("左调偏动作标记",GET_BIT(p->r_40010[0],0));
        parmsSelf.insert("右调偏动作标记",GET_BIT(p->r_40010[0],1));
        parmsSelf.insert("左推移伸动作标记",GET_BIT(p->r_40010[0],2));

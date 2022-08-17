@@ -29,7 +29,8 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
         }
         memset(recvBuf,'\0',sizeof(recvBuf));
         count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
-        //log_debug("ThreadClient_recv recvFun %d",count);
+
+        log_debug("Step1: ThreadClient_recv recvFun %d",count);
 
         if (count == -1)
         {
@@ -45,6 +46,7 @@ DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
         if(info->recvFun!=NULL){
             info->recvFun(recvBuf,count,info->acceptSocket);
         }
+log_debug("Step2: ThreadClient_recv Complete");
         Sleep(300);
     }
     //结束连接
@@ -107,13 +109,14 @@ int tcp_client_doth(client_info *client)
 //TCP客户端发送数据
 int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
+log_debug("tcp_client_send function");
     if(buf==NULL || size<1)
         return 0;
     if(!(sSocket>0)){
         return 0;
     }
     int n = send(sSocket,(char *)buf, size, 0);
-    //log_debug("tcp_client_send %d %d",n, sSocket);
+log_debug("tcp_client_send %d %d",n, sSocket);
     return n;
 }
 
@@ -127,7 +130,8 @@ int tcp_client_recv(const SOCKET sSocket)
     int n = recv(sSocket,(char *)buf, sizeof(buf), 0);
 
     //根据buf接收数据解析
-    //log_debug("tcp_client_recv %d",n);
+    log_debug("Step3: tcp_client_recv %d",n);
+
     return n;
 }
 
@@ -187,8 +191,10 @@ int modbus_send(SOCKET recvSocket)
 //接收到can总线转来的报文
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
+log_debug("Rece Data From can: %d",len);
     if(buf == NULL || len < 1)
         return 0;
+
     //处理报文并推送给JAVA
     emit controlMain->webSocket->broadcast_binary_can(QByteArray(buf,len));
     return 0;
