@@ -3,10 +3,8 @@
 #ifndef WTCPSERVER_H
 #define WTCPSERVER_H
 
-#define WIN32_LEAN_AND_MEAN
 #include<WinSock2.h>
 #include<WS2tcpip.h>
-#include<thread>
 #include<vector>
 
 typedef struct _client_info client_info;

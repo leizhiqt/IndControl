@@ -1,23 +1,15 @@
-win32 {
-    INCLUDEPATH += $$PWD
-    LIBS +=
-
-    #message($$INCLUDEPATH)
-    #message($$LIBS)
-
-    HEADERS += \
-    $$PWD/ProtocolXly.h \
-    $$PWD/ProtocolWebJson.h
-
-    SOURCES += \
-    $$PWD/ProtocolXly.cpp \
-    $$PWD/ProtocolWebJson.cpp
-}
+INCLUDEPATH += $$PWD
+LIBS +=
 
 HEADERS += \
+    $$PWD/ProtocolXly.h \
+    $$PWD/ProtocolWebJson.h \
     $$PWD/ModBusTcp.h \
     $$PWD/SelfMovingtail.h
 
 SOURCES += \
+    $$PWD/ProtocolXly.cpp \
+    $$PWD/ProtocolWebJson.cpp \
     $$PWD/ModBusTcp.cpp \
     $$PWD/SelfMovingtail.cpp
+

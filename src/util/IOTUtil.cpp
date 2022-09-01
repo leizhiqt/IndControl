@@ -4,7 +4,6 @@
 #include "MyDownloader.h"
 
 #include <QDateTime>
-#include <Windows.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <string>

@@ -2,15 +2,16 @@
 
 #include "WTcpServer.h"
 #include "UWLog.h"
+#include "ControlMain.h"
 
 #include "WTcpClient.h"
-#include "ControlMain.h"
-#include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
 #include "ModBusTcp.h"
-#include <vector>
 
-int serv_dowork(server_info_t *s_info);
+#include <thread>
+#include <unistd.h>
+
+int serv_dowork(void* lpParameter);
 
 int tcp_server_start(server_info_t *s_info)
 {
@@ -40,7 +41,7 @@ int tcp_server_broadcast(server_info_t *s_info,char *buf,int len){
     return 0;
 }
 
-DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
+int ThreadProc(void* lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
 
@@ -78,8 +79,10 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
     return 0;
 }
 
-int serv_dowork(server_info_t *s_info)
+int serv_dowork(void* lpParameter)
 {
+    server_info_t *s_info=(server_info_t *)lpParameter;
+
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != NO_ERROR) {
@@ -145,17 +148,11 @@ int serv_dowork(server_info_t *s_info)
         s_info->cliens_p->push_back(info.acceptSocket);
 
         //启动线程
-        DWORD dwThread;
-        HANDLE hThread = CreateThread(NULL,0,ThreadProc,(LPVOID)&info,0,&dwThread);
-        if(hThread==NULL)
-        {
-            s_info->s_forever = 0;
-            closesocket(info.acceptSocket);
-            log_debug("Thread Creat Failed!");
-            break;
-        }
-        CloseHandle(hThread);
-        Sleep(100);
+        std::thread th(ThreadProc,(void *)&info);
+        usleep(500);
+        th.detach();
+
+        sleep(1);
     }
 
     closesocket(s_info->ListenSocket);

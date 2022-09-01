@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Windows.h>
 #include "UWLog.h"
 #include <QDebug>
 
@@ -127,23 +126,7 @@ int binary_to_hexs(unsigned char *in, int len, char *out) {
 
 void utf8ToGbk(char *utf8String, char *gbkString)
 {
-    wchar_t *unicodeStr = NULL;
-    int nRetLen = 0;
 
-    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, NULL, 0);
-
-    //求需求的宽字符数大小
-    unicodeStr = (wchar_t *)malloc(nRetLen * sizeof(wchar_t));
-    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, unicodeStr, nRetLen);
-
-    //将utf-8编码转换成unicode编码
-    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, NULL, 0, NULL, 0);
-
-    //求转换所需字节数
-    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, gbkString, nRetLen, NULL, 0);
-
-    //unicode编码转换成gbk编码
-    free(unicodeStr);
 }
 
 QString float_to_hex(float va)

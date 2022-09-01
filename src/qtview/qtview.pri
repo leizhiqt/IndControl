@@ -1,11 +1,11 @@
-win32 {
-    INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD
 
-    HEADERS += \
-        $$PWD/QTTray.h
+HEADERS += \
+    $$PWD/QTTray.h
 
-    SOURCES += \
-        $$PWD/QTTray.cpp
-}
+SOURCES += \
+    $$PWD/QTTray.cpp
 
 
+#message($$INCLUDEPATH)
+#message($$LIBS)

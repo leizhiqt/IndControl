@@ -3,12 +3,12 @@
 #define BUF_SIZE 128
 #include <iostream>
 #include <thread>
+#include <unistd.h>
 
 #include "UWLog.h"
 #include "WTcpClient.h"
 #include "CanOpenUI.h"
 #include "ControlMain.h"
-#include "PGSQLDriveHelper.h"
 #include "ConvertUtil.h"
 #include "UTypes.h"
 #include "SelfMovingtail.h"
@@ -17,7 +17,7 @@
 using namespace std;
 
 //TCP客户端接收数据
-DWORD WINAPI ThreadClient_recv(__in  LPVOID lpParameter)
+int ThreadClient_recv(void* lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
     char recvBuf[1024] = {0};
@@ -93,14 +93,17 @@ int tcp_client_doth(client_info *client)
     }
 
     //启动线程
-    DWORD dwThread;
-    HANDLE hThread = CreateThread(NULL,0,ThreadClient_recv,(LPVOID)client,0,&dwThread);
-    if(hThread==NULL)
-    {
-        closesocket(client->acceptSocket);
-        log_debug("Thread Creat Failed!");
-    }
+//    DWORD dwThread;
+//    HANDLE hThread = CreateThread(NULL,0,ThreadClient_recv,(LPVOID)client,0,&dwThread);
+//    if(hThread==NULL)
+//    {
+//        closesocket(client->acceptSocket);
+//        log_debug("Thread Creat Failed!");
+//    }
 
+    std::thread th(ThreadClient_recv,client);
+    sleep(1);
+    th.detach();
     log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
 
     return 0;

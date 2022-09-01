@@ -1,10 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
-
-#include "QTcpComponentl.h"
+﻿#include "QTcpComponentl.h"
 #include "ControlMain.h"
 #include "UWLog.h"
-#include <Windows.h>
-#define WIN32_LEAN_AND_MEAN
 
 QTcpComponentl::QTcpComponentl(){
     visualTcpSocket = new QTcpSocket(this);
