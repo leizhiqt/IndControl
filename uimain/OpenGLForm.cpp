@@ -22,7 +22,7 @@ OpenGLForm::OpenGLForm(QWidget *parent) :
     resize(parent->width(), parent->height());
 
 //    setAttribute(Qt::WA_TranslucentBackground, true);
-    setStyleSheet(".OpenGLForm {background-color:#ccddee; border:1px solid green;padding:1px;}");
+    setStyleSheet(".OpenGLForm {background-color:#FFFFFF; border:1px solid green;padding:1px;}");
 
     ui->time_fs->setText("");
     ui->time_fs->setStyleSheet("#time_fs {border:1px solid #FFFFFF;color:#FFFFFF;}");
