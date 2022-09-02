@@ -177,13 +177,13 @@
      <string>发送</string>
     </property>
    </widget>
-   <widget class="QWidget" name="GLSlot" native="true">
+   <widget class="QWidget" name="widget_waterfall_plot" native="true">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>370</y>
-      <width>690</width>
-      <height>270</height>
+      <x>80</x>
+      <y>400</y>
+      <width>650</width>
+      <height>240</height>
      </rect>
     </property>
    </widget>

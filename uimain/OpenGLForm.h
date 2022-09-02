@@ -24,11 +24,6 @@ public:
 protected:
     void paintEvent(QPaintEvent *e);
 
-//    void paintGL();
-
-//public slots:
-//    void display_GUI();
-
 private:
     Ui::OpenGLForm *ui;
 

@@ -40,7 +40,7 @@ public:
     QLineEdit *ModPort;
     QPushButton *ModConn;
     QPushButton *sendCan;
-    QWidget *GLSlot;
+    QWidget *widget_waterfall_plot;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -90,9 +90,9 @@ public:
         sendCan = new QPushButton(centralwidget);
         sendCan->setObjectName(QString::fromUtf8("sendCan"));
         sendCan->setGeometry(QRect(460, 330, 75, 24));
-        GLSlot = new QWidget(centralwidget);
-        GLSlot->setObjectName(QString::fromUtf8("GLSlot"));
-        GLSlot->setGeometry(QRect(60, 370, 690, 270));
+        widget_waterfall_plot = new QWidget(centralwidget);
+        widget_waterfall_plot->setObjectName(QString::fromUtf8("widget_waterfall_plot"));
+        widget_waterfall_plot->setGeometry(QRect(80, 400, 650, 240));
         CanOpenUI->setCentralWidget(centralwidget);
         menubar = new QMenuBar(CanOpenUI);
         menubar->setObjectName(QString::fromUtf8("menubar"));

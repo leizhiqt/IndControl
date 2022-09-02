@@ -56,9 +56,9 @@ void CanOpenUI::set_default_UI()
     qtTray = new QTTray(this);
 
     //
-    openGLForm = new OpenGLForm(this->ui->GLSlot);
-    openGLForm->setStyleSheet(".GLSlot {background-color:#000000; border:1px solid green;}");
-
+    this->ui->widget_waterfall_plot->setStyleSheet("#widget_waterfall_plot {background-color:#ccddee; border:1px solid red;padding:1px;}");
+    openGLForm = new OpenGLForm(this->ui->widget_waterfall_plot);
+    openGLForm->setObjectName(QString::fromUtf8("openGLForm"));
 }
 
 void CanOpenUI::Append(const QString &text,int ch)
@@ -99,3 +99,5 @@ void CanOpenUI::mouseMoveEvent(QMouseEvent *e)
         e->accept();
     }
 }
+
+

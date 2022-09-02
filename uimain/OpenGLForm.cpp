@@ -5,6 +5,10 @@
 #include <QTimer>
 #include <QTime>
 #include <unistd.h>
+#include "UWLog.h"
+#include <QStyleOption>
+#include <QPainter>
+#include <QRandomGenerator>
 
 OpenGLForm::OpenGLForm(QWidget *parent) :
     QWidget(parent),
@@ -12,13 +16,18 @@ OpenGLForm::OpenGLForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    this->setRect(parent->rect());
-    setAttribute(Qt::WA_TranslucentBackground, true);
-//    this->setGeometry(parent->geometry());
-//    this->setGeometry(QOpenGLWidget::geometry());
+//    log_debug("%d",parent->width());
+//    log_debug("%d",parent->height());
+
+    resize(parent->width(), parent->height());
+
+//    setAttribute(Qt::WA_TranslucentBackground, true);
+    setStyleSheet(".OpenGLForm {background-color:#ccddee; border:1px solid green;padding:1px;}");
+
+    ui->time_fs->setText("");
+    ui->time_fs->setStyleSheet("#time_fs {border:1px solid #FFFFFF;color:#FFFFFF;}");
+
     producer_data = std::thread(&OpenGLForm::readyData,this);
-//    usleep(500);
-    producer_data.detach();
 
     start();
 }
@@ -55,20 +64,20 @@ void OpenGLForm::readyData()
 {
 //    int x0 = this->x();
 //    int y0 = this->y();
-    int width = this->width();
-    int height = this->height();
+    int width = this->rect().width();
+    int height = this->geometry().height();
 
     while(true)
     {
-//        waterfallPlot.clear();
-        int color;
+//        int color;
         QVector<QColor> row;
-        for(int j=0;j<width;j++){
-            color = j%255;
-            row.append(QColor(color, color, color));
+        for(int x=0;x<width;x++){
+//            color = x%255;
+            int color_r=QRandomGenerator::global()->bounded(255);
+            int color_g=QRandomGenerator::global()->bounded(255);
+            int color_b=QRandomGenerator::global()->bounded(255);
+            row.append(QColor(color_r, color_g, color_b));
         }
-
-//        std::lock_guard<std::mutex> lk(mtx);
 
         waterfallPlot.append(row);
         if(waterfallPlot.size()>height)
@@ -76,43 +85,33 @@ void OpenGLForm::readyData()
             waterfallPlot.removeFirst();
         }
 
+//        log_debug("%d",waterfallPlot.size());
+
         usleep(1000*15);
     }
 }
 
 void OpenGLForm::paintEvent(QPaintEvent *e)
 {
-
-//    this->setGeometry(QOpenGLWidget::geometry());
 //    QPen pen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     QPen pen(Qt::green, 2, Qt::SolidLine);
 
     QPainter painter(this);
     painter.setPen(pen);
-//Qt::SolidLine Qt::DotLine
-
-//    painter.drawRect(this->rect());
-//    painter.drawRect(160, 20, 50, 40);
-
-    //QColor最后一个参数代表背景的透明度
-    painter.fillRect(this->rect(), QColor(255, 255, 255, 70));
-//    painter.drawLine(QPoint(0, 0), QPoint(100, 100));
-//    painter.drawRect(160, 20, 50, 40);
-    painter.drawRect(this->rect());
-
-//    int height = this->rect().bottom();
 
 //    std::lock_guard<std::mutex> lk(mtx);
+    QStyleOption opt;
+    opt.init(this);
+    style()->drawPrimitive(QStyle::PE_Widget,&opt,&painter,this);
 
-    const int optimize=4;
-
-    for(int y=0;y<waterfallPlot.size()/optimize;y++){
-        for(int x=0;x<waterfallPlot[y].size()/optimize;x++)
+    const int optimize=2;
+    for(int y=1;y<waterfallPlot.size()/optimize;y++){
+        for(int x=1;x<waterfallPlot[y].size()/optimize;x++)
         {
             painter.setPen(QPen(waterfallPlot[optimize*y][optimize*x],optimize));
-            painter.drawPoint(QPoint(optimize*x,-optimize*y+270));
+            painter.drawPoint(QPoint(optimize*x,-optimize*y+height()));
         }
     }
 
-    e->ignore();
+    e->ignore();//继续传给父组件
 }
