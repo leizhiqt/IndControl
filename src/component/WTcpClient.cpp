@@ -155,6 +155,7 @@ int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)
         return 0;
+    if(controlMain->webSocket==NULL || !controlMain->webSocket->isRunning()) return -1;
     //处理报文并推送给JAVA
     emit controlMain->webSocket->broadcast_binary_move(QByteArray(buf,len));
     return 0;

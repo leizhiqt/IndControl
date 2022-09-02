@@ -18,6 +18,10 @@ void log_open(const char* savefp)
     printf("logfile save:%s\n",logfile);
 }
 
+void nop()
+{
+}
+
 void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 {
 

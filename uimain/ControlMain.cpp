@@ -20,6 +20,8 @@ ControlMain::ControlMain(){
     mWin->hide();
 #endif
 
+    webSocket=NULL;
+
     //启动位姿系统服务（向位姿系统下发配置参数，同时接收位姿系统上报的数据)
     xly_srv = (server_info_t *)malloc(sizeof(server_info_t));
     xly_srv->port=conf->xueLangPort;
