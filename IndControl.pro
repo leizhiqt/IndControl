@@ -44,16 +44,19 @@ INCLUDEPATH += $$PWD/uimain
 HEADERS += \
         $$PWD/uimain/CanOpenUI.h \
         $$PWD/uimain/Conf.h \
-        $$PWD/uimain/ControlMain.h
+        $$PWD/uimain/ControlMain.h \
+        uimain/OpenGLForm.h
 
 SOURCES += \
         $$PWD/uimain/CanOpenUI.cpp \
         $$PWD/uimain/Conf.cpp \
         $$PWD/uimain/main.cpp \
-        $$PWD/uimain/ControlMain.cpp
+        $$PWD/uimain/ControlMain.cpp \
+        uimain/OpenGLForm.cpp
 
 FORMS += \
-        $$PWD/uimain/CanOpenUI.ui
+        $$PWD/uimain/CanOpenUI.ui \
+        uimain/OpenGLForm.ui
         $$PWD/uimain/SponWindow.ui
 
 RESOURCES += \

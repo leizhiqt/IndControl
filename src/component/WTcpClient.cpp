@@ -47,7 +47,7 @@ int ThreadClient_recv(void* lpParameter)
             info->recvFun(recvBuf,count,info->acceptSocket);
         }
 log_debug("Step2: ThreadClient_recv Complete");
-        Sleep(300);
+        usleep(300);
     }
     //结束连接
     closesocket(info->acceptSocket);

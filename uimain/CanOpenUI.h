@@ -13,6 +13,7 @@
 #include "QTTray.h"
 #include <QMainWindow>
 #include "ui_CanOpenUI.h"
+#include "OpenGLForm.h"
 
 namespace Ui {
 class CanOpenUI;
@@ -42,6 +43,8 @@ public:
 
 private:
     Ui::CanOpenUI *ui;
+
+    OpenGLForm *openGLForm;
 
     //鼠标移动窗口移动
     QPoint mPoint;

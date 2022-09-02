@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>418</height>
+    <height>712</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -177,6 +177,16 @@
      <string>发送</string>
     </property>
    </widget>
+   <widget class="QWidget" name="GLSlot" native="true">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>370</y>
+      <width>690</width>
+      <height>270</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -184,7 +194,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

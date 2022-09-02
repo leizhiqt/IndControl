@@ -7,6 +7,7 @@
 #include "ControlMain.h"
 #include "ConvertUtil.h"
 #include "UTypes.h"
+#include <QSurfaceFormat>
 
 ControlMain *controlMain;
 
@@ -27,6 +28,11 @@ int main(int argc, char *argv[])
     }
     semaphore.release();
     
+    QSurfaceFormat fmt;
+    fmt.setSamples(4);
+    fmt.setSwapInterval(0);
+    QSurfaceFormat::setDefaultFormat(fmt);
+
 //    uchar_8 value[4];
 //    value[0] = 0x42;
 //    value[1] = 0x49;

@@ -8,6 +8,7 @@
 #include "WTcpClient.h"
 #include "WTcpServer.h"
 #include "Conf.h"
+#include "OpenGLForm.h"
 
 CanOpenUI::CanOpenUI(QWidget *parent) :
     QMainWindow(parent),
@@ -53,6 +54,11 @@ void CanOpenUI::set_default_UI()
     connect(this,SIGNAL(AppendText(QString,int)),this,SLOT(SlotAppendText(QString,int)));
     //托盘
     qtTray = new QTTray(this);
+
+    //
+    openGLForm = new OpenGLForm(this->ui->GLSlot);
+    openGLForm->setStyleSheet(".GLSlot {background-color:#000000; border:1px solid green;}");
+
 }
 
 void CanOpenUI::Append(const QString &text,int ch)

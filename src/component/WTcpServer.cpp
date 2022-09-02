@@ -2,11 +2,11 @@
 
 #include "WTcpServer.h"
 #include "UWLog.h"
-#include "ControlMain.h"
+#include "ConvertUtil.h"
 
 #include "WTcpClient.h"
-#include "ConvertUtil.h"
 #include "ModBusTcp.h"
+#include "ControlMain.h"
 
 #include <thread>
 #include <unistd.h>
@@ -16,7 +16,7 @@ int serv_dowork(void* lpParameter);
 int tcp_server_start(server_info_t *s_info)
 {
     std::thread th(serv_dowork,s_info);
-    Sleep(300);
+    usleep(300);
     while(th.joinable())
     th.detach();
     return -2;
@@ -72,7 +72,7 @@ int ThreadProc(void* lpParameter)
             info->s_info->recvFun(recvBuf,count,info->acceptSocket);
         }
 
-        Sleep(300);
+        usleep(300);
     }
     //结束连接
     closesocket(info->acceptSocket);

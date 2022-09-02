@@ -9,6 +9,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#define ENABLE_GUI 1
+
 #ifdef __cplusplus /* 如果采用了C++，如下代码使用C编译器 */
      extern  "C"  {  /* 如果没有采用C++，顺序预编译 */
 #endif

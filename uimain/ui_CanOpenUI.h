@@ -40,6 +40,7 @@ public:
     QLineEdit *ModPort;
     QPushButton *ModConn;
     QPushButton *sendCan;
+    QWidget *GLSlot;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -47,7 +48,7 @@ public:
     {
         if (CanOpenUI->objectName().isEmpty())
             CanOpenUI->setObjectName(QString::fromUtf8("CanOpenUI"));
-        CanOpenUI->resize(800, 418);
+        CanOpenUI->resize(800, 712);
         centralwidget = new QWidget(CanOpenUI);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         ModBusView = new QTextEdit(centralwidget);
@@ -89,10 +90,13 @@ public:
         sendCan = new QPushButton(centralwidget);
         sendCan->setObjectName(QString::fromUtf8("sendCan"));
         sendCan->setGeometry(QRect(460, 330, 75, 24));
+        GLSlot = new QWidget(centralwidget);
+        GLSlot->setObjectName(QString::fromUtf8("GLSlot"));
+        GLSlot->setGeometry(QRect(60, 370, 690, 270));
         CanOpenUI->setCentralWidget(centralwidget);
         menubar = new QMenuBar(CanOpenUI);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 22));
+        menubar->setGeometry(QRect(0, 0, 800, 23));
         CanOpenUI->setMenuBar(menubar);
         statusbar = new QStatusBar(CanOpenUI);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
