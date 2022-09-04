@@ -48,7 +48,7 @@ public:
     {
         if (CanOpenUI->objectName().isEmpty())
             CanOpenUI->setObjectName(QString::fromUtf8("CanOpenUI"));
-        CanOpenUI->resize(800, 712);
+        CanOpenUI->resize(832, 722);
         centralwidget = new QWidget(CanOpenUI);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         ModBusView = new QTextEdit(centralwidget);
@@ -92,11 +92,11 @@ public:
         sendCan->setGeometry(QRect(460, 330, 75, 24));
         widget_waterfall_plot = new QWidget(centralwidget);
         widget_waterfall_plot->setObjectName(QString::fromUtf8("widget_waterfall_plot"));
-        widget_waterfall_plot->setGeometry(QRect(80, 400, 650, 240));
+        widget_waterfall_plot->setGeometry(QRect(50, 400, 711, 240));
         CanOpenUI->setCentralWidget(centralwidget);
         menubar = new QMenuBar(CanOpenUI);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 23));
+        menubar->setGeometry(QRect(0, 0, 832, 23));
         CanOpenUI->setMenuBar(menubar);
         statusbar = new QStatusBar(CanOpenUI);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>712</height>
+    <width>832</width>
+    <height>722</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -180,9 +180,9 @@
    <widget class="QWidget" name="widget_waterfall_plot" native="true">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>50</x>
       <y>400</y>
-      <width>650</width>
+      <width>711</width>
       <height>240</height>
      </rect>
     </property>
@@ -193,7 +193,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>832</width>
      <height>23</height>
     </rect>
    </property>

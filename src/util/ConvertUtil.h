@@ -1,4 +1,4 @@
-﻿#ifndef CONVERTUTIL_H
+#ifndef CONVERTUTIL_H
 #define CONVERTUTIL_H
 
 #include <QString>
@@ -29,8 +29,6 @@ void printf_hex(unsigned char *hexs,int len);
 
 int hexs_to_binary(const char *in,int len, unsigned char *out);
 int binary_to_hexs(unsigned char *in, int len, char *out);
-
-void utf8ToGbk(char *utf8String, char *gbkString);
 
 /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */

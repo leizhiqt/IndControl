@@ -1,5 +1,3 @@
-﻿#pragma execution_character_set("utf-8")
-
 #include <QApplication>
 #include <QSystemSemaphore>
 #include <QSharedMemory>
@@ -32,33 +30,6 @@ int main(int argc, char *argv[])
     fmt.setSamples(4);
     fmt.setSwapInterval(0);
     QSurfaceFormat::setDefaultFormat(fmt);
-
-
-    //设置中文编码
-    #if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
-    #if _MSC_VER
-        QTextCodec *codec = QTextCodec::codecForName("GBK");
-    #else
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    #endif
-        QTextCodec::setCodecForLocale(codec);
-        QTextCodec::setCodecForCStrings(codec);
-        QTextCodec::setCodecForTr(codec);
-    #else
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-        QTextCodec::setCodecForLocale(codec);
-    #endif
-
-//    uchar_8 value[4];
-//    value[0] = 0x42;
-//    value[1] = 0x49;
-//    value[2] = 0x00;
-//    value[3] = 0x00;
-
-//    printf("=====%5.2f\n",hl_to_int32(value[0],value[1],value[2],value[3]));
-
-//    qDebug()<<value.numeric;
-//        printf("=====%f\n",value.numeric);
 
     //启动主程序
     controlMain = new ControlMain();

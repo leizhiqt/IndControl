@@ -1,4 +1,4 @@
-﻿#include "OpenGLForm.h"
+#include "OpenGLForm.h"
 #include "ui_OpenGLForm.h"
 #include <QPaintEvent>
 #include <QPainter>

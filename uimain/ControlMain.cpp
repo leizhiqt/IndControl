@@ -13,10 +13,10 @@ ControlMain::ControlMain(){
     mWin->setWindowTitle("CanOpen|ModBus|Tcp");
 
 #ifdef ENABLE_GUI
-//    mWin->show();
-    mWin->setWindowFlags(Qt::Window);
-    mWin->showFullScreen();
-    mWin->setWindowState(Qt::WindowMaximized);
+    mWin->show();
+//    mWin->setWindowFlags(Qt::Window);
+//    mWin->showFullScreen();
+//    mWin->setWindowState(Qt::WindowMaximized);
 #endif
 
 #ifndef ENABLE_GUI

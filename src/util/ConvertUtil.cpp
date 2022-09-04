@@ -1,4 +1,4 @@
-﻿#include "ConvertUtil.h"
+#include "ConvertUtil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,11 +122,6 @@ int binary_to_hexs(unsigned char *in, int len, char *out) {
             out[2*i+1] = (in[i] & 0x0f) | 0x30;
     }
     return 0;
-}
-
-void utf8ToGbk(char *utf8String, char *gbkString)
-{
-
 }
 
 QString float_to_hex(float va)

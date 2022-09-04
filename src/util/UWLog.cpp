@@ -1,9 +1,9 @@
-﻿#include "UWLog.h"
+#include "UWLog.h"
 #include "stdarg.h"
 #include "stdio.h"
 #include <fstream>
+#include <string.h>
 #include "FormatTimes.h"
-#include "ConvertUtil.h"
 
 using namespace std;
 
@@ -27,7 +27,6 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     char bufstr[2048]   = "\0";
     char logstr[4096] = "\0";
-//    char log_gbk_str[4096] = "\0";
     char times[20]="\0";
 
     va_list va_alist;
@@ -42,8 +41,6 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
 
     t_stime(times);
 
-//    utf8ToGbk(bufstr,log_gbk_str);
-
     snprintf(logstr,sizeof(logstr),"[%llu %s\t%s\t%d]%s\n",pthread_self(),times,files,line,bufstr);
 
 //    snprintf(logstr,sizeof(logstr),"[%s]%s\n",times,bufstr);
@@ -52,7 +49,6 @@ void log_printfs(const char* files,unsigned int line,const char* fmt, ...)
     out_log_fp.write(logstr,strlen(logstr));
     out_log_fp.flush();
     //printf("_level:%d\n",_level);
-
 
 //    if(_level) printf("%s",logbuf);
 }
