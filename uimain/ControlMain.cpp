@@ -13,7 +13,10 @@ ControlMain::ControlMain(){
     mWin->setWindowTitle("CanOpen|ModBus|Tcp");
 
 #ifdef ENABLE_GUI
-    mWin->show();
+//    mWin->show();
+    mWin->setWindowFlags(Qt::Window);
+    mWin->showFullScreen();
+    mWin->setWindowState(Qt::WindowMaximized);
 #endif
 
 #ifndef ENABLE_GUI
@@ -112,13 +115,12 @@ void ControlMain::th_do(){
                 can_ok=false;
             }
         }
-
         //end
     }
 }
 
 void ControlMain::try_do(){
     std::thread th(&ControlMain::th_do,this);
-    Sleep(150);
+    usleep(1000*30);
     th.detach();
 }

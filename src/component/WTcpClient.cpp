@@ -93,16 +93,8 @@ int tcp_client_doth(client_info *client)
     }
 
     //启动线程
-//    DWORD dwThread;
-//    HANDLE hThread = CreateThread(NULL,0,ThreadClient_recv,(LPVOID)client,0,&dwThread);
-//    if(hThread==NULL)
-//    {
-//        closesocket(client->acceptSocket);
-//        log_debug("Thread Creat Failed!");
-//    }
-
     std::thread th(ThreadClient_recv,client);
-    sleep(1);
+    usleep(1000*30);
     th.detach();
     log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
 

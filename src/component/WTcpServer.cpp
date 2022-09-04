@@ -16,10 +16,9 @@ int serv_dowork(void* lpParameter);
 int tcp_server_start(server_info_t *s_info)
 {
     std::thread th(serv_dowork,s_info);
-    usleep(300);
-    while(th.joinable())
+    usleep(1000*30);
     th.detach();
-    return -2;
+    return 0;
 }
 
 void tcp_server_stop(server_info_t* s_info){
@@ -149,7 +148,7 @@ int serv_dowork(void* lpParameter)
 
         //启动线程
         std::thread th(ThreadProc,(void *)&info);
-        usleep(500);
+        usleep(1000*30);
         th.detach();
 
         sleep(1);
