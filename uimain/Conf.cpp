@@ -48,6 +48,8 @@ Conf::Conf()
     //Modbus协同控制器端口
     modbusSlavePort = confSeting.value("/ModbusSlave/SlavePort").toString().toInt();
 
+//    confSeting.setValue("/ModbusSlave/SlavePort","500");
+
     //控制命令,这里加载到map直接取了就发
     QSettings confSetingControl(qApp->applicationDirPath() + QString("/ControlSetting.ini"), QSettings::IniFormat);
     controlNameList = confSetingControl.allKeys();
