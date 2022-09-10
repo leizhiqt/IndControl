@@ -80,6 +80,6 @@ win32:  IndControl.files= \
 IndControl.path=$${DESTDIR}
 INSTALLS += IndControl
 
-message($$LIBS)
+#message($$LIBS)
 
 message("INSTALLS SUCCESSFUL.....")

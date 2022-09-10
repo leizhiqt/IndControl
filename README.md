@@ -8,3 +8,7 @@
 step1: 项目->属性->C/C+±>General->Debug Information Format->Program Database for Edit & Continue (/ZI)
 step2: 项目->属性->C/C+±>Optimization->Optimization->Disabled(/Od)
 step3: 项目->属性->Linker->Debugging->Generate Debug Info->Yes(/DEBUG)
+
+
+1、http://47.103.21.230/DrivingFaceWisdom/Index
+2、http://47.103.21.230/DrivingFaceWisdom/Position
