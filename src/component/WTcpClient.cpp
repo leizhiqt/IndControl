@@ -1,4 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
+#pragma execution_character_set("utf-8")
 
 #define BUF_SIZE 128
 #include <iostream>
@@ -46,12 +46,8 @@ int ThreadClient_recv(void* lpParameter)
         if(info->recvFun!=NULL){
             info->recvFun(recvBuf,count,info->acceptSocket);
         }
-<<<<<<< Updated upstream
-log_debug("Step2: ThreadClient_recv Complete");
+        log_debug("Step2: ThreadClient_recv Complete");
         usleep(300);
-=======
-        Sleep(300);
->>>>>>> Stashed changes
     }
     //结束连接
     closesocket(info->acceptSocket);
@@ -149,13 +145,11 @@ log_debug("接收到协同控制报文，数据长度: %d", len);
 
     if(buf==NULL || len<1)
         return 0;
-<<<<<<< Updated upstream
+
     if(controlMain->webSocket==NULL || !controlMain->webSocket->isRunning()) return -1;
-=======
 
     QByteArray bytes = QByteArray(buf,len);
 
->>>>>>> Stashed changes
     //处理报文并推送给JAVA
     if(controlMain->webSocket != NULL){
         emit controlMain->webSocket->broadcast_binary_move(bytes);

@@ -26,14 +26,11 @@ int main(int argc, char *argv[])
     }
     semaphore.release();
     
-<<<<<<< Updated upstream
     QSurfaceFormat fmt;
     fmt.setSamples(4);
     fmt.setSwapInterval(0);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-=======
->>>>>>> Stashed changes
     //启动主程序
     controlMain = new ControlMain();
 

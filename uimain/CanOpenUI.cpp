@@ -1,4 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
+#pragma execution_character_set("utf-8")
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -56,9 +56,9 @@ void CanOpenUI::set_default_UI()
     qtTray = new QTTray(this);
 
     //
-    this->ui->widget_waterfall_plot->setStyleSheet("#widget_waterfall_plot {background-color:#ccddee; border:1px solid red;padding:1px;}");
-    openGLForm = new OpenGLForm(this->ui->widget_waterfall_plot);
-    openGLForm->setObjectName(QString::fromUtf8("openGLForm"));
+//    this->ui->widget_waterfall_plot->setStyleSheet("#widget_waterfall_plot {background-color:#ccddee; border:1px solid red;padding:1px;}");
+//    openGLForm = new OpenGLForm(this->ui->widget_waterfall_plot);
+//    openGLForm->setObjectName(QString::fromUtf8("openGLForm"));
 }
 
 void CanOpenUI::Append(const QString &text,int ch)

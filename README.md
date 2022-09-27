@@ -12,3 +12,6 @@ step3: 项目->属性->Linker->Debugging->Generate Debug Info->Yes(/DEBUG)
 
 1、http://47.103.21.230/DrivingFaceWisdom/Index
 2、http://47.103.21.230/DrivingFaceWisdom/Position
+
+
+gcc -mno-cygwin
