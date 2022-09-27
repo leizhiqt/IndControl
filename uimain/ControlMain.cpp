@@ -51,7 +51,7 @@ ControlMain::ControlMain(){
 
     try_do();
 
-    log_debug("boot OK");
+    log_debug("集控服务程序启动成功");
 }
 
 ControlMain::~ControlMain(){
@@ -82,7 +82,7 @@ void ControlMain::th_do(){
     while(1)
     {
         if(!can_ok){
-            ret=start_tcp_client_th(&can_client);//第一次连接后，似乎IP和端口都被置为了0
+            ret=start_tcp_client_th(&can_client);
             log_debug("can_client 连接:ret=%d [%s] [%d]",ret,can_client.ip,can_client.port);
             if(!ret){
                 can_ok=true;
@@ -97,15 +97,19 @@ void ControlMain::th_do(){
             log_debug("modbus_client 连接:ret=%d [%s] [%d]",ret,modbus_client.ip,modbus_client.port);
             if(!ret){
                 modbus_ok=true;
-                log_debug("modbus_ok:%s %d",can_client.ip,can_client.port);
+                log_debug("modbus_ok:%s %d",modbus_client.ip,modbus_client.port);
             }else{
                 log_debug("modbus_client_connect_fail:%s %d",modbus_client.ip,modbus_client.port);
             }
         }
 
         //心跳包检测
+<<<<<<< Updated upstream
 //      Sleep(1000*60*5); //时间太长了，假设程序启动时服务端没有启动，会等待很久才会重连
         usleep(1000 * 5);
+=======
+        Sleep(1000 * 5);
+>>>>>>> Stashed changes
         if(can_ok){
             ret=tcp_client_send(can_client.acceptSocket,buf,sizeof(buf));
             log_debug("心跳包检测:ret=%d [%s] [%d]",ret,can_client.ip,can_client.port);
@@ -115,7 +119,10 @@ void ControlMain::th_do(){
                 can_ok=false;
             }
         }
+<<<<<<< Updated upstream
         //end
+=======
+>>>>>>> Stashed changes
     }
 }
 

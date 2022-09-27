@@ -9,7 +9,7 @@
 void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_json)
 {
     selfmoveingtail_t *p;
-    char hexs[1024];
+    char hexs[4096];
     if(len>=sizeof(selfmoveingtail_t)){
        p=(selfmoveingtail_t *)frame_buf;
 
@@ -19,8 +19,6 @@ void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_
 
        QJsonObject parmsSelf;
 
-//       to16_hexs(hexs,p->r_40003);
-       //sprintf(hexs,"%02x %02x",p->r_40003,p->r_40003[1]);
        parmsSelf.insert("风机启动标识",GET_BIT(p->r_40003[0],0));
        parmsSelf.insert("泵站启动标识",GET_BIT(p->r_40003[0],1));
        parmsSelf.insert("整机运行标识",GET_BIT(p->r_40003[0],2));

@@ -68,6 +68,7 @@ struct _response_xly_t
  };
 
  void conver_xly_frame_to_json(const char *str_json,const int len, char *frame_buf);
+ int conver_opencan_to_json(const char *frame_buf,const int len, char *str_json);
  //void conver_xly_json_to_frame(const char *frame_buf,const int len, char *str_json);
 
  //标准帧
@@ -102,14 +103,11 @@ struct _response_opencan13_t
      uchar_8 cobid_20;//帧格式（1个字节）
      uchar_8 cobid_12;//帧类型（1个字节）
      uchar_8 cobid_4;
-//   uchar_8 cobid[2];//cobid
      uchar_8 data0[2];//数据1
      uchar_8 data1[2];//数据2
      uchar_8 data2[2];//数据3
      uchar_8 data3[2];//数据4
 };
-
-void conver_opencan_to_json(const char *frame_buf,const int len, char *str_json);
 
 /* 采用C编译器编译的C语言代码段 */
 #ifdef __cplusplus /* 结束使用C编译器 */

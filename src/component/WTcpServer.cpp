@@ -172,7 +172,7 @@ void recvXly(char *buf,int len,SOCKET recvSocket)
     emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
 }
 
-/* 接收到modbus发来的数据 */
+/* 接收到modbus发来的控制指令 */
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
     if(buf==NULL || len<1)

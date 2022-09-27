@@ -15,6 +15,7 @@
 #include "ProtocolXly.h"
 
 using namespace std;
+//int nStart = 0;
 
 //TCP客户端接收数据
 int ThreadClient_recv(void* lpParameter)
@@ -23,31 +24,34 @@ int ThreadClient_recv(void* lpParameter)
     char recvBuf[1024] = {0};
     int count = 0;
     while(1){
-        //发送数据
+        //向协同控制器请求数据
         if(info->sendFun!=NULL){
             info->sendFun(info->acceptSocket);
         }
         memset(recvBuf,'\0',sizeof(recvBuf));
         count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
-
-        log_debug("Step1: ThreadClient_recv recvFun %d",count);
-
         if (count == -1)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
-                log_debug("ThreadClient_recv recvFun %d",count);
                 break; //表示没有数据了
             }
             return 0; //遇见其他错误
         }
-        if(count==0) break;//被对方关闭
+        if(count==0) {
+            break;//被对方关闭
+        }
+
         //处理接收数据 回调函数
         if(info->recvFun!=NULL){
             info->recvFun(recvBuf,count,info->acceptSocket);
         }
+<<<<<<< Updated upstream
 log_debug("Step2: ThreadClient_recv Complete");
         usleep(300);
+=======
+        Sleep(300);
+>>>>>>> Stashed changes
     }
     //结束连接
     closesocket(info->acceptSocket);
@@ -104,14 +108,12 @@ int tcp_client_doth(client_info *client)
 //TCP客户端发送数据
 int tcp_client_send(const SOCKET sSocket,const char *buf,int size)
 {
-log_debug("tcp_client_send function");
     if(buf==NULL || size<1)
         return 0;
     if(!(sSocket>0)){
         return 0;
     }
     int n = send(sSocket,(char *)buf, size, 0);
-log_debug("tcp_client_send %d %d",n, sSocket);
     return n;
 }
 
@@ -121,12 +123,8 @@ int tcp_client_recv(const SOCKET sSocket)
     if(!(sSocket>0)){
         return 0;
     }
-    char buf[1024];
+    char buf[4096];
     int n = recv(sSocket,(char *)buf, sizeof(buf), 0);
-
-    //根据buf接收数据解析
-    log_debug("Step3: tcp_client_recv %d",n);
-
     return n;
 }
 
@@ -145,17 +143,31 @@ int stop_tcp_client_th(SOCKET *sSocket)
 //接收到Modbus协同控制器报文
 int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
+log_debug("接收到协同控制报文，数据长度: %d", len);
+
+    printf_hex((uchar_8 *)buf,len);
+
     if(buf==NULL || len<1)
         return 0;
+<<<<<<< Updated upstream
     if(controlMain->webSocket==NULL || !controlMain->webSocket->isRunning()) return -1;
+=======
+
+    QByteArray bytes = QByteArray(buf,len);
+
+>>>>>>> Stashed changes
     //处理报文并推送给JAVA
-    emit controlMain->webSocket->broadcast_binary_move(QByteArray(buf,len));
+    if(controlMain->webSocket != NULL){
+        emit controlMain->webSocket->broadcast_binary_move(bytes);
+    }
     return 0;
 }
 
 //给Modbus协同控制器发送报文请求数据
 int modbus_send(SOCKET recvSocket)
 {
+log_debug("向协同控制器请求数据");
+
     static uint16_t selfMoveCount=0x0500;//这里只有modbus master用的计数器
     //获得命令内容
     std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find("ControlSet/SelfMoveData");
@@ -187,15 +199,15 @@ int modbus_send(SOCKET recvSocket)
 //接收到can总线转来的报文
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
-log_debug("Rece Data From can: %d",len);
+log_debug("接收到掘进机工况数据，数据长度: %d", len);
     if(buf == NULL || len < 1)
         return 0;
 
     QByteArray bytes = QByteArray(buf,len);
 
     //处理报文并推送给JAVA
-    emit controlMain->webSocket->broadcast_binary_can(bytes);
-
-    log_debug("can_recv=========");
+    if(controlMain->webSocket != NULL){
+        emit controlMain->webSocket->broadcast_binary_can(bytes);
+    }
     return 0;
 }
