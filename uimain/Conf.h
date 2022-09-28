@@ -1,4 +1,4 @@
-#pragma execution_character_set("utf-8")
+﻿#pragma execution_character_set("utf-8")
 
 #ifndef CONF_H
 #define CONF_H
@@ -37,8 +37,8 @@ public:
         QString pgUser;//PG数据库用户
         QString pgPass;//PG数据库密码
         QString pgDataBase;//PG数据库名称
-
-        int modBusPort;//本机modbus端口
+        QString modBusServer;//Modbus服务器IP
+        int modBusPort;//modbus端口
 
         QString canOpenIp;//can服务IP
         int canOpenPort;//CAN服务端口

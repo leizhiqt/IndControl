@@ -1,4 +1,4 @@
-#pragma execution_character_set("utf-8")
+﻿#pragma execution_character_set("utf-8")
 
 #include "ControlMain.h"
 #include "UWLog.h"
@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 ControlMain::ControlMain(){
-
     conf = Conf::getInstance();
 
     mWin = new CanOpenUI();
@@ -24,6 +23,7 @@ ControlMain::ControlMain(){
 #endif
 
     webSocket=NULL;
+    log_debug("================");
 
     //启动位姿系统服务（向位姿系统下发配置参数，同时接收位姿系统上报的数据)
     xly_srv = (server_info_t *)malloc(sizeof(server_info_t));
@@ -36,13 +36,18 @@ ControlMain::ControlMain(){
 
     //启动ModBus,监听502端口，接收来自控制台的指令
     //解析后封装成CAN协议转发至22004
+    //这里应该不要了
+    //这里应该调WModbusTcp
     modbus_srv = (server_info_t *)malloc(sizeof(server_info_t));
     modbus_srv->port=conf->modBusPort;
-    modbus_srv->s_forever=1;
-    modbus_srv->recvFun=recvModbusTcp;
-    modbus_srv->cliens_p =&modbus_cliens;
-    tcp_server_start(modbus_srv);
-    //log_debug("modbus_srv:%p",modbus_srv);
+    snprintf(modbus_srv->ip,sizeof(modbus_srv->ip),"%s",conf->modBusServer.toLatin1().data());
+//    modbus_srv->s_forever=1;
+//    modbus_srv->recvFun=recvModbusTcp;
+//    modbus_srv->cliens_p =&modbus_cliens;
+//    tcp_server_start(modbus_srv);
+
+    modbustcp_server_start(modbus_srv);
+    log_debug("modbus_srv:%p",modbus_srv);
 
     command = new ProtocolWebJson();
 

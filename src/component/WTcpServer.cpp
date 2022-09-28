@@ -44,7 +44,7 @@ int ThreadProc(void* lpParameter)
 {
     client_info *info = (client_info *)lpParameter;
 
-    // 取得ip和端口号
+    //取得ip和端口号
     sprintf(info->ip, inet_ntoa(info->addr.sin_addr));
     info->port = ntohs(info->addr.sin_port);
     log_debug("recv:ip=%s port=%d ",info->ip,info->port);
@@ -58,6 +58,7 @@ int ThreadProc(void* lpParameter)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
+                log_debug("");
                 break; //表示没有数据了
             }
             return 0; //遇见其他错误
@@ -175,12 +176,16 @@ void recvXly(char *buf,int len,SOCKET recvSocket)
 /* 接收到modbus发来的控制指令 */
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
-    if(buf==NULL || len<1)
+    log_debug("转发Modbus数据给can");
+    if(buf==NULL || len<1){
+        log_debug("长度为0，不转发");
         return;
+    }
 
     //如果功能码是06(修改)
     if(buf[7] == 0x06)
     {
+        log_debug("功能码06");
         char *nth_byte = buf+8;
         ntoh_16(nth_byte);
         //得到数据修改地址
@@ -194,7 +199,7 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
         //printf_hex((unsigned char *)slave_reg.r_slave,10);
 
         //给操作台的响应桢(同请求帧相同)
-        tcp_client_send(recvSocket,(char *)buf,len);
+        //tcp_client_send(recvSocket,(char *)buf,len);
 
         //以下去INI文件中匹配操作台报文
         //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
@@ -220,8 +225,10 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
             log_debug("not find %s",cmdstr.toLatin1().data());
         }
         return ;
+    }else{
+        log_debug("非控制指令不转发");
     }
-
+/*
     if(buf[7] == 0x03){
         int in = 4;
         int rlen =(buf[11]*2 + in);//返回的数据个数
@@ -241,4 +248,5 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
         tcp_client_send(recvSocket,(char *)slave_reg.slave_buf,slen);
         return ;
     }
+*/
 }

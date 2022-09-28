@@ -9,6 +9,7 @@
 #include "WebSocket.h"
 #include "WTcpClient.h"
 #include "WTcpServer.h"
+#include "WModbusTcp.h"
 #include "WebSocketCommand.h"
 
 #include "CanOpenUI.h"

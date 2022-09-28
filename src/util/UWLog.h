@@ -1,4 +1,4 @@
-#pragma execution_character_set("utf-8")
+﻿#pragma execution_character_set("utf-8")
 
 #ifndef UWLOG_H
 #define UWLOG_H
@@ -16,9 +16,9 @@
      }
 #endif
 
-//#define log_debug(fmt, ...) \
-//        log_printfs(__FILE__,__LINE__,fmt, ##__VA_ARGS__)
+#define log_debug(fmt, ...) \
+        log_printfs(__FILE__,__LINE__,fmt, ##__VA_ARGS__)
 
-#define log_debug(fmt, ...) nop()
+//#define log_debug(fmt, ...) nop()
 
 #endif // UWLOG_H

@@ -33,6 +33,7 @@ Conf::Conf()
     pgDataBase = confSeting.value("/Database/PgDatabase").toString();
 
     //ModBus服务
+    modBusServer=confSeting.value("/Modbus/ModbusServer").toString();
     modBusPort = confSeting.value("/Modbus/ModbusPort").toString().toInt();
 
     //总线服务IP

@@ -10,7 +10,7 @@
 buildDir = $$PWD/build/win64
 TARGET_ARCH = x64
 
-QT       += gui network websockets
+QT       += gui network websockets serialbus
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,8 +38,8 @@ include(./src/component/component.pri)
 include(./src/qtview/qtview.pri)
 include(./src/protocol/protocol.pri)
 
-INCLUDEPATH += $$PWD/uimain
-#LIBS += -lUser32
+INCLUDEPATH += $$PWD/uimain $$PWD/3rd/$$TARGET_ARCH/modbus/include
+LIBS += -lUser32 -lws2_32 -L$$PWD/3rd/$$TARGET_ARCH/modbus/lib -lmodbus
 
 HEADERS += \
         $$PWD/uimain/CanOpenUI.h \

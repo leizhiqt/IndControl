@@ -1,6 +1,4 @@
-﻿#pragma execution_character_set("utf-8")
-
-#ifndef WTCPSERVER_H
+﻿#ifndef WTCPSERVER_H
 #define WTCPSERVER_H
 
 #include<WinSock2.h>
@@ -16,7 +14,7 @@ typedef struct _server_info
   void (*recvFun)(char *buf,int len,SOCKET recvSocket);
   int port;
   int s_forever;
-
+  char ip[128];
   std::vector<SOCKET> *cliens_p;
 
 } server_info_t;
