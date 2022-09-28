@@ -80,7 +80,7 @@
                 sprintf(hexs,"%d",hl_to_int16(p->data3[0],p->data3[1]));
                 parms.insert("油泵C相电流",hexs);
             }
-            if(cobid == 0x0310){
+            else if(cobid == 0x0310){
                 send_can_son.insert("method", "data310");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("截割A相电流",hexs);
@@ -94,7 +94,7 @@
                 sprintf(hexs,"%d",hl_to_int16(p->data3[0],p->data3[1]));
                 parms.insert("二运A相电流",hexs);
             }
-            if(cobid == 0x0410){
+            else if(cobid == 0x0410){
                 send_can_son.insert("method", "data410");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("二运B相电流",hexs);
@@ -108,7 +108,7 @@
                 sprintf(hexs,"%d",hl_to_int16(p->data3[0],p->data3[1]));
                 parms.insert("风机B相电流",hexs);
             }
-            if(cobid == 0x0510){
+            else if(cobid == 0x0510){
                 send_can_son.insert("method", "data510");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("风机C相电流",hexs);
@@ -122,7 +122,7 @@
                 sprintf(hexs,"%d",hl_to_int16(p->data3[0],p->data3[1]));
                 parms.insert("截割高速温度",hexs);
             }
-            if(cobid == 0x0211){
+            else if(cobid == 0x0211){
                 send_can_son.insert("method", "data211");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("油箱油温",hexs);
@@ -151,7 +151,7 @@
                 parms.insert("遥控模式",GET_BIT(hl_to_int16(p->data3[0],p->data3[1]),14));
                 parms.insert("远控模式",GET_BIT(hl_to_int16(p->data3[0],p->data3[1]),15));
             }
-            if(cobid == 0x0311){
+            else if(cobid == 0x0311){
                 send_can_son.insert("method", "data311");
                 //故障代码
                 parms.insert("油泵故障",GET_BIT(hl_to_int16(p->data0[0],p->data0[1]),0));
@@ -222,7 +222,7 @@
                 parms.insert("未使用",GET_BIT(hl_to_int16(p->data3[0],p->data3[1]),14));
                 parms.insert("未使用",GET_BIT(hl_to_int16(p->data3[0],p->data3[1]),15));
             }
-            if(cobid == 0x0287){
+            else if(cobid == 0x0287){
                 send_can_son.insert("method", "data287");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("AI1（瓦斯）",hexs);
@@ -233,7 +233,7 @@
                 sprintf(hexs,"%d",hl_to_int16(p->data2[0],p->data2[1]));
                 parms.insert("AI3（粉尘）",hexs);
             }
-            if(cobid == 0x0487){
+            else if(cobid == 0x0487){
                 send_can_son.insert("method", "data487");
                 sprintf(hexs,"%d",hl_to_int16(p->data0[0],p->data0[1]));
                 parms.insert("危险区1有人",GET_BIT(hl_to_int16(p->data0[0],p->data0[1]),0));
@@ -241,10 +241,11 @@
                 parms.insert("危险区3有人",GET_BIT(hl_to_int16(p->data0[0],p->data0[1]),2));
                 parms.insert("危险区4有人",GET_BIT(hl_to_int16(p->data0[0],p->data0[1]),3));
             }
-            if(cobid == 0x0387){
-                log_debug("cobid:387,未使用的COBID,不需要解析");
+            else{
+                log_debug("cobid不存在");
                 return 0;
             }
+            /*
             if(cobid == 0x0587){
                 log_debug("cobid:587,未使用的COBID,不需要解析");
                 return 0;
@@ -253,6 +254,7 @@
                 log_debug("cobid:06E,未使用的COBID,不需要解析");
                 return 0;
             }
+            */
         }else{
             log_debug("非08开头的报文,不需要解析");
             return 0;

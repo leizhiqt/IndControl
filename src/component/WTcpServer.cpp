@@ -222,7 +222,7 @@ void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
             tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
         }
         else{
-            log_debug("not find %s",cmdstr.toLatin1().data());
+            log_debug("未能识别的指令 %s",cmdstr.toLatin1().data());
         }
         return ;
     }else{
