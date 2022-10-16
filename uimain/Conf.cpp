@@ -49,8 +49,6 @@ Conf::Conf()
     //Modbus协同控制器端口
     modbusSlavePort = confSeting.value("/ModbusSlave/SlavePort").toString().toInt();
 
-//    confSeting.setValue("/ModbusSlave/SlavePort","500");
-
     //控制命令,这里加载到map直接取了就发
     QSettings confSetingControl(qApp->applicationDirPath() + QString("/ControlSetting.ini"), QSettings::IniFormat);
     controlNameList = confSetingControl.allKeys();
@@ -67,8 +65,24 @@ Conf::Conf()
         hexs_to_binary(p,qstr.length(),(unsigned char *)binary);
         QByteArray canFrame(binary,qstr.length()/2);
         conf_can_packs.insert(std::pair<std::string,QByteArray>(stdkey,canFrame));
-        //printf_hex((unsigned char*)binary,canFrame.length());
-        //log_debug("key:%s",stdkey.c_str());
+    }
+
+    //寄存器地址与CAN头
+    QSettings confStorageControl(qApp->applicationDirPath() + QString("/StorageAdd.ini"), QSettings::IniFormat);
+    storageKeyList = confStorageControl.allKeys();
+    char binaryB[128];
+    for(int j = 0; j < storageKeyList.size(); j++){
+        QString keyAdd = storageKeyList.at(j);
+        keyAdd.remove(QRegExp("\\s"));
+        std::string stdKeyAdd = keyAdd.toStdString();
+        QByteArray valueAdd =confStorageControl.value(keyAdd).toByteArray();
+        QString qstrAdd = QString(valueAdd);
+        qstrAdd.remove(QRegExp("\\s"));
+        const char *pAdd = qstrAdd.toLatin1().constData();
+        memset(binaryB,'\0',sizeof(binaryB));
+        hexs_to_binary(pAdd,qstrAdd.length(),(unsigned char *)binaryB);
+        QByteArray storageFrame(binaryB,qstrAdd.length() / 2);
+        conf_storage_packs.insert(std::pair<std::string,QByteArray>(stdKeyAdd, storageFrame));
     }
 }
 

@@ -157,9 +157,10 @@ void WebSocket::slot_broadcast_binary_move(QByteArray content)
 
 //推送掘进机工况数据给客户端
 void WebSocket::slot_broadcast_binary_can(QByteArray content){
+    log_debug("开始解析报文");
     char *buf = content.begin();
     int len = content.length();
-    char json_buf[4096];
+    char json_buf[10240];
     memset(json_buf,'\0',sizeof(json_buf));
 
     if(len%13 !=0){
@@ -181,5 +182,11 @@ void WebSocket::slot_broadcast_binary_can(QByteArray content){
                 socket->sendTextMessage(json_buf);
             }
         }
+        delete frame;
+        frame = NULL;
     }
+    delete buf;
+    buf = NULL;
 }
+
+

@@ -1,4 +1,4 @@
-#pragma execution_character_set("utf-8")
+﻿#pragma execution_character_set("utf-8")
 
 #define BUF_SIZE 128
 #include <iostream>
@@ -25,25 +25,30 @@ int ThreadClient_recv(void* lpParameter)
     int count = 0;
     while(1){
         //向协同控制器请求数据
-        if(info->sendFun!=NULL){
+        if(info->sendFun!=NULL && info->acceptSocket != NULL){
             info->sendFun(info->acceptSocket);
         }
         memset(recvBuf,'\0',sizeof(recvBuf));
-        count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
+        if(info->acceptSocket != NULL){
+            count = recv(info->acceptSocket, recvBuf, sizeof(recvBuf), 0);
+        }
         if (count == -1)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
                 break; //表示没有数据了
+                log_debug("errno==eagain");
             }
+            log_debug("遇见其他错误");
             return 0; //遇见其他错误
         }
         if(count==0) {
             break;//被对方关闭
+            log_debug("连接被对方关闭");
         }
 
         //处理接收数据 回调函数
-        if(info->recvFun!=NULL){
+        if(info->recvFun!=NULL && info->acceptSocket != NULL){
             info->recvFun(recvBuf,count,info->acceptSocket);
         }
         log_debug("Step2: ThreadClient_recv Complete");
@@ -57,7 +62,7 @@ int ThreadClient_recv(void* lpParameter)
 //与服务器建立连接
 int tcp_client_doth(client_info *client)
 {
-    log_debug("tcp_client_do_conn [%s] [%d] ....",client->ip,client->port);
+    //log_debug("与服务器建立连接 [%s] [%d] ....",client->ip,client->port);
     WSADATA wsd;
     SOCKADDR_IN servAddr;
 
@@ -66,18 +71,21 @@ int tcp_client_doth(client_info *client)
     //初始化套接字动态库
     if (WSAStartup(MAKEWORD(2, 2), &wsd) != 0)
     {
-        printf("WSAStartup failed\n");
+        log_debug("初始化套接字动态库失败");
         return -1;
     }
+
+    //log_debug("初始化套接字动态库成功");
 
     //创建套接字
     client->acceptSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (INVALID_SOCKET == client->acceptSocket) {
-        printf("socker failed\n");
-        log_debug("socker failed %s %d",client->ip,client->port);
+        log_debug("与服务器建立连接失败 %s %d",client->ip,client->port);
         WSACleanup();
         return -2;
     }
+
+    //log_debug("尝试连接服务器");
 
     //设置服务器地址
     servAddr.sin_family = AF_INET;
@@ -96,7 +104,7 @@ int tcp_client_doth(client_info *client)
     std::thread th(ThreadClient_recv,client);
     usleep(1000*30);
     th.detach();
-    log_debug("tcp_client_do_conn %s %d ok",client->ip,client->port);
+    //log_debug("与服务器建立连接成功 %s %d",client->ip,client->port);
 
     return 0;
 }
@@ -139,12 +147,15 @@ int stop_tcp_client_th(SOCKET *sSocket)
 //接收到Modbus协同控制器报文
 int modbus_recv(char *buf,int len,SOCKET recvSocket)
 {
+
 log_debug("接收到协同控制报文，数据长度: %d", len);
 
     printf_hex((uchar_8 *)buf,len);
 
-    if(buf==NULL || len<1)
-        return 0;
+    if(controlMain == NULL){
+        log_debug("controlMain初始化未完成");
+        return -1;
+    }
 
     if(controlMain->webSocket==NULL || !controlMain->webSocket->isRunning()) return -1;
 
@@ -160,6 +171,10 @@ log_debug("接收到协同控制报文，数据长度: %d", len);
 //给Modbus协同控制器发送报文请求数据
 int modbus_send(SOCKET recvSocket)
 {
+    if(recvSocket == NULL){
+        return -1;
+    }
+
 log_debug("向协同控制器请求数据");
 
     static uint16_t selfMoveCount=0x0500;//这里只有modbus master用的计数器
@@ -193,14 +208,28 @@ log_debug("向协同控制器请求数据");
 //接收到can总线转来的报文
 int can_recv(char *buf,int len,SOCKET recvSocket)
 {
-log_debug("接收到掘进机工况数据，数据长度: %d", len);
-    if(buf == NULL || len < 1)
-        return 0;
+    if(recvSocket == NULL){
+        log_debug("can_recv: recvsocket is null");
+        return -1;
+    }
+
+    log_debug("接收到掘进机工况数据，数据长度: %d", len);
+
+    if(controlMain == NULL){
+        log_debug("controlMain初始化未完成");
+        return -1;
+    }
+
+    if(controlMain->webSocket==NULL || !controlMain->webSocket->isRunning()){
+        log_debug("WebSocket服务未运行");
+        return -1;
+    }
 
     QByteArray bytes = QByteArray(buf,len);
 
     //处理报文并推送给JAVA
     if(controlMain->webSocket != NULL){
+        log_debug("准备解析报文");
         emit controlMain->webSocket->broadcast_binary_can(bytes);
     }
     return 0;

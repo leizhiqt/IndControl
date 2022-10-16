@@ -7,6 +7,7 @@
 #include <QDebug>
 
  //解析位姿系统工况数据报文
+ //2022-10-15修改报文协议，增加字段
  void conver_xly_frame_to_json(const char *frame_buf,const int len, char *str_json)
  {
      request_xly_t *p;
@@ -19,19 +20,25 @@
         response_xly_qjson.insert("method", "gesturedata");
 
         QJsonObject parms;
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r3));parms.insert("bodyxvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r4));parms.insert("bodyyvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r5));parms.insert("bodyzvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r6));parms.insert("bodyfyangle",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r7));parms.insert("bodyhgangle",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r8));parms.insert("bodyhxangle",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r9));parms.insert("headxvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r10));parms.insert("headyvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r11));parms.insert("headzvalue",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r12));parms.insert("headfyangle",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r13));parms.insert("headhgangle",hexs);
-        sprintf(hexs,"%0.2f",byte4_to_float32(p->r14));parms.insert("headhxangle",hexs);
-        sprintf(hexs,"%d",p->r15);parms.insert("qzystate",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r3));parms.insert("X坐标测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r4));parms.insert("Y坐标测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r5));parms.insert("Z坐标测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r6));parms.insert("俯仰角测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r7));parms.insert("横滚角测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r8));parms.insert("航向角测量值(机身)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r9));parms.insert("X坐标测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r10));parms.insert("Y坐标测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r11));parms.insert("Z坐标测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r12));parms.insert("回转测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r13));parms.insert("伸缩测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r14));parms.insert("抬升测量值(截割头)",hexs);
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r15));parms.insert("后置相机连接状态",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r16));parms.insert("雷达连接状态",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r17));parms.insert("惯导连接状态",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r18));parms.insert("倾角传感器连接状态",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r19));parms.insert("油缸行程传感器连接状态",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r20));parms.insert("截割完成",hexs);//2022-10-15新增
+        sprintf(hexs,"%0.2f",byte4_to_float32(p->r21));parms.insert("截割暂停",hexs);//2022-10-15新增
 
         response_xly_qjson.insert("params", parms);
         QJsonDocument document;
@@ -41,7 +48,6 @@
         memcpy(str_json,str_p,bytes.size());
      }
  }
-
 
  //解析掘进机工况数据报文
  //原函数是void，现改成返回int
@@ -245,16 +251,6 @@
                 log_debug("cobid不存在");
                 return 0;
             }
-            /*
-            if(cobid == 0x0587){
-                log_debug("cobid:587,未使用的COBID,不需要解析");
-                return 0;
-            }
-            if(cobid == 0x006E){
-                log_debug("cobid:06E,未使用的COBID,不需要解析");
-                return 0;
-            }
-            */
         }else{
             log_debug("非08开头的报文,不需要解析");
             return 0;

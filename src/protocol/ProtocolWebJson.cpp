@@ -8,6 +8,7 @@
 #include "UWLog.h"
 
 /* 这是websocket 收到消息 */
+/* 2022-10-15 修改，增加截割轨迹编号 */
 void ProtocolWebJson::recvTextMessage(const QString &content)
 {
     //JAVA发来的消息
@@ -158,7 +159,11 @@ void ProtocolWebJson::recvTextMessage(const QString &content)
         ust_value.va_float = valueContent.value("diginspeed").toString().toFloat();
         swap_byte32(response_xly.r28,ust_value.ascii);
 
-        response_xly.r29 = 0xBF;
+        //2022-10-15新增[截割轨迹编号]
+        ust_value.va_float = valueContent.value("trackno").toString().toFloat();
+        swap_byte32(response_xly.r29,ust_value.ascii);
+
+        response_xly.r30 = 0xBF;
         printf_hex((unsigned char *)&response_xly,sizeof(response_xly_t));
 
         //将报文下发给位姿系统客户端

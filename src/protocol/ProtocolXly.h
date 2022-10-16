@@ -16,55 +16,62 @@ typedef struct _request_opencan_t request_opencan_t;
 
 struct _response_xly_t
  {
-    uchar_8 r1;
-    uchar_8 r2;
-    uchar_8 r3[4];
-    uchar_8 r4[4];
-    uchar_8 r5[4];
-    uchar_8 r6;
-    uchar_8 r7;
-    uchar_8 r8;
-    uchar_8 r9[4];
-    uchar_8 r10[4];
-    uchar_8 r11[4];
-    uchar_8 r12[4];
-    uchar_8 r13[4];
-    uchar_8 r14[4];
-    uchar_8 r15[4];
-    uchar_8 r16[4];
-    uchar_8 r17[4];
-    uchar_8 r18[4];
-    uchar_8 r19[4];
-    uchar_8 r20[4];
-    uchar_8 r21[4];
-    uchar_8 r22[4];
-    uchar_8 r23[4];
-    uchar_8 r24[4];
-    uchar_8 r25[4];
-    uchar_8 r26[4];
-    uchar_8 r27[4];
-    uchar_8 r28[4];
-    uchar_8 r29;
+    uchar_8 r1;     //通讯头1
+    uchar_8 r2;     //通讯头2
+    uchar_8 r3[4];  //初始经度
+    uchar_8 r4[4];  //初始纬度
+    uchar_8 r5[4];  //初始高度
+    uchar_8 r6;     //惯导标定,触发指令：0x01:触发；0x00：未触发
+    uchar_8 r7;     //回转油缸标定,触发指令：0x01:触发；0x00：未触发
+    uchar_8 r8;     //后置视觉标定,触发指令：0x01:触发；0x00：未触发
+    uchar_8 r9[4];  //激光A点X坐标
+    uchar_8 r10[4]; //激光A点Y坐标
+    uchar_8 r11[4]; //激光A点Z坐标
+    uchar_8 r12[4]; //激光B点X坐标
+    uchar_8 r13[4]; //激光B点Y坐标
+    uchar_8 r14[4]; //激光B点Z坐标
+    uchar_8 r15[4]; //激光C点X坐标
+    uchar_8 r16[4]; //激光C点Y坐标
+    uchar_8 r17[4]; //激光C点Z坐标
+    uchar_8 r18[4]; //激光A1点X坐标
+    uchar_8 r19[4]; //激光A1点Y坐标
+    uchar_8 r20[4]; //激光A1点Z坐标
+    uchar_8 r21[4]; //激光B1点X坐标
+    uchar_8 r22[4]; //激光B1点Y坐标
+    uchar_8 r23[4]; //激光B1点Z坐标
+    uchar_8 r24[4]; //激光C1点X坐标
+    uchar_8 r25[4]; //激光C1点Y坐标
+    uchar_8 r26[4]; //激光C1点Z坐标
+    uchar_8 r27[4]; //截割深度
+    uchar_8 r28[4]; //掘进速度
+    uchar_8 r29[4]; //截割轨迹编号
+    uchar_8 r30;    //结束符(2022-10-15新增）
  };
 
  struct _request_xly_t
  {
-     uchar_8 r1;
-     uchar_8 r2;
-     uchar_8 r3[4];
-     uchar_8 r4[4];
-     uchar_8 r5[4];
-     uchar_8 r6[4];
-     uchar_8 r7[4];
-     uchar_8 r8[4];
-     uchar_8 r9[4];
-     uchar_8 r10[4];
-     uchar_8 r11[4];
-     uchar_8 r12[4];
-     uchar_8 r13[4];
-     uchar_8 r14[4];
-     uchar_8 r15;
-     uchar_8 r16;
+     uchar_8 r1;        //通讯头1
+     uchar_8 r2;        //通讯头2
+     uchar_8 r3[4];     //X坐标测量值（机身)
+     uchar_8 r4[4];     //Y坐标测量值（机身)
+     uchar_8 r5[4];     //Z坐标测量值（机身)
+     uchar_8 r6[4];     //俯仰角测量值（机身)
+     uchar_8 r7[4];     //横滚角测量值（机身)
+     uchar_8 r8[4];     //航向角测量值（机身)
+     uchar_8 r9[4];     //X坐标测量值（截割头)
+     uchar_8 r10[4];    //Y坐标测量值（截割头)
+     uchar_8 r11[4];    //Z坐标测量值（截割头)
+     uchar_8 r12[4];    //回转测量值（截割头)
+     uchar_8 r13[4];    //伸缩测量值（截割头)
+     uchar_8 r14[4];    //抬升测量值（截割头)
+     uchar_8 r15[4];    //后置相机连接状态
+     uchar_8 r16[4];    //雷达连接状态
+     uchar_8 r17[4];    //惯导连接状态
+     uchar_8 r18[4];    //倾角传感器连接状态
+     uchar_8 r19[4];    //油缸行程传感器连接状态
+     uchar_8 r20[4];    //截割完成
+     uchar_8 r21[4];    //截割暂停
+     uchar_8 r22;       //结束符
  };
 
  void conver_xly_frame_to_json(const char *str_json,const int len, char *frame_buf);

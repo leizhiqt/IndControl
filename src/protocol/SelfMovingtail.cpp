@@ -6,6 +6,7 @@
 #include "UWLog.h"
 #include <QDebug>
 
+/* 自移机尾 */
 void conver_selfmovetail_to_json(const char *frame_buf,const int len, char *str_json)
 {
     selfmoveingtail_t *p;

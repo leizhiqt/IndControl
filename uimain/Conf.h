@@ -52,6 +52,10 @@ public:
 
         QStringList controlNameList;//设备控制名称
         QStringList controlValueList;//设备控制报文
+
+        std::map<std::string,QByteArray> conf_storage_packs;//寄存器地址与CAN头
+        QStringList storageKeyList;//寄存器地址
+        QStringList storageValueList;//CAN报文头
 public:
         ~Conf();
         static Conf * getInstance()//2.提供全局访问点

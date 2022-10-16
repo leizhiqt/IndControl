@@ -4,6 +4,7 @@
 #include<WinSock2.h>
 #include<WS2tcpip.h>
 #include<vector>
+#include <QString>
 
 typedef struct _client_info client_info;
 typedef struct _server_info server_info_t;
@@ -29,5 +30,7 @@ int tcp_server_broadcast(server_info_t *s_info,char *buf,int len);
 void recvXly(char *buf,int len,SOCKET recvSocket);
 //接收到操作台发来的报文
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket);
+
+QString toHexadecimal(const QByteArray &byteArray);
 
 #endif // WTCPSERVER_H

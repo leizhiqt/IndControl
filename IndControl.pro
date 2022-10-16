@@ -10,7 +10,7 @@
 buildDir = $$PWD/build/win64
 TARGET_ARCH = x64
 
-QT       += gui network websockets serialbus
+QT       += gui network websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

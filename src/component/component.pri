@@ -3,6 +3,7 @@ LIBS +=
 
 HEADERS += \
     $$PWD/QTcpComponentl.h \
+    $$PWD/WModbusTcpClient.h \
     $$PWD/WTcpClient.h \
     $$PWD/WTcpServer.h \
     $$PWD/WebSocket.h \
@@ -11,6 +12,7 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/QTcpComponentl.cpp \
+    $$PWD/WModbusTcpClient.cpp \
     $$PWD/WTcpClient.cpp \
     $$PWD/WTcpServer.cpp \
     $$PWD/WebSocket.cpp \

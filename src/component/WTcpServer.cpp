@@ -10,6 +10,7 @@
 
 #include <thread>
 #include <unistd.h>
+#include <string.h>
 
 int serv_dowork(void* lpParameter);
 
@@ -164,89 +165,158 @@ int serv_dowork(void* lpParameter)
 /* 接收到位姿系统发来的数据 */
 void recvXly(char *buf,int len,SOCKET recvSocket)
 {
+    log_debug("位姿系统发来数据");
     if(buf==NULL || len<1)
             return;
-
+    if(recvSocket == NULL){
+        log_debug("recvSocket is null");
+        return;
+    }
     printf_hex((unsigned char*)buf,len);
 
     //信号槽机制 广播websocket
     emit controlMain->webSocket->broadcast_binary(QByteArray(buf,len));
 }
 
+QString toHexadecimal(const QByteArray &byteArray)
+{
+    QString str;
+    for(int i = 0; i< byteArray.length(); i++){
+        QString byteStr = QString::number(static_cast<uchar>(byteArray[i]), 16);
+        if(byteStr.length() == 1) str += "0" + byteStr;
+        else str += byteStr;
+    }
+    return str;
+}
+
 /* 接收到modbus发来的控制指令 */
 void recvModbusTcp(char *buf,int len,SOCKET recvSocket)
 {
-    log_debug("转发Modbus数据给can");
-    if(buf==NULL || len<1){
-        log_debug("长度为0，不转发");
+    if(buf==NULL){
+        log_debug("报文内容为空,不转发");
         return;
     }
 
-    //如果功能码是06(修改)
-    if(buf[7] == 0x06)
-    {
-        log_debug("功能码06");
-        char *nth_byte = buf+8;
-        ntoh_16(nth_byte);
-        //得到数据修改地址
-        uint16_t ret_inx= *((uint16_t *)(nth_byte));
-        //替换相应数据
-        slave_reg.r_slave[2*ret_inx]=buf[10];
-        slave_reg.r_slave[2*ret_inx+1]=buf[11];
+    if(recvSocket == NULL){
+        log_debug("与交换机的连接未完成,不转发");
+        return;
+    }
 
-        //printf_hex((unsigned char *)buf,len);
-        //log_debug("===================== %04x %d %02x %02x",ret_inx,ret_inx,slave_reg.r_slave[ret_inx],slave_reg.r_slave[ret_inx+1]);
-        //printf_hex((unsigned char *)slave_reg.r_slave,10);
+    //去除左边13个字节
+    char hexs[512]={0};
+    sprintf_hex(hexs,(unsigned char *)(buf+13),100);
+    QString newHexstrT(hexs);
+    //log_debug("控制台发来的报文:%s",newHexstrT.toLatin1().data());
 
-        //给操作台的响应桢(同请求帧相同)
-        //tcp_client_send(recvSocket,(char *)buf,len);
+    //用来保存值不为0的寄存器地址和值
+    QStringList addList;
+    QStringList valueList;
 
-        //以下去INI文件中匹配操作台报文
-        //得到对应的canOpen报文,然后通过tcpClient发给给can总线(22004端口)
-        char hexs[512]={0};
-        sprintf_hex(hexs,(unsigned char *)(buf+2),len-2);
-        QString cmdstr = "ControlSet/";
-        QString hexstr(hexs);
-        hexstr.remove(QRegExp("\\s"));
-        cmdstr.append(hexstr.toUpper());
+    //每次取2个字节，寄存器地址从40000开始
+    int32_t storageAdd = 40000;
+    newHexstrT.remove(QRegExp("\\s"));
+    int iIndex = 0;
+    for(int i = 0; i < 50; i++){
+       QString tmpValue = newHexstrT.mid(iIndex,4);
+       if(tmpValue.compare("0000")){
+           addList.append(QString::number(storageAdd));
+           valueList.append(tmpValue.toStdString().data());
+       }
+       storageAdd++;
+       iIndex += 4;
+    }
 
-        std::string stdcmd=cmdstr.toStdString();
-        std::map<std::string,QByteArray>::iterator iter = Conf::getInstance()->conf_can_packs.find(stdcmd);
-        if(iter != Conf::getInstance()->conf_can_packs.end())
-        {
-            //获得命令内容
-            //log_debug("is find %s",cmdstr.toLatin1().data());
-            QByteArray qbuf = iter->second;
-            char *buf = qbuf.begin();
-            //printf_hex((unsigned char *)buf,qbuf.length());
-            tcp_client_send(controlMain->can_client.acceptSocket,buf,qbuf.length());
+    //判断一下有不有不为0的寄存器地址
+    if(addList.count() == 0){
+        log_debug("从控制台发来的报文中没有检测到值不为0的情况");
+        return;
+    }
+
+    //从配置文件中检测报文头
+    QStringList canHeadList;
+    QStringList canValueList;
+    for(int i = 0 ; i < addList.count(); i++){
+        QString strAdd = addList.at(i);//取得寄存器地址
+        QString strValue = valueList.at(i);//取得值
+        //log_debug("地址：%s，值：%s",strAdd.toStdString().data(),strValue.toStdString().data());
+        std::string stdStrAdd = strAdd.toStdString();
+        std::map<std::string,QByteArray>::iterator itfind = Conf::getInstance()->conf_storage_packs.find(stdStrAdd);
+        //查找报文头
+        if(itfind != Conf::getInstance()->conf_storage_packs.end()){
+            QByteArray qbuf = itfind->second;
+            QString name = toHexadecimal(qbuf);
+            canValueList.append(strValue);
+            canHeadList.append(name);
+            //log_debug("报文头：%s, 值：%s",name.toStdString().data(),strValue.toStdString().data());
         }
-        else{
-            log_debug("未能识别的指令 %s",cmdstr.toLatin1().data());
-        }
-        return ;
+    }
+
+    if(canHeadList.count() == 0){
+        log_debug("从控制台发来的报文中没有检测到报文头");
+        return;
+    }
+
+    //检查有不有重复的报文头，如果有则将其值转为二进制相加后转为十六制
+    QStringList newCanHead;
+    QStringList newCanValue;
+    //如果只有一条记录
+    if(canHeadList.count() == 1){
+        newCanHead.append(canHeadList.at(0));
+        newCanValue.append(canValueList.at(0));
     }else{
-        log_debug("非控制指令不转发");
-    }
-/*
-    if(buf[7] == 0x03){
-        int in = 4;
-        int rlen =(buf[11]*2 + in);//返回的数据个数
-        int slen = rlen+5;
-        memset(slave_reg.slave_buf,'\0',sizeof(slave_reg.slave_buf));
-        memcpy(slave_reg.slave_buf,buf,5);//校验信息，MODBUS协议
-        slave_reg.slave_buf[5]=rlen;//数据长度
-        slave_reg.slave_buf[6]=buf[6];//功能码
-        slave_reg.slave_buf[7]=buf[7];//ID
-        slave_reg.slave_buf[8]=rlen-in;//数据个数
-        if(buf[11]%2==0){
-            memcpy(slave_reg.slave_buf+9,slave_reg.r_slave,slave_reg.slave_buf[8]);//偶数
-        }else{
-            memset(slave_reg.slave_buf+9,'\0',slave_reg.slave_buf[8]);
+        for(int i = 0; i < canHeadList.count(); i++){
+            for(int k = i + 1; k < canHeadList.count(); k++){
+                if(canHeadList.at(i).compare(canHeadList.at(k))){
+                    //这里说明出现了相同的报文头
+                    QString firstValue = canValueList.at(i);
+                    QString secondValue = canValueList.at(k);
+                    bool ok;
+                    //把这两个相同报文头对应的值取到转成10进制了
+                    unsigned int intFirst = firstValue.toInt(&ok,10);
+                    unsigned int intSecond = secondValue.toInt(&ok,10);
+                    //这两个值相加然后要转成16进制
+                    unsigned int nResult = intFirst + intSecond;
+                    newCanHead.append(canHeadList.at(i));
+                    newCanValue.append(QString::number(nResult, 16));
+                }
+            }
         }
-        //这里是给操作台的响应桢
-        tcp_client_send(recvSocket,(char *)slave_reg.slave_buf,slen);
-        return ;
     }
-*/
+
+    //分别取出报文头和值与配置文件进行校验
+    if(newCanHead.count() == 0){
+        //log_debug("去除重复后，从控制台发来的报文中没有检测到报文头");
+        return;
+    }
+    QByteArray sendData;
+    for(int i = 0; i < newCanHead.count(); i++){
+        QString tmpCanHead = newCanHead.at(i);
+        QString tmpCanValue = newCanValue.at(i);
+        std::map<std::string,QByteArray> ab = Conf::getInstance()->conf_can_packs;
+        std::map<std::string,QByteArray>::iterator iter;
+        for(iter=ab.begin();iter!=ab.end();++iter){
+            QByteArray qbuf = iter->second;
+            QString rptText = toHexadecimal(qbuf);
+            //比较报文头
+            if(rptText.contains(tmpCanHead)){
+                //报文头对上了，接着比较值对不对
+                int iIndex = 10;
+                for(int i = 0; i < 4; i++){
+                   QString tmpValue = rptText.mid(iIndex,4);
+                   if(tmpValue.compare(tmpCanValue) == 0){
+                       sendData.append(qbuf);
+                       //log_debug("匹配上报文：%s",rptText.toStdString().data());
+                   }
+                   iIndex += 4;
+                }
+            }
+        }
+    }
+
+    //如果匹配结果不为空
+    if(sendData.count() > 0){
+        char *buf = sendData.begin();
+        tcp_client_send(controlMain->can_client.acceptSocket,buf,sendData.length());
+        //log_debug("推送报文：%s",toHexadecimal(sendData).toStdString().data());
+    }
 }

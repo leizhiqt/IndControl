@@ -11,6 +11,7 @@
 #include "WTcpServer.h"
 #include "WModbusTcp.h"
 #include "WebSocketCommand.h"
+#include "WModbusTcpClient.h"
 
 #include "CanOpenUI.h"
 
@@ -51,6 +52,8 @@ public:
 
     //位姿系统
     server_info_t *xly_srv;
+
+    uint16_t nowValue = 0; //寄存器地址29当前的值
 };
 
 extern ControlMain *controlMain;
